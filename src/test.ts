@@ -4,12 +4,13 @@ const httpsAgent = new https.Agent({
   rejectUnauthorized: true,
 });
 
-const Protocol = 'https'
-const Username = 'root'
-const Password = 'root'
+const Protocol = 'http'
+const Username = 'postman'
+const Password = 'password'
 const CameraIP = '192.168.50.34'
 const Path = 'axis-cgi/applications/list.cgi'
-const url = `${Protocol}://${CameraIP}/${Path}`
+// const url = `${Protocol}://${Username}@${CameraIP}/${Path}`
+const url = "https://postman-echo.com/basic-auth"
 
 class Request {
   url: string;
