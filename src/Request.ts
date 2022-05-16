@@ -1,29 +1,31 @@
-import { stringify } from 'querystring';
 import { HttpMethod } from 'urllib';
 
-// Class that defines request
+// Class that defines a request
+
 class Request {
   url: string;
-  username: string
-  password: string
-  method: HttpMethod
-  args: Map <string, string>
+  username: string;
+  password: string;
+  method: HttpMethod;
+  args: Map <string, string>;
+  options:urllib.RequestOptions;
 
-  constructor(url:string, method:HttpMethod, username:string, password:string, args:Map<string, string>){
+  constructor(url:string, method:HttpMethod, username:string, password:string, args:Map<string, string>, options:urllib.RequestOptions){
     this.url = url;
     this.username = username;
     this.password = password;
     this.method = method;
     this.args = args;
+    this.options = options
 
     if(this.args.size > 0){
       this.url = this.addArgumentsToURL(this.url, this.args);
       console.log(this.url)
     }
     if(this.method == 'POST'){
-
+      // @TODO
     }else if(this.method == 'GET'){
-
+      // @TODO
     }
   }
 
@@ -52,6 +54,9 @@ class Request {
   }
   getargs() : Map<string, string>{
     return this.args;
+  }
+  getOptions():urllib.RequestOptions{
+    return this.options;
   }
   
 }
