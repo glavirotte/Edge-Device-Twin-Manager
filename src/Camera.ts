@@ -4,18 +4,20 @@ import http from 'http'
 const xml2js = require('xml2js');
 
 class Camera {
-    id:string
-    ipAddress:string
+    id:string;
+    ipAddress:string;
+    data:any;
 
     constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = id;
+        this.data = {};
     }
 
 /*-------------------------Camera Methods-------------------------*/
 
     // Get json object from a Request sent to the camera
-    getCameraData(req: Request){
+    async getCameraData(req: Request){
         try {
         // const response: Response
         const options:urllib.RequestOptions = {
@@ -46,25 +48,24 @@ class Camera {
             }
             // result is a JavaScript object
             // convert it to a JSON string
-            const json = JSON.stringify(result, null, 4);
-            
-            // log JSON string
-            console.log(json);
+            this.data = result
+            this.displayData()
+            return result;
             });
             
         }
     
         // Send request to the camera
         httpClient.request(req.getURL(), options, responseHandler)
-    
+
         } catch (error) {
-        if (error instanceof Error) {
-            console.log('error message: ', error.message);
-            return error.message;
-        } else {
-            console.log('unexpected error: ', error);
-            return 'An unexpected error occurred';
-        }
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+                return error.message;
+            } else {
+                console.log('unexpected error: ', error);
+                return 'An unexpected error occurred';
+            }
         }
     }
 
@@ -76,6 +77,14 @@ class Camera {
     getIPAddress():string{
         return this.ipAddress;
     }
+    getData():any{
+        return this.data;
+    }
+    displayData():string{
+        const json = JSON.stringify(this.data, null, 2);
+        console.log(json);
+        return json;
+    }
 }
 
-export {Camera}
+export { Camera }

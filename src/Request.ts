@@ -1,3 +1,4 @@
+import { stringify } from 'querystring';
 import { HttpMethod } from 'urllib';
 
 // Class that defines request
@@ -16,7 +17,8 @@ class Request {
     this.args = args;
 
     if(this.args.size > 0){
-      this.addArgumentsToURL();
+      this.url = this.addArgumentsToURL(this.url, this.args);
+      console.log(this.url)
     }
     if(this.method == 'POST'){
 
@@ -26,11 +28,12 @@ class Request {
   }
 
   /* Concatenates arguments from a hashMap to the URL*/
-  addArgumentsToURL(){
-    this.url += '?'
-    this.args.forEach((values, keys) => {
-      this.url += values+'='+keys+'&';
+  addArgumentsToURL(url:string, args:Map<string, string>):string{
+    url += '?'
+    args.forEach((values, keys) => {
+      url += keys+'='+values+'&';
     });
+    return url
   }
 
   /* Getters & setters */

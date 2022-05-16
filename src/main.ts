@@ -11,7 +11,7 @@ const method: HttpMethod = 'GET'
 const url = `${protocol}://${cameraIP}/${path}`
 const args:Map<string, string> = new Map()
 
-const cam = new Camera('camera1', cameraIP)
-const req = new Request(url, method, username, password, args);
+const camera = new Camera('camera1', cameraIP) // Create Camera object
+const request = new Request(url, method, username, password, args); // Create Request
 
-cam.getCameraData(req)
+camera.getCameraData(request)  // Query to Camera

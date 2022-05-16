@@ -10,10 +10,11 @@ class Camera {
     constructor(id, ipAddress) {
         this.ipAddress = ipAddress;
         this.id = id;
+        this.data = {};
     }
     /*-------------------------Camera Methods-------------------------*/
     // Get json object from a Request sent to the camera
-    getCameraData(req) {
+    async getCameraData(req) {
         try {
             // const response: Response
             const options = {
@@ -42,9 +43,8 @@ class Camera {
                     }
                     // result is a JavaScript object
                     // convert it to a JSON string
-                    const json = JSON.stringify(result, null, 4);
-                    // log JSON string
-                    console.log(json);
+                    this.data = result;
+                    this.displayData();
                 });
             };
             // Send request to the camera
@@ -67,6 +67,14 @@ class Camera {
     }
     getIPAddress() {
         return this.ipAddress;
+    }
+    getData() {
+        return this.data;
+    }
+    displayData() {
+        const json = JSON.stringify(this.data, null, 2);
+        console.log(json);
+        return json;
     }
 }
 exports.Camera = Camera;
