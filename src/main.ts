@@ -1,6 +1,6 @@
 import { HttpMethod } from 'urllib'
-import { Camera } from './Camera'
-import { Request } from './Request'
+import { Camera } from "./Camera"
+import { Request } from "./Request"
 
 const protocol = 'https'
 const username = 'root'

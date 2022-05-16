@@ -14,11 +14,7 @@ class Request {
         }
         if (this.method == 'POST') {
         }
-        if (this.method == 'GET') {
-            console.log("equal");
-        }
-        if (this.method === 'GET') {
-            console.log("equal");
+        else if (this.method == 'GET') {
         }
     }
     /* Concatenates arguments from a hashMap to the URL*/
