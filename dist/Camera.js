@@ -10,7 +10,7 @@ class Camera {
     constructor(id, ipAddress) {
         this.ipAddress = ipAddress;
         this.id = id;
-        this.data = {};
+        this.data = JSON.parse('{}');
     }
     /*-------------------------Camera Methods-------------------------*/
     // Get json object from a Request sent to the camera
@@ -30,10 +30,10 @@ class Camera {
                 }
             };
             // Send request to the camera
-            // httpClient.request(req.getURL(), options, responseHandler)
             const result = await urllib_1.default.request(req.getURL(), options);
-            this.data = (0, Utils_1.xml2json)(result.data);
-            return this.data;
+            const tmp = (0, Utils_1.xml2json)(result.data);
+            // console.log(this.data)
+            return result;
         }
         catch (error) {
             if (error instanceof Error) {

@@ -6,17 +6,18 @@ import {xml2json} from './Utils'
 class Camera {
     id:string;
     ipAddress:string;
-    data:any;
+    data:JSON;
 
     constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = id;
-        this.data = {};
+        this.data = JSON.parse('{}');
     }
 
 /*-------------------------Camera Methods-------------------------*/
 
     // Get json object from a Request sent to the camera
+    
     async getCameraData(req: Request){
         try {
         // const response: Response
@@ -34,10 +35,10 @@ class Camera {
         };
         
         // Send request to the camera
-        // httpClient.request(req.getURL(), options, responseHandler)
         const result = await httpClient.request(req.getURL(), options)
-        this.data = xml2json(result.data)
-        return this.data;
+        const tmp = xml2json(result.data)
+        // console.log(this.data)
+        return result;
 
         } catch (error) {
             if (error instanceof Error) {
