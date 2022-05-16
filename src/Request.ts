@@ -8,14 +8,24 @@ class Request {
   username: string
   password: string
   method: HttpMethod
-  args: string[];
+  args: Map <string, string>
 
-  constructor(url: string, method:HttpMethod, username:string, password: string, args: string[]){
+  constructor(url:string, method:HttpMethod, username:string, password:string, args:Map<string, string>){
     this.url = url;
     this.username = username;
     this.password = password;
     this.method = method;
     this.args = args;
+    if(this.args.size > 0){
+      this.addArgumentsToURL();
+    }
+  }
+
+  addArgumentsToURL(){
+    this.url += '?'
+    this.args.forEach((values, keys) => {
+      this.url += values+'='+keys+'&';
+    });
   }
 
   getURL() : string {
@@ -30,7 +40,7 @@ class Request {
   getPassword() : string {
     return this.password;
   }
-  getargs() : string[]{
+  getargs() : Map<string, string>{
     return this.args;
   }
 }
@@ -66,7 +76,7 @@ async function getCameraData(req: Request){
         if(err) {
             throw err;
         }
-        // `result` is a JavaScript object
+        // result is a JavaScript object
         // convert it to a JSON string
         const json = JSON.stringify(result, null, 4);
       
