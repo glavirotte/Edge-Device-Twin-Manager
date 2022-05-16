@@ -4,12 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const urllib_1 = __importDefault(require("urllib"));
-const protocol = 'https';
-const username = 'root';
-const password = 'root';
-const cameraIP = '192.168.50.34';
-const path = 'axis-cgi/applications/list.cgi';
-// const url = `${protocol}://${cameraIP}/${path}`
 const url = 'https://postman-echo.com/digest-auth';
 class Request {
     constructor(url, args) {

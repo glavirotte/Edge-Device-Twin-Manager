@@ -1,15 +1,13 @@
-import fetch from 'node-fetch';
-import https from 'https';
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: true,
-});
+import httpClient from 'urllib';
+import http from 'http'
 
-const Protocol = 'https'
-const Username = 'root'
-const Password = 'root'
-const CameraIP = '192.168.50.34'
-const Path = 'axis-cgi/applications/list.cgi'
-const url = `${Protocol}://${CameraIP}/${Path}`
+const protocol = 'https'
+const username = 'root'
+const password = 'root'
+const cameraIP = '192.168.50.34'
+const path = 'axis-cgi/applications/list.cgi'
+const method = 'GET'
+const url = `${protocol}://${cameraIP}/${path}`
 
 class Request {
   url: string;
@@ -25,32 +23,31 @@ class Request {
   }
 }
 
-type Field = {};
-
-type CameraResponse = {
-  data: Field[];
-};
-
 async function getCameraData(req: Request){
   try {
     // const response: Response
-    const response = await fetch(req.getURL(), {
-      method: req.args[0],
-      agent: httpsAgent,
+    const options:urllib.RequestOptions = {
+      method: method,
+      rejectUnauthorized: false,
+      // auth: "username:password" use it if you want simple auth
+      digestAuth: `${username}:${password}`,
       headers: {
-        Authorization: 'Basic ' + Buffer.from(`${Username}:${Password}`).toString('base64')
+         //'Content-Type': 'application/xml'  use it if payload is xml
+         //'Content-Type': 'application/json' use it if payload is json 
+        'Content-Type': 'application/text'
       }
-    })
+    };
 
-    if (!response.ok) {
-      throw new Error(`Error! status: ${response.status}`);
+    const responseHandler = (err: Error, data: string, res: http.IncomingMessage) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(res.statusCode);
+      console.log(res.headers);
+      console.log(data);
     }
 
-    // const result: CameraResponse
-    const result = (await response.json()) as string;
-    // console.log('result is:\n', JSON.stringify(result, null, 4));
-    console.log(result)
-    return result;
+    httpClient.request(req.getURL(), options, responseHandler)
 
   } catch (error) {
     if (error instanceof Error) {
@@ -63,5 +60,5 @@ async function getCameraData(req: Request){
   }
 }
 
-const req = new Request(url, ['GET'])
+const req = new Request(url, [])
 getCameraData(req);
