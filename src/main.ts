@@ -1,5 +1,6 @@
 import { HttpMethod } from 'urllib'
-import { Request, getCameraData } from './Request'
+import { Camera } from './Camera'
+import { Request } from './Request'
 
 const protocol = 'https'
 const username = 'root'
@@ -10,5 +11,7 @@ const method: HttpMethod = 'GET'
 const url = `${protocol}://${cameraIP}/${path}`
 const args:Map<string, string> = new Map()
 
+const cam = new Camera('camera1', cameraIP)
 const req = new Request(url, method, username, password, args);
-getCameraData(req);
+
+cam.getCameraData(req)
