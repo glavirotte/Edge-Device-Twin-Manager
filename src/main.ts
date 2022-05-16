@@ -1,5 +1,6 @@
 import httpClient from 'urllib';
 import http from 'http'
+const xml2js = require('xml2js');
 
 const protocol = 'https'
 const username = 'root'
@@ -34,17 +35,30 @@ async function getCameraData(req: Request){
       headers: {
          //'Content-Type': 'application/xml'  use it if payload is xml
          //'Content-Type': 'application/json' use it if payload is json 
-        'Content-Type': 'application/text'
+        'Content-Type': 'application/xml'
       }
     };
 
-    const responseHandler = (err: Error, data: string, res: http.IncomingMessage) => {
+    const responseHandler = (err: Error, data: any, res: http.IncomingMessage) => {
       if (err) {
         console.log(err);
       }
       console.log(res.statusCode);
       console.log(res.headers);
-      console.log(data);
+      console.log(data.toString());
+
+      xml2js.parseString(data, (err:Error, result:JSON) => {
+        if(err) {
+            throw err;
+        }
+        // `result` is a JavaScript object
+        // convert it to a JSON string
+        const json = JSON.stringify(result, null, 4);
+      
+        // log JSON string
+        console.log(json);
+      });
+      
     }
 
     httpClient.request(req.getURL(), options, responseHandler)

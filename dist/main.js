@@ -4,13 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const urllib_1 = __importDefault(require("urllib"));
+const xml2js = require('xml2js');
 const protocol = 'https';
 const username = 'root';
 const password = 'root';
 const cameraIP = '192.168.50.34';
 const path = 'axis-cgi/applications/list.cgi';
-// const url = `${protocol}://${cameraIP}/${path}`
-const url = 'https://postman-echo.com/digest-auth';
+const method = 'GET';
+const url = `${protocol}://${cameraIP}/${path}`;
 class Request {
     constructor(url, args) {
         this.url = url;
@@ -24,14 +25,14 @@ async function getCameraData(req) {
     try {
         // const response: Response
         const options = {
-            method: 'GET',
+            method: method,
             rejectUnauthorized: false,
             // auth: "username:password" use it if you want simple auth
-            digestAuth: "postman:password",
+            digestAuth: `${username}:${password}`,
             headers: {
                 //'Content-Type': 'application/xml'  use it if payload is xml
                 //'Content-Type': 'application/json' use it if payload is json 
-                'Content-Type': 'application/text'
+                'Content-Type': 'application/xml'
             }
         };
         const responseHandler = (err, data, res) => {
@@ -40,7 +41,17 @@ async function getCameraData(req) {
             }
             console.log(res.statusCode);
             console.log(res.headers);
-            console.log(data);
+            console.log(data.toString());
+            xml2js.parseString(data, (err, result) => {
+                if (err) {
+                    throw err;
+                }
+                // `result` is a JavaScript object
+                // convert it to a JSON string
+                const json = JSON.stringify(result, null, 4);
+                // log JSON string
+                console.log(json);
+            });
         };
         urllib_1.default.request(req.getURL(), options, responseHandler);
     }
@@ -55,5 +66,5 @@ async function getCameraData(req) {
         }
     }
 }
-const req = new Request(url, ['GET']);
+const req = new Request(url, []);
 getCameraData(req);

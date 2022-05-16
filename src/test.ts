@@ -1,58 +1,26 @@
-import httpClient from 'urllib';
-import http from 'http'
+const xml2js = require('xml2js');
 
-const url = 'https://postman-echo.com/digest-auth'
+const xml = `<?xml version="1.0" encoding="UTF-8" ?>
+            <user id="1">
+                <name>John Doe</name>
+                <email>john.doe@example.com</email>
+                <roles>
+                    <role>Member</role>
+                    <role>Admin</role>
+                </roles>
+                <admin>true</admin>
+            </user>`;
 
-class Request {
-  url: string;
-  args: string[];
-
-  constructor(url: string, args: string[]){
-    this.url = url;
-    this.args = args;
+xml2js.parseString(xml, (err:Error, result:JSON) => {
+  if(err) {
+      throw err;
   }
 
-  getURL() : string {
-    return this.url;
-  }
-}
+  // `result` is a JavaScript object
+  // convert it to a JSON string
+  const json = JSON.stringify(result, null, 4);
 
-async function getCameraData(req: Request){
-  try {
-    // const response: Response
-    const options:urllib.RequestOptions = {
-      method: 'GET',
-      rejectUnauthorized: false,
-      // auth: "username:password" use it if you want simple auth
-      digestAuth: "postman:password",
-      headers: {
-         //'Content-Type': 'application/xml'  use it if payload is xml
-         //'Content-Type': 'application/json' use it if payload is json 
-        'Content-Type': 'application/text'
-      }
-    };
-
-    const responseHandler = (err: Error, data: string, res: http.IncomingMessage) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(res.statusCode);
-      console.log(res.headers);
-      console.log(data);
-    }
-
-    httpClient.request(req.getURL(), options, responseHandler)
-
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log('error message: ', error.message);
-      return error.message;
-    } else {
-      console.log('unexpected error: ', error);
-      return 'An unexpected error occurred';
-    }
-  }
-}
-
-const req = new Request(url, ['GET'])
-getCameraData(req);
+  // log JSON string
+  console.log(json);
+  
+});
