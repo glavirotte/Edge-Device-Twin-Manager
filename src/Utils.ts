@@ -1,18 +1,16 @@
 const xml2js = require('xml2js');
-import { HttpClientResponse } from 'urllib'
 
-function xml2json(data:string | HttpClientResponse<any>){
-    //Parse xml from response and generate a json object
-    const json = xml2js.parseString(data, (err:Error, json:JSON) => {
-    if(err) {
-        throw err;
-    }
-    // result is a JavaScript object
-    // convert it to a JSON string
-    const str = JSON.stringify(json, null, 2);
-    console.log(str);
+function xml2json(xml:string):any{
+    return new Promise((resolve, reject) => {
+        xml2js.parseString(xml, (err:Error, result:JSON) => {
+            if (err) {
+                reject(err);
+            } else {
+                // console.log(JSON.stringify(result, null, 2))
+                resolve(result);
+            }
+        });
     });
-    console.log(json)
 }
 
 export { xml2json }

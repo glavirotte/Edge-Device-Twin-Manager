@@ -31,8 +31,8 @@ class Camera {
             };
             // Send request to the camera
             const result = await urllib_1.default.request(req.getURL(), options);
-            const tmp = (0, Utils_1.xml2json)(result.data);
-            // console.log(this.data)
+            const tmp = await (0, Utils_1.xml2json)(result.data);
+            console.log(JSON.stringify(tmp, null, 2));
             return result;
         }
         catch (error) {

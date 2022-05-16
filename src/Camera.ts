@@ -36,9 +36,10 @@ class Camera {
         
         // Send request to the camera
         const result = await httpClient.request(req.getURL(), options)
-        const tmp = xml2json(result.data)
-        // console.log(this.data)
-        return result;
+        const json:any = await xml2json(result.data)
+        console.log(JSON.stringify(json, null, 2))
+        this.data = json
+        return json;
 
         } catch (error) {
             if (error instanceof Error) {
