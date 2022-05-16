@@ -1,7 +1,7 @@
 import  { Request } from "./Request";
 import httpClient from 'urllib';
-import http from 'http'
-const xml2js = require('xml2js');
+import {xml2json} from './Utils'
+
 
 class Camera {
     id:string;
@@ -20,6 +20,7 @@ class Camera {
     async getCameraData(req: Request){
         try {
         // const response: Response
+        // @TODO, move to Request class
         const options:urllib.RequestOptions = {
             method: req.getMethod(),
             rejectUnauthorized: false,
@@ -31,32 +32,12 @@ class Camera {
             'Content-Type': 'application/xml'
             }
         };
-    
-        // Callback function that handles response from camera
-        const responseHandler = (err: Error, data: any, res: http.IncomingMessage) => {
-            if (err) {
-            console.log(err);
-            }
-            console.log(res.statusCode);
-            console.log(res.headers);
-            console.log(data.toString());
-    
-            //Parse xml from response and generate a json object
-            xml2js.parseString(data, (err:Error, result:JSON) => {
-            if(err) {
-                throw err;
-            }
-            // result is a JavaScript object
-            // convert it to a JSON string
-            this.data = result
-            this.displayData()
-            return result;
-            });
-            
-        }
-    
+        
         // Send request to the camera
-        httpClient.request(req.getURL(), options, responseHandler)
+        // httpClient.request(req.getURL(), options, responseHandler)
+        const result = await httpClient.request(req.getURL(), options)
+        this.data = xml2json(result.data)
+        return this.data;
 
         } catch (error) {
             if (error instanceof Error) {
@@ -68,6 +49,8 @@ class Camera {
             }
         }
     }
+
+   
 
 /*-------------------------Getters & Setters-------------------------*/
 

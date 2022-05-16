@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Camera = void 0;
 const urllib_1 = __importDefault(require("urllib"));
-const xml2js = require('xml2js');
+const Utils_1 = require("./Utils");
 class Camera {
     constructor(id, ipAddress) {
         this.ipAddress = ipAddress;
@@ -17,6 +17,7 @@ class Camera {
     async getCameraData(req) {
         try {
             // const response: Response
+            // @TODO, move to Request class
             const options = {
                 method: req.getMethod(),
                 rejectUnauthorized: false,
@@ -28,27 +29,11 @@ class Camera {
                     'Content-Type': 'application/xml'
                 }
             };
-            // Callback function that handles response from camera
-            const responseHandler = (err, data, res) => {
-                if (err) {
-                    console.log(err);
-                }
-                console.log(res.statusCode);
-                console.log(res.headers);
-                console.log(data.toString());
-                //Parse xml from response and generate a json object
-                xml2js.parseString(data, (err, result) => {
-                    if (err) {
-                        throw err;
-                    }
-                    // result is a JavaScript object
-                    // convert it to a JSON string
-                    this.data = result;
-                    this.displayData();
-                });
-            };
             // Send request to the camera
-            urllib_1.default.request(req.getURL(), options, responseHandler);
+            // httpClient.request(req.getURL(), options, responseHandler)
+            const result = await urllib_1.default.request(req.getURL(), options);
+            this.data = (0, Utils_1.xml2json)(result.data);
+            return this.data;
         }
         catch (error) {
             if (error instanceof Error) {
