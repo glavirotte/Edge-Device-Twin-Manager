@@ -10,8 +10,7 @@ const path = 'axis-cgi/applications/list.cgi'
 const method: HttpMethod = 'POST'
 const url = `${protocol}://${cameraIP}/${path}`
 const args:Map<string, string> = new Map()
-const applicationsFolder = './Applications/'
-const file = 'helloworld'
+
 const options:urllib.RequestOptions = {
     method: method,
     rejectUnauthorized: false,
@@ -22,7 +21,7 @@ const options:urllib.RequestOptions = {
     //'Content-Type': 'application/json' use it if payload is json 
     'Content-Type': 'application/xml'
     },
-    // files: applicationsFolder
+
 }
 
 const camera = new Camera('camera1', cameraIP) // Create Camera object
