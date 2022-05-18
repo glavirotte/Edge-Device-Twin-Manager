@@ -2,21 +2,28 @@ import  { Request } from './Request';
 import HttpClient, { HttpMethod } from 'urllib';
 import { xml2json } from './Utils'
 import { Application } from './Application'
+import { User } from './User';
 
-const username:string = 'root'
-const password:string = 'root'
+
 class Camera {
     id:string;
     ipAddress:string;
     data:JSON;
+    user:User
 
     constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = id;
         this.data = JSON.parse('{}');
+        this.user = new User('', '')
     }
 
 /*-------------------------Camera Methods-------------------------*/
+
+    connect(user:User){
+        this.user.username = user.getUsername()
+        this.user.password = user.getPassword()
+    }
 
     // Get json object from a Request sent to the camera
     
@@ -60,11 +67,11 @@ class Camera {
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: username+':'+password,
+            digestAuth: this.user.username+':'+this.user.password,
             timeout:30000,
             files: application.getLocation()
         }
-        const request = new Request(url, method, username, password, args, options)
+        const request = new Request(url, method, this.user.username, this.user.password, args, options)
         const response = await this.askCamera(request)
 
     }
@@ -83,11 +90,11 @@ class Camera {
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: username+':'+password,
+            digestAuth: this.user.username+':'+this.user.password,
             timeout:30000,
             files: application.getLocation()
         }
-        const request = new Request(url, method, username, password, args, options)
+        const request = new Request(url, method, this.user.username, this.user.password, args, options)
         const response = await this.askCamera(request)
     }
 
@@ -103,10 +110,10 @@ class Camera {
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: username+':'+password,
+            digestAuth: this.user.username+':'+this.user.password,
             timeout: 5000,
         }
-        const request = new Request(url, method, username, password, args, options)
+        const request = new Request(url, method, this.user.username, this.user.password, args, options)
         const response = await this.askCamera(request)
     }
   
