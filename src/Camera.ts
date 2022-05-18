@@ -2,9 +2,9 @@ import  { Request } from './Request';
 import HttpClient, { HttpMethod } from 'urllib';
 import { xml2json } from './Utils'
 import { Application } from './Application'
-import { resourceLimits } from 'worker_threads';
 
-
+const username:string = 'root'
+const password:string = 'root'
 class Camera {
     id:string;
     ipAddress:string;
@@ -23,6 +23,7 @@ class Camera {
     async askCamera(req: Request){
         try {        
         // Send request to the camera
+
         const response = await HttpClient.request(req.getURL(), req.getOptions())
         let data:any;
 
@@ -47,10 +48,10 @@ class Camera {
         }
     }
 
-    async uploadApplication(application:Application){
+    //Upload an application to the camera
+
+    async uploadApplication(application:Application){  
         const protocol = 'http'
-        const username = 'root'
-        const password = 'root'
         const cameraIP = this.ipAddress
         const uri = 'axis-cgi/applications/upload.cgi'
         const method: HttpMethod = 'POST'
@@ -65,14 +66,13 @@ class Camera {
         }
         const request = new Request(url, method, username, password, args, options)
         const response = await this.askCamera(request)
-            // .then((data:HttpClient.HttpClientResponse<any>) =>{console.log(data.status.toString())})
 
     }
 
+    //Remove an application from the camera
+
     async removeApplication(application:Application){
         const protocol = 'http'
-        const username = 'root'
-        const password = 'root'
         const cameraIP = this.ipAddress
         const uri = 'axis-cgi/applications/control.cgi'
         const method: HttpMethod = 'POST'
@@ -91,10 +91,10 @@ class Camera {
         const response = await this.askCamera(request)
     }
 
+    //Give the list of applications currently on the camera
+
     async listApplications(){
         const protocol = 'http'
-        const username = 'root'
-        const password = 'root'
         const cameraIP = this.ipAddress
         const uri = 'axis-cgi/applications/list.cgi'
         const method: HttpMethod = 'POST'

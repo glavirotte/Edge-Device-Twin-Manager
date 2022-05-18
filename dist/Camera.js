@@ -7,6 +7,8 @@ exports.Camera = void 0;
 const Request_1 = require("./Request");
 const urllib_1 = __importDefault(require("urllib"));
 const Utils_1 = require("./Utils");
+const username = 'root';
+const password = 'root';
 class Camera {
     constructor(id, ipAddress) {
         this.ipAddress = ipAddress;
@@ -42,10 +44,9 @@ class Camera {
             }
         }
     }
+    //Upload an application to the camera
     async uploadApplication(application) {
         const protocol = 'http';
-        const username = 'root';
-        const password = 'root';
         const cameraIP = this.ipAddress;
         const uri = 'axis-cgi/applications/upload.cgi';
         const method = 'POST';
@@ -60,12 +61,10 @@ class Camera {
         };
         const request = new Request_1.Request(url, method, username, password, args, options);
         const response = await this.askCamera(request);
-        // .then((data:HttpClient.HttpClientResponse<any>) =>{console.log(data.status.toString())})
     }
+    //Remove an application from the camera
     async removeApplication(application) {
         const protocol = 'http';
-        const username = 'root';
-        const password = 'root';
         const cameraIP = this.ipAddress;
         const uri = 'axis-cgi/applications/control.cgi';
         const method = 'POST';
@@ -83,10 +82,9 @@ class Camera {
         const request = new Request_1.Request(url, method, username, password, args, options);
         const response = await this.askCamera(request);
     }
+    //Give the list of applications currently on the camera
     async listApplications() {
         const protocol = 'http';
-        const username = 'root';
-        const password = 'root';
         const cameraIP = this.ipAddress;
         const uri = 'axis-cgi/applications/list.cgi';
         const method = 'POST';

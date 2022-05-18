@@ -1,4 +1,3 @@
-import { assert } from 'console';
 import { HttpMethod } from 'urllib';
 
 // Class that defines a request
