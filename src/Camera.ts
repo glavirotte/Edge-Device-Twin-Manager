@@ -24,7 +24,6 @@ class Camera {
         try {        
         // Send request to the camera
         const response = await HttpClient.request(req.getURL(), req.getOptions())
-        const responseHeader = response.headers
         let data:any;
 
         if(response.headers['content-type'] === 'text/xml'){

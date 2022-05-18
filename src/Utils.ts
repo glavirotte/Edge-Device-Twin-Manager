@@ -6,7 +6,6 @@ function xml2json(xml:string):any{
             if (err) {
                 reject(err);
             } else {
-                // console.log(JSON.stringify(result, null, 2))
                 resolve(result);
             }
         });

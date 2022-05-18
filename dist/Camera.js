@@ -19,7 +19,6 @@ class Camera {
         try {
             // Send request to the camera
             const response = await urllib_1.default.request(req.getURL(), req.getOptions());
-            const responseHeader = response.headers;
             let data;
             if (response.headers['content-type'] === 'text/xml') {
                 data = await (0, Utils_1.xml2json)(response.data); // Parse xml to json

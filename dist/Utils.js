@@ -9,7 +9,6 @@ function xml2json(xml) {
                 reject(err);
             }
             else {
-                // console.log(JSON.stringify(result, null, 2))
                 resolve(result);
             }
         });
