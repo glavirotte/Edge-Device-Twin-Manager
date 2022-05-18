@@ -51,7 +51,7 @@ class Camera {
     //Upload an application to the camera
 
     async uploadApplication(application:Application){  
-        const protocol = 'http'
+        const protocol = 'https'
         const cameraIP = this.ipAddress
         const uri = 'axis-cgi/applications/upload.cgi'
         const method: HttpMethod = 'POST'
@@ -72,7 +72,7 @@ class Camera {
     //Remove an application from the camera
 
     async removeApplication(application:Application){
-        const protocol = 'http'
+        const protocol = 'https'
         const cameraIP = this.ipAddress
         const uri = 'axis-cgi/applications/control.cgi'
         const method: HttpMethod = 'POST'
@@ -94,7 +94,7 @@ class Camera {
     //Give the list of applications currently on the camera
 
     async listApplications(){
-        const protocol = 'http'
+        const protocol = 'https'
         const cameraIP = this.ipAddress
         const uri = 'axis-cgi/applications/list.cgi'
         const method: HttpMethod = 'POST'
