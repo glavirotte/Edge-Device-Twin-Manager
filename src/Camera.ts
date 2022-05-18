@@ -1,5 +1,5 @@
-import  { Request } from "./Request";
-import httpClient from 'urllib';
+import  { Request } from './Request';
+import HttpClient from 'urllib';
 import {xml2json} from './Utils'
 
 
@@ -21,15 +21,21 @@ class Camera {
     async getCameraData(req: Request){
         try {        
         // Send request to the camera
-        const result = await httpClient.request(req.getURL(), req.getOptions())
-        const json:any = await xml2json(result.data)
-        console.log(JSON.stringify(json, null, 2))
-        this.data = json
-        return json;
+        const response = await HttpClient.request(req.getURL(), req.getOptions())
+        const responseHeader = response.headers
+        let data:any;
+
+        if(response.headers['content-type'] === 'text/xml'){
+            data = await xml2json(response.data)  // Parse xml to json
+            console.log(JSON.stringify(data, null, 2))  // Print response data to the console
+            this.data = data
+        }
+
+        return data;
 
         } catch (error) {
             if (error instanceof Error) {
-                console.log('error message: ', error.message);
+                console.log('In getCameraData -> error message: ', error.message);
                 return error.message;
             } else {
                 console.log('unexpected error: ', error);

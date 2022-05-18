@@ -16,28 +16,20 @@ class Camera {
     // Get json object from a Request sent to the camera
     async getCameraData(req) {
         try {
-            // const response: Response
-            // @TODO, move to Request class
-            const options = {
-                method: req.getMethod(),
-                rejectUnauthorized: false,
-                // auth: "username:password" use it if you want simple auth
-                digestAuth: req.getUsername() + ':' + req.getPassword(),
-                headers: {
-                    //'Content-Type': 'application/text'  use it if payload is text
-                    //'Content-Type': 'application/json' use it if payload is json 
-                    'Content-Type': 'application/xml'
-                }
-            };
             // Send request to the camera
-            const result = await urllib_1.default.request(req.getURL(), options);
-            const tmp = await (0, Utils_1.xml2json)(result.data);
-            console.log(JSON.stringify(tmp, null, 2));
-            return result;
+            const response = await urllib_1.default.request(req.getURL(), req.getOptions());
+            const responseHeader = response.headers;
+            let data;
+            if (response.headers['content-type'] === 'text/xml') {
+                data = await (0, Utils_1.xml2json)(response.data); // Parse xml to json
+                console.log(JSON.stringify(data, null, 2)); // Print response data to the console
+                this.data = data;
+            }
+            return data;
         }
         catch (error) {
             if (error instanceof Error) {
-                console.log('error message: ', error.message);
+                console.log('In getCameraData -> error message: ', error.message);
                 return error.message;
             }
             else {

@@ -1,3 +1,4 @@
+import { assert } from 'console';
 import { HttpMethod } from 'urllib';
 
 // Class that defines a request
@@ -21,11 +22,6 @@ class Request {
     if(this.args.size > 0){
       this.url = this.addArgumentsToURL(this.url, this.args);
       console.log(this.url)
-    }
-    if(this.method == 'POST'){
-      // @TODO
-    }else if(this.method == 'GET'){
-      // @TODO
     }
   }
 
