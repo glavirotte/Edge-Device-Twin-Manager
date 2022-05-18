@@ -1,6 +1,8 @@
 import  { Request } from './Request';
-import HttpClient from 'urllib';
-import {xml2json} from './Utils'
+import HttpClient, { HttpMethod } from 'urllib';
+import { xml2json } from './Utils'
+import { Application } from './Application'
+import { resourceLimits } from 'worker_threads';
 
 
 class Camera {
@@ -18,7 +20,7 @@ class Camera {
 
     // Get json object from a Request sent to the camera
     
-    async getCameraData(req: Request){
+    async askCamera(req: Request){
         try {        
         // Send request to the camera
         const response = await HttpClient.request(req.getURL(), req.getOptions())
@@ -29,13 +31,15 @@ class Camera {
             data = await xml2json(response.data)  // Parse xml to json
             console.log(JSON.stringify(data, null, 2))  // Print response data to the console
             this.data = data
+        }else if(response.headers['content-type'] === 'text/plain'){
+            console.log(response.status.toString())
+            console.log(response.data.toString())
         }
-
-        return data;
+        return await data;
 
         } catch (error) {
             if (error instanceof Error) {
-                console.log('In getCameraData -> error message: ', error.message);
+                console.log('In askCamera -> error message: ', error.message);
                 return error.message;
             } else {
                 console.log('unexpected error: ', error);
@@ -44,7 +48,69 @@ class Camera {
         }
     }
 
-   
+    async uploadApplication(application:Application){
+        const protocol = 'http'
+        const username = 'root'
+        const password = 'root'
+        const cameraIP = this.ipAddress
+        const uri = 'axis-cgi/applications/upload.cgi'
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${cameraIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const options:urllib.RequestOptions = {
+            method: method,
+            rejectUnauthorized: false,
+            digestAuth: username+':'+password,
+            timeout:30000,
+            files: application.getLocation()
+        }
+        const request = new Request(url, method, username, password, args, options)
+        const response = await this.askCamera(request)
+            // .then((data:HttpClient.HttpClientResponse<any>) =>{console.log(data.status.toString())})
+
+    }
+
+    async removeApplication(application:Application){
+        const protocol = 'http'
+        const username = 'root'
+        const password = 'root'
+        const cameraIP = this.ipAddress
+        const uri = 'axis-cgi/applications/control.cgi'
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${cameraIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        args.set('package', application.getName())
+        args.set('action', 'remove')
+        const options:urllib.RequestOptions = {
+            method: method,
+            rejectUnauthorized: false,
+            digestAuth: username+':'+password,
+            timeout:30000,
+            files: application.getLocation()
+        }
+        const request = new Request(url, method, username, password, args, options)
+        const response = await this.askCamera(request)
+    }
+
+    async listApplications(){
+        const protocol = 'http'
+        const username = 'root'
+        const password = 'root'
+        const cameraIP = this.ipAddress
+        const uri = 'axis-cgi/applications/list.cgi'
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${cameraIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const options:urllib.RequestOptions = {
+            method: method,
+            rejectUnauthorized: false,
+            digestAuth: username+':'+password,
+            timeout: 5000,
+        }
+        const request = new Request(url, method, username, password, args, options)
+        const response = await this.askCamera(request)
+    }
+  
 
 /*-------------------------Getters & Setters-------------------------*/
 

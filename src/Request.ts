@@ -21,7 +21,6 @@ class Request {
 
     if(this.args.size > 0){
       this.url = this.addArgumentsToURL(this.url, this.args);
-      console.log(this.url)
     }
   }
 

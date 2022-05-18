@@ -12,7 +12,6 @@ class Request {
         this.options = options;
         if (this.args.size > 0) {
             this.url = this.addArgumentsToURL(this.url, this.args);
-            console.log(this.url);
         }
     }
     /* Concatenates arguments from a hashMap to the URL*/
