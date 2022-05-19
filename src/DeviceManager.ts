@@ -6,17 +6,17 @@ const password = 'root'
 
 class DeviceManager {
     
-    username:string
-    password:string
-    devices:Map<Device, Twin>
+    private username:string
+    private password:string
+    private devices:Map<Device, Twin>
 
-    constructor(){
+    public constructor(){
         this.username = username
         this.password = password
         this.devices = new Map()
     }
 
-    registerDevice(device:Device){
+    public registerDevice(device:Device){
         const deviceTwin = new Twin(device)
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(username, password)
@@ -24,7 +24,7 @@ class DeviceManager {
 
 /*------------------ Getters & Setters ------------------------ */
 
-    getDevice(id:string):void | Device{
+    public getDevice(id:string):void | Device{
         for (let [device, twin] of this.devices) {
             if(device.getID() == id){
                 return device
@@ -32,10 +32,10 @@ class DeviceManager {
         }
         throw(Error('No registered device has this id !'))
     }
-    getUsername(){
+    public getUsername(){
         return this.username
     }
-    getPassword(){
+    public getPassword(){
         return this.password
     }
 }

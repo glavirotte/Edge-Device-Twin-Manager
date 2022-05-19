@@ -3,14 +3,14 @@ import { HttpMethod } from 'urllib';
 // Class that defines a request
 
 class Request {
-  url: string;
-  username: string;
-  password: string;
-  method: HttpMethod;
-  args: Map <string, string>;
-  options:urllib.RequestOptions;
+  private url: string;
+  private username: string;
+  private password: string;
+  private method: HttpMethod;
+  private args: Map <string, string>;
+  private options:urllib.RequestOptions;
 
-  constructor(url:string, method:HttpMethod, username:string, password:string, args:Map<string, string>, options:urllib.RequestOptions){
+  public constructor(url:string, method:HttpMethod, username:string, password:string, args:Map<string, string>, options:urllib.RequestOptions){
     this.url = url;
     this.username = username;
     this.password = password;
@@ -24,7 +24,7 @@ class Request {
   }
 
   /* Concatenates arguments from a hashMap to the URL*/
-  addArgumentsToURL(url:string, args:Map<string, string>):string{
+  private addArgumentsToURL(url:string, args:Map<string, string>):string{
     url += '?'
     args.forEach((values, keys) => {
       url += keys+'='+values+'&';
@@ -34,22 +34,22 @@ class Request {
 
   /* Getters & setters */
 
-  getURL() : string {
+  public getURL() : string {
     return this.url;
   }
-  getMethod() : HttpMethod {
+  public getMethod() : HttpMethod {
     return this.method;
   }
-  getUsername() : string {
+  public getUsername() : string {
     return this.username;
   }
-  getPassword() : string {
+  public getPassword() : string {
     return this.password;
   }
-  getargs() : Map<string, string>{
+  public getargs() : Map<string, string>{
     return this.args;
   }
-  getOptions():urllib.RequestOptions{
+  public getOptions():urllib.RequestOptions{
     return this.options;
   }
   

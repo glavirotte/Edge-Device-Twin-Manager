@@ -9,15 +9,15 @@ import { Device } from "./Device";
 
 class Twin {
 
-    json:JSON
-    device:Device
+    private json:JSON
+    private device:Device
 
-    constructor(device:Device){
+    public constructor(device:Device){
         this.device = device
         this.json = JSON.parse('{}')
     }
 
-    getTwin(){
+    public getTwin(){
         return this.json
     }
 }

@@ -14,14 +14,14 @@ import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
 
 class Device {
-    id:string
-    ipAddress:string
-    data:JSON
-    username:string
-    password:string
-    URIs:IURIs
+    private id:string
+    private ipAddress:string
+    private data:JSON
+    private username:string
+    private password:string
+    private URIs:IURIs
 
-    constructor(id:string, ipAddress:string){
+    public constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = id;
         this.data = JSON.parse('{}');
@@ -32,14 +32,14 @@ class Device {
 
 /*-------------------------Device Methods-------------------------*/
 
-    setLoginCredentials(username:string, password:string){
+    public setLoginCredentials(username:string, password:string){
         this.username = username
         this.password = password
     }
 
     // Get json object from a Request sent to the Device
     
-    async askDevice(req: Request){
+    private async askDevice(req: Request){
         try {        
         // Send request to the Device
 
@@ -69,7 +69,7 @@ class Device {
 
     //Install an application on the Device
     
-    async installApplication(application:Application){  
+    public async installApplication(application:Application){  
         const protocol = 'http'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.upload
@@ -90,7 +90,7 @@ class Device {
 
     //Remove an application from the Device
 
-    async removeApplication(application:Application){
+    public async removeApplication(application:Application){
         const protocol = 'http'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.control
@@ -112,7 +112,7 @@ class Device {
 
     //Give the list of applications currently on the Device
 
-    async listApplications(){
+    public async listApplications(){
         const protocol = 'http'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.list
@@ -132,16 +132,16 @@ class Device {
 
 /*-------------------------Getters & Setters-------------------------*/
 
-    getID(): string{
+    public getID(): string{
         return  this.id
     }
-    getIPAddress():string{
+    public getIPAddress():string{
         return this.ipAddress;
     }
-    getData():any{
+    public getData():any{
         return this.data;
     }
-    displayData():string{
+    public displayData():string{
         const json = JSON.stringify(this.data, null, 2);
         console.log(json);
         return json;
