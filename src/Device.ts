@@ -12,6 +12,8 @@ import { xml2json } from './Utils'
 import { Application } from './Application'
 import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
+import { DeviceManager } from './DeviceManager';
+import { IResponse } from './interfaces/IResponse'
 
 class Device {
     private id:string
@@ -19,39 +21,37 @@ class Device {
     private username:string
     private password:string
     private URIs:IURIs
+    private deviceManager:DeviceManager
 
     public constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = id;
-        this.username = ''
-        this.password = ''
+        this.username = {} as string
+        this.password = {} as string
         this.URIs = loadJSON('./src/Data_Storage/URIs.json')
+        this.deviceManager = {} as DeviceManager
     }
 
 /*-------------------------Device Methods-------------------------*/
-
-    public setLoginCredentials(username:string, password:string){
-        this.username = username
-        this.password = password
-    }
 
     // Get json object from a Request sent to the Device
     
     private async askDevice(req: Request){
         try {
+
         // Send request to the Device
+        const res = await HttpClient.request(req.getURL(), req.getOptions())
+        var data = {} as any;
 
-        const response = await HttpClient.request(req.getURL(), req.getOptions())
-        let data:any;
+        if(res.headers['content-type'] === 'text/xml'){
+            data = await xml2json(res.data)  // Parse xml to json
+            const response:IResponse = JSON.parse(JSON.stringify(data))
+            this.deviceManager.updateDeviceTwin(this, response)
 
-        if(response.headers['content-type'] === 'text/xml'){
-            data = await xml2json(response.data)  // Parse xml to json
-            console.log(JSON.stringify(data, null, 2))  // Print response data to the console
-        }else if(response.headers['content-type'] === 'text/plain'){
-            console.log(response.status.toString())
-            console.log(response.data.toString())
+        }else if(res.headers['content-type'] === 'text/plain'){
+            console.log(res.status.toString())
+            console.log(res.data.toString())
         }
-        return await data;
 
         } catch (error) {
             if (error instanceof Error) {
@@ -64,7 +64,7 @@ class Device {
         }
     }
 
-    //Install an application on the Device
+    // Install an application on the Device
     
     public async installApplication(application:Application){  
         const protocol = 'http'
@@ -81,11 +81,11 @@ class Device {
             files: application.getLocation()
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response = await this.askDevice(request)
+        await this.askDevice(request)
 
     }
 
-    //Remove an application from the Device
+    // Remove an application from the Device
 
     public async removeApplication(application:Application){
         const protocol = 'http'
@@ -104,10 +104,10 @@ class Device {
             files: application.getLocation()
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response = await this.askDevice(request)
+        await this.askDevice(request)
     }
 
-    //Give the list of applications currently on the Device
+    // Give the list of applications currently on the Device
 
     public async listApplications(){
         const protocol = 'http'
@@ -123,7 +123,7 @@ class Device {
             timeout: 5000,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response = await this.askDevice(request)
+        this.askDevice(request)
     }
   
 
@@ -134,6 +134,13 @@ class Device {
     }
     public getIPAddress():string{
         return this.ipAddress;
+    }
+    public setLoginCredentials(username:string, password:string){
+        this.username = username
+        this.password = password
+    }
+    public setDeviceManager(deviceManager:DeviceManager){
+        this.deviceManager = deviceManager
     }
 }
 

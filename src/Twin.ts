@@ -6,19 +6,21 @@ with the applications installed
 #########################################################*/
 
 import { Device } from "./Device";
+import { ApplicationEntity, IResponse } from "./interfaces/IResponse"
 
 class Twin {
 
-    private json:JSON
     private device:Device
+    private applications: (ApplicationEntity)[] | null | undefined
 
     public constructor(device:Device){
         this.device = device
-        this.json = JSON.parse('{}')
+        this.applications = JSON.parse('{}')
     }
 
-    public getTwin(){
-        return this.json
+    updateApplicationList(data: IResponse){
+        this.applications = data.reply.application
+        console.log(this.applications)
     }
 }
 

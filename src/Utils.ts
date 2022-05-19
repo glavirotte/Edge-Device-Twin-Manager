@@ -3,7 +3,7 @@ import { json } from "stream/consumers";
 const xml2js = require('xml2js');
 const fs = require('fs')
 
-function xml2json(xml:string):any{
+function xml2json(xml:string){
     return new Promise((resolve, reject) => {
         xml2js.parseString(xml, (err:Error, result:JSON) => {
             if (err) {

@@ -1,4 +1,13 @@
+/*#######################################################  
+
+This class describes the Device Manager object which is
+used to update the state of the Device twin and to interact
+with the physical device
+
+#########################################################*/
+
 import { Device } from "./Device"
+import { IResponse } from "./interfaces/IResponse"
 import { Twin } from "./Twin"
 
 const username = 'root'
@@ -20,6 +29,12 @@ class DeviceManager {
         const deviceTwin = new Twin(device)
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(username, password)
+        device.setDeviceManager(this)
+    }
+
+    public updateDeviceTwin(device:Device, data:IResponse){
+        const twin = this.devices.get(device)
+        twin?.updateApplicationList(data)
     }
 
 /*------------------ Getters & Setters ------------------------ */
