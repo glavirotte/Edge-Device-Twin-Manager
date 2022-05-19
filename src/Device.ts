@@ -10,13 +10,16 @@ import  { Request } from './Request';
 import HttpClient, { HttpMethod } from 'urllib';
 import { xml2json } from './Utils'
 import { Application } from './Application'
+import { loadJSON } from './Utils'
+import { IURIs } from './interfaces/IURIs'
 
 class Device {
-    id:string;
-    ipAddress:string;
-    data:JSON;
+    id:string
+    ipAddress:string
+    data:JSON
     username:string
     password:string
+    URIs:IURIs
 
     constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
@@ -24,6 +27,7 @@ class Device {
         this.data = JSON.parse('{}');
         this.username = ''
         this.password = ''
+        this.URIs = loadJSON('./src/Data_Storage/URIs.json')
     }
 
 /*-------------------------Device Methods-------------------------*/
@@ -64,11 +68,11 @@ class Device {
     }
 
     //Install an application on the Device
-
+    
     async installApplication(application:Application){  
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = 'axis-cgi/applications/upload.cgi'
+        const uri = this.URIs.upload
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -89,7 +93,7 @@ class Device {
     async removeApplication(application:Application){
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = 'axis-cgi/applications/control.cgi'
+        const uri = this.URIs.control
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -111,7 +115,7 @@ class Device {
     async listApplications(){
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = 'axis-cgi/applications/list.cgi'
+        const uri = this.URIs.list
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
