@@ -1,4 +1,5 @@
 class Application{
+    
     name:string
     location:string
 
@@ -6,7 +7,7 @@ class Application{
         this.name = name
         this.location = location
     }
-    getName() :string{
+    getName():string{
         return this.name
     }
     getLocation():string{

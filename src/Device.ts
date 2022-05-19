@@ -1,28 +1,43 @@
+/*#######################################################  
+
+This class describes and give methods to communicate 
+with a physical device on the local network
+
+#########################################################*/
+
+
 import  { Request } from './Request';
 import HttpClient, { HttpMethod } from 'urllib';
 import { xml2json } from './Utils'
 import { Application } from './Application'
 
-const username:string = 'root'
-const password:string = 'root'
-class Camera {
+class Device {
     id:string;
     ipAddress:string;
     data:JSON;
+    username:string
+    password:string
 
     constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = id;
         this.data = JSON.parse('{}');
+        this.username = ''
+        this.password = ''
     }
 
-/*-------------------------Camera Methods-------------------------*/
+/*-------------------------Device Methods-------------------------*/
 
-    // Get json object from a Request sent to the camera
+    setLoginCredentials(username:string, password:string){
+        this.username = username
+        this.password = password
+    }
+
+    // Get json object from a Request sent to the Device
     
-    async askCamera(req: Request){
+    async askDevice(req: Request){
         try {        
-        // Send request to the camera
+        // Send request to the Device
 
         const response = await HttpClient.request(req.getURL(), req.getOptions())
         let data:any;
@@ -39,7 +54,7 @@ class Camera {
 
         } catch (error) {
             if (error instanceof Error) {
-                console.log('In askCamera -> error message: ', error.message);
+                console.log('In askDevice -> error message: ', error.message);
                 return error.message;
             } else {
                 console.log('unexpected error: ', error);
@@ -48,66 +63,66 @@ class Camera {
         }
     }
 
-    //Upload an application to the camera
+    //Install an application on the Device
 
-    async uploadApplication(application:Application){  
-        const protocol = 'https'
-        const cameraIP = this.ipAddress
+    async installApplication(application:Application){  
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
         const uri = 'axis-cgi/applications/upload.cgi'
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${cameraIP}/${uri}`
+        const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: username+':'+password,
+            digestAuth: this.username+':'+this.password,
             timeout:30000,
             files: application.getLocation()
         }
-        const request = new Request(url, method, username, password, args, options)
-        const response = await this.askCamera(request)
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response = await this.askDevice(request)
 
     }
 
-    //Remove an application from the camera
+    //Remove an application from the Device
 
     async removeApplication(application:Application){
-        const protocol = 'https'
-        const cameraIP = this.ipAddress
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
         const uri = 'axis-cgi/applications/control.cgi'
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${cameraIP}/${uri}`
+        const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
         args.set('package', application.getName())
         args.set('action', 'remove')
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: username+':'+password,
+            digestAuth: this.username+':'+this.password,
             timeout:30000,
             files: application.getLocation()
         }
-        const request = new Request(url, method, username, password, args, options)
-        const response = await this.askCamera(request)
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response = await this.askDevice(request)
     }
 
-    //Give the list of applications currently on the camera
+    //Give the list of applications currently on the Device
 
     async listApplications(){
-        const protocol = 'https'
-        const cameraIP = this.ipAddress
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
         const uri = 'axis-cgi/applications/list.cgi'
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${cameraIP}/${uri}`
+        const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: username+':'+password,
+            digestAuth: this.username+':'+this.password,
             timeout: 5000,
         }
-        const request = new Request(url, method, username, password, args, options)
-        const response = await this.askCamera(request)
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response = await this.askDevice(request)
     }
   
 
@@ -129,4 +144,4 @@ class Camera {
     }
 }
 
-export { Camera }
+export { Device }
