@@ -16,7 +16,6 @@ import { IURIs } from './interfaces/IURIs'
 class Device {
     private id:string
     private ipAddress:string
-    private data:JSON
     private username:string
     private password:string
     private URIs:IURIs
@@ -24,7 +23,6 @@ class Device {
     public constructor(id:string, ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = id;
-        this.data = JSON.parse('{}');
         this.username = ''
         this.password = ''
         this.URIs = loadJSON('./src/Data_Storage/URIs.json')
@@ -40,7 +38,7 @@ class Device {
     // Get json object from a Request sent to the Device
     
     private async askDevice(req: Request){
-        try {        
+        try {
         // Send request to the Device
 
         const response = await HttpClient.request(req.getURL(), req.getOptions())
@@ -49,7 +47,6 @@ class Device {
         if(response.headers['content-type'] === 'text/xml'){
             data = await xml2json(response.data)  // Parse xml to json
             console.log(JSON.stringify(data, null, 2))  // Print response data to the console
-            this.data = data
         }else if(response.headers['content-type'] === 'text/plain'){
             console.log(response.status.toString())
             console.log(response.data.toString())
@@ -137,14 +134,6 @@ class Device {
     }
     public getIPAddress():string{
         return this.ipAddress;
-    }
-    public getData():any{
-        return this.data;
-    }
-    public displayData():string{
-        const json = JSON.stringify(this.data, null, 2);
-        console.log(json);
-        return json;
     }
 }
 
