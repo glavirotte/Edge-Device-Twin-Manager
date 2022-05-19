@@ -1,2 +1,2 @@
-# Edge-Twin-Device-Manager
-Automate the deployment and maintenance of a local Axis Cameras network
+# Edge-Device-Twin-Manager
+Automate the deployment and maintenance of a local Camera network with device twins
