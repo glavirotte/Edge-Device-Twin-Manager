@@ -5,22 +5,23 @@ with the applications installed
 
 #########################################################*/
 
-import { Device } from "./Device";
-import { ApplicationEntity, IResponse } from "./interfaces/IResponse"
+import { ApplicationProperties, IResponse } from "./interfaces/IResponse"
+import { writeJSON } from "./Utils"
 
 class Twin {
+    private id:string
+    private applications: ApplicationProperties | undefined
 
-    private device:Device
-    private applications: (ApplicationEntity)[] | null | undefined
-
-    public constructor(device:Device){
-        this.device = device
-        this.applications = JSON.parse('{}')
+    public constructor(id:string){
+        this.id = id
+        this.applications = {} as ApplicationProperties | undefined
     }
 
-    updateApplicationList(data: IResponse){
-        this.applications = data.reply.application
-        console.log(this.applications)
+    // Update the state of the Twin by storing values from last request
+    updateState(response: IResponse){
+        this.applications = response.reply.application?.[0].$
+        writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
+        console.log(this)
     }
 }
 

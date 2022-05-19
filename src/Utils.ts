@@ -20,4 +20,15 @@ function loadJSON(address:string){
     return obj
 }
 
-export { xml2json, loadJSON }
+function writeJSON(obj:any, address:string){
+    const data = JSON.stringify(obj, null, 4)
+    fs.writeFile(address, data, (err:Error)=>{
+        if(err){
+            throw err;
+        }else{
+            console.log("JSON object saved at: "+ address)
+        }
+    })
+}
+
+export { xml2json, loadJSON, writeJSON }

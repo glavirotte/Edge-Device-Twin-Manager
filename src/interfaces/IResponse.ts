@@ -17,9 +17,9 @@ export interface $ {
     result: string;
 }
 export interface ApplicationEntity {
-    $: $1;
+    $: ApplicationProperties;
 }
-export interface $1 {
+export interface ApplicationProperties {
     Name: string;
     NiceName: string;
     Vendor: string;

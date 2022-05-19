@@ -25,16 +25,18 @@ class DeviceManager {
         this.devices = new Map()
     }
 
+    // Add a device in the hashmap of Device/Twin and set login credentials to access device
     public registerDevice(device:Device){
-        const deviceTwin = new Twin(device)
+        const deviceTwin = new Twin(device.getID())
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(username, password)
         device.setDeviceManager(this)
     }
 
-    public updateDeviceTwin(device:Device, data:IResponse){
+    // Update state of the twin, called after a device API request
+    public updateDeviceTwin(device:Device, response:IResponse){
         const twin = this.devices.get(device)
-        twin?.updateApplicationList(data)
+        twin?.updateState(response)
     }
 
 /*------------------ Getters & Setters ------------------------ */
@@ -46,6 +48,9 @@ class DeviceManager {
             }
         }
         throw(Error('No registered device has this id !'))
+    }
+    public getTwin(device:Device):void | Device{
+        this.devices.get(device)
     }
     public getUsername(){
         return this.username

@@ -1,0 +1,15 @@
+{
+    "id": "camera1",
+    "applications": {
+        "Name": "loiteringguard",
+        "NiceName": "AXIS Loitering Guard",
+        "Vendor": "Axis Communications",
+        "Version": "2.3-2",
+        "ApplicationID": "46775",
+        "License": "None",
+        "Status": "Stopped",
+        "ConfigurationPage": "local/loiteringguard/config.html",
+        "VendorHomePage": "http://www.axis.com",
+        "LicenseName": "Proprietary"
+    }
+}
