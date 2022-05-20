@@ -16,6 +16,7 @@ import { DeviceManager } from './DeviceManager';
 import { IResponse } from './interfaces/IResponse'
 
 class Device {
+
     private id:string
     private ipAddress:string
     private username:string
@@ -49,6 +50,9 @@ class Device {
             this.deviceManager.updateDeviceTwin(this, response)
 
         }else if(res.headers['content-type'] === 'text/plain'){
+            if(res.status != 200){
+                throw new Error('Error with request ! Status code: '+res.status.toString())
+            }
             console.log(res.status.toString())
             console.log(res.data.toString())
         }
@@ -62,6 +66,25 @@ class Device {
                 return 'An unexpected error occurred';
             }
         }
+    }
+
+    // Request to get the list of Applications currently installed on the device
+
+    public async listApplications(){
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.list
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const options:urllib.RequestOptions = {
+            method: method,
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+            timeout: 5000,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        this.askDevice(request)
     }
 
     // Install an application on the Device
@@ -82,7 +105,7 @@ class Device {
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
-
+        this.listApplications()
     }
 
     // Remove an application from the Device
@@ -105,27 +128,8 @@ class Device {
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
+        await this.listApplications()
     }
-
-    // Give the list of applications currently on the Device
-
-    public async listApplications(){
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.list
-        const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
-        const args:Map<string, string> = new Map()
-        const options:urllib.RequestOptions = {
-            method: method,
-            rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
-            timeout: 5000,
-        }
-        const request = new Request(url, method, this.username, this.password, args, options)
-        this.askDevice(request)
-    }
-  
 
 /*-------------------------Getters & Setters-------------------------*/
 

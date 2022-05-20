@@ -23,6 +23,14 @@ class Twin {
         writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
         console.log(this)
     }
+
+/*------------------ Getters & Setters ------------------------ */
+    getApplications():ApplicationProperties | undefined{
+        return this.applications
+    }
+    getID():string{
+        return this.id
+    }
 }
 
 export { Twin }

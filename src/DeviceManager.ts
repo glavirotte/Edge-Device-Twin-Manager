@@ -10,18 +10,14 @@ import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
 import { Twin } from "./Twin"
 
-const username = 'root'
-const password = 'root'
+const defautlUsername = 'root'
+const defaultPassword = 'pass'
 
 class DeviceManager {
     
-    private username:string
-    private password:string
     private devices:Map<Device, Twin>
 
     public constructor(){
-        this.username = username
-        this.password = password
         this.devices = new Map()
     }
 
@@ -29,7 +25,7 @@ class DeviceManager {
     public registerDevice(device:Device){
         const deviceTwin = new Twin(device.getID())
         this.devices.set(device, deviceTwin)
-        device.setLoginCredentials(username, password)
+        device.setLoginCredentials(defautlUsername, defaultPassword)
         device.setDeviceManager(this)
     }
 
@@ -51,12 +47,6 @@ class DeviceManager {
     }
     public getTwin(device:Device):void | Device{
         this.devices.get(device)
-    }
-    public getUsername(){
-        return this.username
-    }
-    public getPassword(){
-        return this.password
     }
 }
 
