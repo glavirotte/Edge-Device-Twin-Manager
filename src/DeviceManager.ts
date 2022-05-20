@@ -23,16 +23,31 @@ class DeviceManager {
 
     // Add a device in the hashmap of Device/Twin and set login credentials to access device
     public registerDevice(device:Device){
-        const deviceTwin = new Twin(device.getID())
-        this.devices.set(device, deviceTwin)
-        device.setLoginCredentials(defautlUsername, defaultPassword)
-        device.setDeviceManager(this)
+        if(!this.devices.has(device)){
+            const deviceTwin = new Twin(this)
+            this.devices.set(device, deviceTwin)
+            device.setLoginCredentials(defautlUsername, defaultPassword)
+            device.getDeviceInfo()
+        }
     }
 
     // Update state of the twin, called after a device API request
     public updateDeviceTwin(device:Device, response:IResponse){
         const twin = this.devices.get(device)
         twin?.updateState(response)
+    }
+
+    // Update state of device
+    public updatePhysicalDevice(twin:Twin){
+        let device:Device
+        for (let [key, value] of this.devices.entries()) {
+            if (Object.is(value, twin)){
+                device = key
+                device.setID(twin.getID())
+                console.log(device)
+                return
+            }
+        }
     }
 
 /*------------------ Getters & Setters ------------------------ */

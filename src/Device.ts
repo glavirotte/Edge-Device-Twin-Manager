@@ -5,7 +5,6 @@ with a physical device on the local network
 
 #########################################################*/
 
-
 import  { Request } from './Request';
 import HttpClient, { HttpMethod } from 'urllib';
 import { xml2json } from './Utils'
@@ -15,7 +14,7 @@ import { IURIs } from './interfaces/IURIs'
 import { DeviceManager } from './DeviceManager';
 import { IResponse } from './interfaces/IResponse'
 
-class Device {
+class Device{
 
     private id:string
     private ipAddress:string
@@ -24,13 +23,14 @@ class Device {
     private URIs:IURIs
     private deviceManager:DeviceManager
 
-    public constructor(id:string, ipAddress:string){
+    public constructor(ipAddress:string, deviceManager:DeviceManager){
         this.ipAddress = ipAddress;
-        this.id = id;
+        this.id = {} as string;
         this.username = {} as string
         this.password = {} as string
         this.URIs = loadJSON('./src/Data_Storage/URIs.json')
-        this.deviceManager = {} as DeviceManager
+        this.deviceManager = deviceManager
+        this.deviceManager.registerDevice(this)
     }
 
 /*-------------------------Device Methods-------------------------*/
@@ -42,9 +42,9 @@ class Device {
 
         // Send request to the Device
         const res = await HttpClient.request(req.getURL(), req.getOptions())
-        var data = {} as any;
 
         if(res.headers['content-type'] === 'text/xml'){
+            var data = {} as any;
             data = await xml2json(res.data)  // Parse xml to json
             const response:IResponse = JSON.parse(JSON.stringify(data))
             this.deviceManager.updateDeviceTwin(this, response)
@@ -55,6 +55,10 @@ class Device {
             }
             console.log(res.status.toString())
             console.log(res.data.toString())
+
+        }else if(res.headers['content-type'] === 'application/json;charset=utf8'){
+            const response:IResponse = JSON.parse(res.data.toString())
+            this.deviceManager.updateDeviceTwin(this, response)
         }
 
         } catch (error) {
@@ -68,10 +72,28 @@ class Device {
         }
     }
 
+    public async getDeviceInfo(){
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.basicdeviceinfo
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion":"1.0", "method":"getAllProperties"}'
+        const options:urllib.RequestOptions = {
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        await this.askDevice(request)
+    }
+
     // Request to get the list of Applications currently installed on the device
 
     public async listApplications(){
-        const protocol = 'http'
+        const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.list
         const method: HttpMethod = 'POST'
@@ -84,13 +106,13 @@ class Device {
             timeout: 5000,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        this.askDevice(request)
+        await this.askDevice(request)
     }
 
     // Install an application on the Device
     
     public async installApplication(application:Application){  
-        const protocol = 'http'
+        const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.upload
         const method: HttpMethod = 'POST'
@@ -105,13 +127,13 @@ class Device {
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
-        this.listApplications()
+        await this.listApplications()
     }
 
     // Remove an application from the Device
 
     public async removeApplication(application:Application){
-        const protocol = 'http'
+        const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.control
         const method: HttpMethod = 'POST'
@@ -143,8 +165,9 @@ class Device {
         this.username = username
         this.password = password
     }
-    public setDeviceManager(deviceManager:DeviceManager){
-        this.deviceManager = deviceManager
+    public setID(id:string){
+        this.id = id
+        console.log(id)
     }
 }
 

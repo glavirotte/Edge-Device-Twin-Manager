@@ -7,19 +7,40 @@ object.
 #########################################################*/
 
 export interface IResponse {
-    reply: Reply;
+    apiVersion?: string;
+    data?: Data;
+    reply?: Reply;
   }
-export interface Reply {
+  export interface Data {
+    propertyList: PropertyList;
+  }
+  export interface PropertyList {
+    Architecture: string;
+    ProdNbr: string;
+    HardwareID: string;
+    Version: string;
+    ProdFullName: string;
+    Brand: string;
+    ProdType: string;
+    Soc: string;
+    SocSerialNumber: string;
+    WebURL: string;
+    ProdVariant: string;
+    SerialNumber: string;
+    ProdShortName: string;
+    BuildDate: string;
+  }
+  export interface Reply {
     $: $;
     application?: (ApplicationEntity)[] | null;
-}
-export interface $ {
+  }
+  export interface $ {
     result: string;
-}
-export interface ApplicationEntity {
+  }
+  export interface ApplicationEntity {
     $: ApplicationProperties;
-}
-export interface ApplicationProperties {
+  }
+  export interface ApplicationProperties {
     Name: string;
     NiceName: string;
     Vendor: string;
@@ -30,4 +51,5 @@ export interface ApplicationProperties {
     ConfigurationPage: string;
     VendorHomePage: string;
     LicenseName: string;
-} 
+  }
+  
