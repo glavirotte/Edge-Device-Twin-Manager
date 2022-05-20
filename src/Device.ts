@@ -168,7 +168,6 @@ class Device{
     }
     public setID(id:string){
         this.id = id
-        console.log(id)
     }
 }
 

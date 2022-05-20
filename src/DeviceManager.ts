@@ -1,6 +1,6 @@
 /*#######################################################  
 
-This class describes the Device Manager object which is
+This class describes the Device Manager object, which is
 used to update the state of the Device twin and to interact
 with the physical device
 
@@ -22,25 +22,32 @@ class DeviceManager {
     }
 
     // Add a device in the hashmap of Device/Twin and set login credentials to access device
+
     public async registerDevice(device:Device){
         if(!this.devices.has(device)){
-            const deviceTwin = new Twin(this)
-            this.devices.set(device, deviceTwin)
-            device.setLoginCredentials(defautlUsername, defaultPassword)
-            const response = await device.getDeviceInfo()
+            const deviceTwin = new Twin(this)           // Create the device twin
+            this.devices.set(device, deviceTwin)        // Add device/twin pair in the hashmap
+            device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
+            const response = await device.getDeviceInfo()      // get the response from the device
             if(response !== undefined){
-                this.updateDeviceTwin(device, response)
+                this.updateDeviceTwin(device, response)         // Update the twin properties
+                deviceTwin.setIPAddress(device.getIPAddress())  // store ipAddress in the deviceTwin
+                device.setID(deviceTwin.getID())                // set the id of of the device object
+            }else{
+                throw(new Error('No response from the device !'))
             }
         }
     }
 
     // Update state of the twin, called after a device API request
+
     public updateDeviceTwin(device:Device, response:IResponse){
         const twin = this.devices.get(device)
-        twin?.updateState(response)
+        const id = twin?.updateState(response)
     }
 
     // Update state of device
+
     public updatePhysicalDevice(twin:Twin){
         let device:Device
         for (let [key, value] of this.devices.entries()) {
