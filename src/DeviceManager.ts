@@ -22,12 +22,15 @@ class DeviceManager {
     }
 
     // Add a device in the hashmap of Device/Twin and set login credentials to access device
-    public registerDevice(device:Device){
+    public async registerDevice(device:Device){
         if(!this.devices.has(device)){
             const deviceTwin = new Twin(this)
             this.devices.set(device, deviceTwin)
             device.setLoginCredentials(defautlUsername, defaultPassword)
-            device.getDeviceInfo()
+            const response = await device.getDeviceInfo()
+            if(response !== undefined){
+                this.updateDeviceTwin(device, response)
+            }
         }
     }
 

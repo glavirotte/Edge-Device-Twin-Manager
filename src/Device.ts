@@ -21,33 +21,30 @@ class Device{
     private username:string
     private password:string
     private URIs:IURIs
-    private deviceManager:DeviceManager
 
-    public constructor(ipAddress:string, deviceManager:DeviceManager){
+    public constructor(ipAddress:string){
         this.ipAddress = ipAddress;
         this.id = {} as string;
         this.username = {} as string
         this.password = {} as string
         this.URIs = loadJSON('./src/Data_Storage/URIs.json')
-        this.deviceManager = deviceManager
-        this.deviceManager.registerDevice(this)
     }
 
 /*-------------------------Device Methods-------------------------*/
 
     // Get json object from a Request sent to the Device
     
-    private async askDevice(req: Request){
+    private async askDevice(req: Request):Promise<IResponse | undefined>{
         try {
 
         // Send request to the Device
         const res = await HttpClient.request(req.getURL(), req.getOptions())
+        var response:IResponse = {} as IResponse
 
         if(res.headers['content-type'] === 'text/xml'){
             var data = {} as any;
             data = await xml2json(res.data)  // Parse xml to json
-            const response:IResponse = JSON.parse(JSON.stringify(data))
-            this.deviceManager.updateDeviceTwin(this, response)
+            response=  JSON.parse(JSON.stringify(data))
 
         }else if(res.headers['content-type'] === 'text/plain'){
             if(res.status != 200){
@@ -57,22 +54,21 @@ class Device{
             console.log(res.data.toString())
 
         }else if(res.headers['content-type'] === 'application/json;charset=utf8'){
-            const response:IResponse = JSON.parse(res.data.toString())
-            this.deviceManager.updateDeviceTwin(this, response)
+            response = JSON.parse(res.data.toString())
         }
+
+        return response
 
         } catch (error) {
             if (error instanceof Error) {
                 console.log('In askDevice -> error message: ', error.message);
-                return error.message;
             } else {
                 console.log('unexpected error: ', error);
-                return 'An unexpected error occurred';
             }
         }
     }
 
-    public async getDeviceInfo(){
+    public async getDeviceInfo():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.basicdeviceinfo
@@ -87,7 +83,12 @@ class Device{
             digestAuth: this.username+':'+this.password,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request)
+
+        if(response !== undefined){
+            return response
+        }
+        return response
     }
 
     // Request to get the list of Applications currently installed on the device
