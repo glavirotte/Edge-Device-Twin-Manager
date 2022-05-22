@@ -11,7 +11,6 @@ import { xml2json } from './Utils'
 import { Application } from './Application'
 import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
-import { DeviceManager } from './DeviceManager';
 import { IResponse } from './interfaces/IResponse'
 
 class Device{
