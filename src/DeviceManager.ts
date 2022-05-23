@@ -5,7 +5,6 @@ used to update the state of the Device twin and to interact
 with the physical device
 
 #########################################################*/
-import { Application } from "./Application"
 import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
 import { Twin } from "./Twin"
