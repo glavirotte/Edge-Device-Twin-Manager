@@ -33,19 +33,6 @@ class DeviceManager {
                 this.updateDeviceTwin(device, response)         // Update the twin properties
                 deviceTwin.setIPAddress(device.getIPAddress())  // store ipAddress in the deviceTwin
                 device.setID(deviceTwin.getID())                // set the id of of the device object
-            
-
-                // Just for testing !!
-                const appLocation = '../App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap'
-                const app = new Application('loiteringguard', appLocation)
-                var cam:Device | undefined = this.getDevice("B8A44F3A42AB")
-                if(cam !== undefined){
-                    const r = await cam.installApplication(app)
-                    if(r !== undefined){
-                        this.updateDeviceTwin(cam, r)
-                    }
-                }
-
             }else{
                 throw(new Error('No response from the device !'))
             }
