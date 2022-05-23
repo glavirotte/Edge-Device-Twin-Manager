@@ -19,8 +19,8 @@ class Twin {
     public constructor(deviceManager:DeviceManager){
         this.id = {} as string
         this.ipAddress = {} as string
-        this.applications = {} as ApplicationProperties | undefined
         this.properties = {} as PropertyList | undefined
+        this.applications = {} as ApplicationProperties | undefined
     }
 
     // Update the state of the Twin by storing values from last request

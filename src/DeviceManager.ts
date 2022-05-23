@@ -5,7 +5,7 @@ used to update the state of the Device twin and to interact
 with the physical device
 
 #########################################################*/
-
+import { Application } from "./Application"
 import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
 import { Twin } from "./Twin"
@@ -28,11 +28,24 @@ class DeviceManager {
             const deviceTwin = new Twin(this)           // Create the device twin
             this.devices.set(device, deviceTwin)        // Add device/twin pair in the hashmap
             device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
-            const response = await device.getDeviceInfo()      // get the response from the device
+            var response = await device.getDeviceInfo()      // get the response from the device
             if(response !== undefined){
                 this.updateDeviceTwin(device, response)         // Update the twin properties
                 deviceTwin.setIPAddress(device.getIPAddress())  // store ipAddress in the deviceTwin
                 device.setID(deviceTwin.getID())                // set the id of of the device object
+            
+
+                // Just for testing !!
+                const appLocation = '../App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap'
+                const app = new Application('loiteringguard', appLocation)
+                var cam:Device | undefined = this.getDevice("B8A44F3A42AB")
+                if(cam !== undefined){
+                    const r = await cam.installApplication(app)
+                    if(r !== undefined){
+                        this.updateDeviceTwin(cam, r)
+                    }
+                }
+
             }else{
                 throw(new Error('No response from the device !'))
             }
@@ -62,7 +75,7 @@ class DeviceManager {
 
 /*------------------ Getters & Setters ------------------------ */
 
-    public getDevice(id:string):void | Device{
+    public getDevice(id:string):Device | undefined{
         for (let [device, twin] of this.devices) {
             if(device.getID() == id){
                 return device

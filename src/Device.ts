@@ -86,13 +86,14 @@ class Device{
 
         if(response !== undefined){
             return response
+        }else{
+            throw new Error("Undefined response !")
         }
-        return response
     }
 
     // Request to get the list of Applications currently installed on the device
 
-    public async listApplications(){
+    public async listApplications():Promise<IResponse | undefined>{
         const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.list
@@ -106,12 +107,18 @@ class Device{
             timeout: 5000,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request)
+
+        if(response !== undefined){
+            return response
+        }else{
+            throw new Error("Undefined response !")
+        }
     }
 
     // Install an application on the Device
     
-    public async installApplication(application:Application){  
+    public async installApplication(application:Application):Promise<IResponse | undefined>{  
         const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.upload
@@ -127,12 +134,18 @@ class Device{
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
-        await this.listApplications()
+
+        const response:IResponse | undefined = await this.listApplications()
+        if(response !== undefined){
+            return response
+        }else{
+            throw new Error("Undefined response !")
+        }
     }
 
     // Remove an application from the Device
 
-    public async removeApplication(application:Application){
+    public async removeApplication(application:Application):Promise<IResponse | undefined>{
         const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.control
@@ -150,7 +163,13 @@ class Device{
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
-        await this.listApplications()
+        
+        const response:IResponse | undefined = await this.listApplications()
+        if(response !== undefined){
+            return response
+        }else{
+            throw new Error("Undefined response !")
+        }
     }
 
 /*-------------------------Getters & Setters-------------------------*/
