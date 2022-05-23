@@ -27,14 +27,17 @@ class DeviceManager {
             const deviceTwin = new Twin(this)           // Create the device twin
             this.devices.set(device, deviceTwin)        // Add device/twin pair in the hashmap
             device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
-            var response = await device.getDeviceInfo()      // get the response from the device
-            if(response !== undefined){
-                this.updateDeviceTwin(device, response)         // Update the twin properties
-                deviceTwin.setIPAddress(device.getIPAddress())  // store ipAddress in the deviceTwin
-                device.setID(deviceTwin.getID())                // set the id of of the device object
-            }else{
-                throw(new Error('No response from the device !'))
-            }
+            device.getDeviceInfo()      // get the response from the device
+                .then(response => {
+                    if(response !== undefined){
+                        this.updateDeviceTwin(device, response)         // Update the twin properties
+                        deviceTwin.setIPAddress(device.getIPAddress())  // store ipAddress in the deviceTwin
+                        device.setID(deviceTwin.getID())                // set the id of of the device object
+                    }
+                })
+
+            device.listApplications()
+                .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
         }
     }
 
