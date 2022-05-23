@@ -6,7 +6,8 @@ with a physical device on the local network
 #########################################################*/
 
 import  { Request } from './Request';
-import HttpClient, { HttpMethod } from 'urllib';
+import  { HttpMethod } from 'urllib';
+import HttpClient from 'urllib';
 import { xml2json } from './Utils'
 import { Application } from './Application'
 import { loadJSON } from './Utils'
