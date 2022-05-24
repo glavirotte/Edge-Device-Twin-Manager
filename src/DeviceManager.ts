@@ -8,6 +8,7 @@ with the physical device
 import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
 import { Twin } from "./Twin"
+import { Application } from "./Application"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -38,6 +39,10 @@ class DeviceManager {
 
             device.listApplications()
                 .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
+
+            // const app:Application = new Application("loiteringguard", "../App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")
+            // device.installApplication(app)
+            //     .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
         }
     }
 
