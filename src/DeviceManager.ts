@@ -21,29 +21,26 @@ class DeviceManager {
         this.devices = new Map()
     }
 
-    // Add a device in the hashmap of Device/Twin and set login credentials to access device
+    // Add a device, twin pair in the hashmap of Device/Twin and set login credentials to access device
 
-    public async registerDevice(device:Device){
-        if(!this.devices.has(device)){
-            const deviceTwin = new Twin(this)           // Create the device twin
-            this.devices.set(device, deviceTwin)        // Add device/twin pair in the hashmap
-            device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
-            device.getDeviceInfo()      // get the response from the device
-                .then(response => {
-                    if(response !== undefined){
-                        this.updateDeviceTwin(device, response)         // Update the twin properties
-                        deviceTwin.setIPAddress(device.getIPAddress())  // store ipAddress in the deviceTwin
-                        device.setID(deviceTwin.getID())                // set the id of of the device object
-                    }
-                })
+    public async createTwin(ipAddress:string){
+        const deviceTwin = new Twin(ipAddress, this)
+        const device = new Device(ipAddress)
+        this.devices.set(device, deviceTwin)
 
-            device.listApplications()
-                .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
+        device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
+        device.getDeviceInfo()      // get the response from the device
+            .then(response => {
+                if(response !== undefined){
+                    this.updateDeviceTwin(device, response)         // Update the twin properties
+                    device.setID(deviceTwin.getID())                // set the id of of the device object
+                }
+            })
 
-            // const app:Application = new Application("loiteringguard", "../App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")
-            // device.installApplication(app)
-            //     .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
-        }
+        device.listApplications()
+            .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
+        
+        this.ensureDeviceConnectivity(deviceTwin)
     }
 
     // Update state of the twin, called after a device API request
@@ -67,15 +64,32 @@ class DeviceManager {
         }
     }
 
+    // Send a http request every 5s to check connectivity with device
+
+    private async ensureDeviceConnectivity(twin:Twin){
+        const device = this.getDevice(twin)
+
+        if(device !== undefined){
+            setInterval(async () => {
+                const res = await device.ping()
+                if(res === 200){
+                    console.log("connected !")
+                }else{
+                    console.log("offline !")
+                }
+            },5000)
+        }
+    }
+
 /*------------------ Getters & Setters ------------------------ */
 
-    public getDevice(id:string):Device | undefined{
+    public getDevice(deviceTwin:Twin):Device | undefined{
         for (let [device, twin] of this.devices) {
-            if(device.getID() == id){
+            if(twin === deviceTwin){
                 return device
             }
         }
-        throw(Error('No registered device has this id !'))
+        throw(Error('No registered device for that twin !'))
     }
     public getTwin(device:Device):void | Device{
         this.devices.get(device)

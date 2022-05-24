@@ -68,6 +68,37 @@ class Device{
         }
     }
 
+    // Ping function to check connection with physical device
+    // send HTTP Request to check connectivity
+
+    public async ping(){
+
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.basicdeviceinfo
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion":"1.0", "method":"getSupportedVersions"}'
+        const options:urllib.RequestOptions = {
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+            timeout:1000,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        var status = 404
+        try {
+            const response = await HttpClient.request(request.getURL(), request.getOptions())
+            status = response.status
+        } catch (error) {
+            // console.log(error)
+        }finally{
+            return status
+        }
+    }
+
     public async getDeviceInfo():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
