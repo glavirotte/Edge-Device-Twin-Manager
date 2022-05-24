@@ -11,5 +11,5 @@ deviceManager.registerDevice(camera)   // instanciate Device object
     // .then(() => {deviceManager.getDevice(camera.getID())?.removeApplication(app)
     //     .then(response => {if(response !== undefined) {deviceManager.updateDeviceTwin(camera, response)}})})
     
-    // .then(() => {deviceManager.getDevice(camera.getID())?.installApplication(app)
-    //     .then(response => {if(response !== undefined) {deviceManager.updateDeviceTwin(camera, response)}})})
+    .then(() => {deviceManager.getDevice(camera.getID())?.installApplication(app)
+        .then(response => {if(response !== undefined) {deviceManager.updateDeviceTwin(camera, response)}})})
