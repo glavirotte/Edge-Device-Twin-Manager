@@ -9,6 +9,11 @@ import { DeviceManager } from "./DeviceManager"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { writeJSON } from "./Utils"
 
+enum State {
+    CONNECTED,
+    OFFLINE,
+}
+
 class Twin {
     private id:string
     private ipAddress:string
@@ -16,6 +21,7 @@ class Twin {
     private applications: (ApplicationEntity)[] | null
     private lastseen:number
     private lastentry:number
+    private state:State
     
     public constructor(ipAddress:string, deviceManager:DeviceManager){
         this.id = {} as string
@@ -24,6 +30,7 @@ class Twin {
         this.applications = {} as (ApplicationEntity)[] | null
         this.lastseen = 0
         this.lastentry = 0
+        this.state = State.OFFLINE
     }
 
     // Update the state of the Twin by storing values from last request
@@ -59,6 +66,27 @@ class Twin {
     setIPAddress(ipAddress:string){
         this.ipAddress = ipAddress
     }
+    getLastSeen(){
+        return this.lastseen
+    }
+    setLastSeen(timeStamp:number){
+        this.lastseen = timeStamp
+        // writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
+    }
+    getLastEntry(){
+        return this.lastentry
+    }
+    setLastEntry(timeStamp:number){
+        this.lastentry = timeStamp
+        // writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
+    }
+    getState(){
+        return this.state
+    }
+    setState(s:State){
+        this.state = s
+        // writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
+    }
 }
 
-export { Twin }
+export { Twin, State}

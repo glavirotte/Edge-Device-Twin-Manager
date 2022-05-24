@@ -30,7 +30,7 @@ function writeJSON(obj:any, address:string){
         if(err){
             throw err;
         }else{
-            console.log("JSON object saved at: "+ address)
+            // console.log("JSON object saved at: "+ address)
         }
     })
 }

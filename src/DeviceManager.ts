@@ -5,10 +5,10 @@ used to update the state of the Device twin and to interact
 with the physical device
 
 #########################################################*/
+import { time } from "console"
 import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
-import { Twin } from "./Twin"
-import { Application } from "./Application"
+import { State, Twin } from "./Twin"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -40,7 +40,7 @@ class DeviceManager {
         device.listApplications()
             .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
         
-        this.ensureDeviceConnectivity(deviceTwin)
+        this.checkDeviceConnectivity(deviceTwin, 5000)
     }
 
     // Update state of the twin, called after a device API request
@@ -64,20 +64,29 @@ class DeviceManager {
         }
     }
 
-    // Send a http request every 5s to check connectivity with device
+    // Send a http request every {{ ms }} second to check connectivity with device
 
-    private async ensureDeviceConnectivity(twin:Twin){
+    private async checkDeviceConnectivity(twin:Twin, ms:number){
         const device = this.getDevice(twin)
 
         if(device !== undefined){
             setInterval(async () => {
-                const res = await device.ping()
+                const res = await device.ping()     // Send "ping" request and wait for the result status code
+                const timeStamp = Date.now()        // get current timestamp
                 if(res === 200){
-                    console.log("connected !")
+                    twin.setState(State.CONNECTED)  // Update State
+                    console.log("connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    
+                    if(timeStamp - twin.getLastSeen() > 2*ms){  // If device has been disconnected
+                        twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
+                    }
+                    twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
+                    
                 }else{
-                    console.log("offline !")
+                    console.log("offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    twin.setState(State.OFFLINE)    // Update state
                 }
-            },5000)
+            }, ms)
         }
     }
 
