@@ -228,16 +228,21 @@ class Device{
         }
     }
 
-    public async switchLight():Promise<boolean | undefined>{
+    public async switchLight(wishedStatus:boolean):Promise<boolean | undefined>{
         const lightStatus = await this.getLightStatus()
         var body
-        if(lightStatus === true){
+
+        if(wishedStatus === lightStatus){
+            console.log("Light status is already on:", lightStatus)
+            return lightStatus
+        }else if(lightStatus === true){
             body = '{"apiVersion": "1.0","method": "deactivateLight","params": {"lightID": "led0"}}'
-        }else if(lightStatus == false){
+        }else if(lightStatus === false){
             body = '{"apiVersion": "1.0","method": "activateLight","params": {"lightID": "led0"}}'
         }else{
             throw new Error("Error while requesting light status")
         }
+
         const protocol = 'http'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.lightcontrol

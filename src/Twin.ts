@@ -7,14 +7,11 @@ with the applications installed
 
 import { DeviceManager } from "./DeviceManager"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
+import { ITwin, State } from "./interfaces/ITwin"
 import { writeJSON } from "./Utils"
 
-enum State {
-    ONLINE,
-    OFFLINE,
-}
 
-class Twin {
+class Twin implements ITwin{
     private id:string
     private ipAddress:string
     private properties: PropertyList | undefined
@@ -22,6 +19,7 @@ class Twin {
     private lastseen:number     // last time the device was online
     private lastentry:number    // last time the device start connection with the system
     private state:State         // Current state
+    private lightStatus:boolean
     
     public constructor(ipAddress:string, deviceManager:DeviceManager){
         this.id = {} as string
@@ -31,6 +29,7 @@ class Twin {
         this.lastseen = 0
         this.lastentry = 0
         this.state = State.OFFLINE
+        this.lightStatus = {} as boolean
     }
 
     // Update the state of the Twin by storing values from last request
@@ -45,47 +44,52 @@ class Twin {
             if(response?.reply?.application?.[0].$ !== undefined){
                 this.applications = response?.reply?.application
             }
-            writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
-            // console.log(this)
         } catch (error) {
             console.log(error)
         }
-
         return result
 
     }
 
+    public storeTwinObject(){
+        writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
+        console.log(this)
+    }
+
 /*------------------ Getters & Setters ------------------------ */
 
-    getApplications():(ApplicationEntity)[] | null{
+    public getApplications():(ApplicationEntity)[] | null{
         return this.applications
     }
-    getID(){
+    public getID():string{
         return this.id
     }
-    setIPAddress(ipAddress:string){
+    public setIPAddress(ipAddress:string):void{
         this.ipAddress = ipAddress
     }
-    getLastSeen(){
+    public getLastSeen():number{
         return this.lastseen
     }
-    setLastSeen(timeStamp:number){
+    public setLastSeen(timeStamp:number):void{
         this.lastseen = timeStamp
-        // writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
     }
-    getLastEntry(){
+    public getLastEntry():number{
         return this.lastentry
     }
-    setLastEntry(timeStamp:number){
+    public setLastEntry(timeStamp:number):void{
         this.lastentry = timeStamp
-        // writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
     }
-    getState(){
+    public getState():State{
         return this.state
     }
-    setState(s:State){
+    public setState(s:State):void{
         this.state = s
-        // writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
+    }
+    public getLightStatus():boolean{
+        return this.lightStatus
+    }
+    public setLightStatus(newLightStatus:boolean):void{
+        this.lightStatus = newLightStatus
     }
 }
 

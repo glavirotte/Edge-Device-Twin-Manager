@@ -5,9 +5,11 @@ used to update the state of the Device twin and to interact
 with the physical device
 
 #########################################################*/
+
 import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
 import { State, Twin } from "./Twin"
+import { TwinHandler } from "./TwinHandler"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -16,20 +18,22 @@ class DeviceManager {
     
     private devices:Map<Device, Twin>
     private twins:Map<string, Twin>
+    private proxies:Map<any, Twin>
 
     public constructor(){
         this.devices = new Map()
         this.twins = new Map()
+        this.proxies = new Map()
     }
 
-    // Add a device, twin pair in the hashmap of Device/Twin and set login credentials to access device
-
-    public async createTwin(ipAddress:string):Promise<Twin>{
+    // Create a twin, setup it and return a twin proxy for the user to be able to interract with it
+    public async createTwin(ipAddress:string):Promise<any>{
         const deviceTwin = new Twin(ipAddress, this)
         const device = new Device(ipAddress)
         this.devices.set(device, deviceTwin)
 
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
+        
         await device.getDeviceInfo()      // get the response from the device
             .then(response => {
                 if(response !== undefined){
@@ -38,26 +42,29 @@ class DeviceManager {
                     this.twins.set(deviceTwin.getID(), deviceTwin)
                 }
             })
-
-        await device.listApplications()
-            .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
-            .then(() => device.switchLight()) // just for testing !
-            .then((currenLightStatus) => {console.log("Current light status: ", currenLightStatus)})// just for testing !
         
-        await this.checkDeviceConnectivity(deviceTwin, 5000)
-    
-        return deviceTwin
+        device.getLightStatus().then((lightStatus) => {if(lightStatus !== undefined) {deviceTwin.setLightStatus(lightStatus)}}) // Get camera light status
+        device.listApplications()
+            .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
+            // .then(() => device.switchLight(false)) // just for testing !
+            // .then((currenLightStatus) => {console.log("Current light status: ", currenLightStatus)})// just for testing !
+        
+        await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
+        
+        deviceTwin.storeTwinObject()    // Store the object locally
+        const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
+        this.proxies.set(twinProxy, deviceTwin)
+
+        return twinProxy
     }
 
     // Update state of the twin, called after a device API request
-
     public updateDeviceTwin(device:Device, response:IResponse){
         const twin = this.devices.get(device)
         const id = twin?.updateState(response)
     }
 
     // Update state of device
-
     public updatePhysicalDevice(twin:Twin){
         let device:Device
         for (let [key, value] of this.devices.entries()) {
@@ -71,7 +78,6 @@ class DeviceManager {
     }
 
     // Send a http request every {{ ms }} second to check connectivity with device
-
     private async checkDeviceConnectivity(twin:Twin, ms:number){
         const device = this.getDevice(twin)
 
@@ -95,6 +101,7 @@ class DeviceManager {
             }, ms)
         }
     }
+
 
 /*------------------ Getters & Setters ------------------------ */
 

@@ -1,12 +1,9 @@
-import { Application } from './Application'
+
 import { DeviceManager } from './DeviceManager'
+import { Twin } from './Twin'
 const cameraIP = '192.168.50.34'
 const deviceManager = new DeviceManager()
 
-deviceManager.createTwin(cameraIP).then((twin)=>{
-        console.log(twin)
+deviceManager.createTwin(cameraIP).then((twinProxy:Twin) => {
+    twinProxy.setLightStatus(false)
 })
-
-// const app = new Application("lol", "test")
-
-// const watchedObject = onChange(app, () =>{console.log("changed !")})
