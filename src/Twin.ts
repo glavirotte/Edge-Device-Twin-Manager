@@ -10,7 +10,6 @@ import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IRespo
 import { ITwin, State } from "./interfaces/ITwin"
 import { writeJSON } from "./Utils"
 
-
 class Twin implements ITwin{
     private id:string
     private ipAddress:string

@@ -31,7 +31,7 @@ class TwinHandler extends Object{
         const property = prop as ObjectKey;
         console.log(`Setting property ${prop} as ${value} of ${twin.getID()}`)  // To be modified
         
-        // @TODO Has to be imrpoved 
+        // @TODO Has to be imrpoved
         if(prop === "lightStatus"){
             this.deviceManager.getDevice(twin)?.switchLight(value)
             .then((newLightStatus) => {twin[property] = newLightStatus as any})
