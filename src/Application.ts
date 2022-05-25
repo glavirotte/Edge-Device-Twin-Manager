@@ -7,7 +7,7 @@ to the Camera by the device manager and will be uploaded.
 
 class Application{
     
-    private name:string     // The name of the app
+     name:string     // The name of the app
     private location:string // Where the source file is located (.eap)
 
     public constructor (name:string, location:string){

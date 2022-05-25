@@ -45,7 +45,7 @@ class DeviceManager {
             .then((currenLightStatus) => {console.log("Current light status: ", currenLightStatus)})// just for testing !
         
         await this.checkDeviceConnectivity(deviceTwin, 5000)
-
+    
         return deviceTwin
     }
 
