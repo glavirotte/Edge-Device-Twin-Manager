@@ -3,6 +3,7 @@ interface IURIs {
     upload:string
     control:string
     basicdeviceinfo:string
+    lightcontrol:string
 }
 
 export { IURIs }

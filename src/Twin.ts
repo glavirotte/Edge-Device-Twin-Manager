@@ -10,7 +10,7 @@ import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IRespo
 import { writeJSON } from "./Utils"
 
 enum State {
-    CONNECTED,
+    ONLINE,
     OFFLINE,
 }
 
@@ -46,7 +46,7 @@ class Twin {
                 this.applications = response?.reply?.application
             }
             writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
-            console.log(this)
+            // console.log(this)
         } catch (error) {
             console.log(error)
         }
@@ -89,4 +89,4 @@ class Twin {
     }
 }
 
-export { Twin, State}
+export { Twin, State }

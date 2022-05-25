@@ -10,8 +10,10 @@ export interface IResponse {
     apiVersion?: string;
     data?: Data;
     reply?: Reply;
+    method: string;
   }
   export interface Data {
+    status: boolean;
     propertyList: PropertyList;
   }
   export interface PropertyList {

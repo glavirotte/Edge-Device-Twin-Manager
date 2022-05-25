@@ -15,31 +15,38 @@ const defaultPassword = 'pass'
 class DeviceManager {
     
     private devices:Map<Device, Twin>
+    private twins:Map<string, Twin>
 
     public constructor(){
         this.devices = new Map()
+        this.twins = new Map()
     }
 
     // Add a device, twin pair in the hashmap of Device/Twin and set login credentials to access device
 
-    public async createTwin(ipAddress:string){
+    public async createTwin(ipAddress:string):Promise<Twin>{
         const deviceTwin = new Twin(ipAddress, this)
         const device = new Device(ipAddress)
         this.devices.set(device, deviceTwin)
 
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
-        device.getDeviceInfo()      // get the response from the device
+        await device.getDeviceInfo()      // get the response from the device
             .then(response => {
                 if(response !== undefined){
                     this.updateDeviceTwin(device, response)         // Update the twin properties
                     device.setID(deviceTwin.getID())                // set the id of of the device object
+                    this.twins.set(deviceTwin.getID(), deviceTwin)
                 }
             })
 
-        device.listApplications()
+        await device.listApplications()
             .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
+            .then(() => device.switchLight()) // just for testing !
+            .then((currenLightStatus) => {console.log("Current light status: ", currenLightStatus)})// just for testing !
         
-        this.checkDeviceConnectivity(deviceTwin, 5000)
+        await this.checkDeviceConnectivity(deviceTwin, 5000)
+
+        return deviceTwin
     }
 
     // Update state of the twin, called after a device API request
@@ -73,8 +80,8 @@ class DeviceManager {
                 const res = await device.ping()     // Send "ping" request and wait for the result status code
                 const timeStamp = Date.now()        // get current timestamp
                 if(res === 200){
-                    twin.setState(State.CONNECTED)  // Update State
-                    console.log(twin.getID() + " connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    twin.setState(State.ONLINE)  // Update State
+                    console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     
                     if(timeStamp - twin.getLastSeen() > 2*ms){  // If device has been disconnected
                         twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
@@ -82,7 +89,7 @@ class DeviceManager {
                     twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
                     
                 }else{
-                    console.log(twin.getID() + "offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     twin.setState(State.OFFLINE)    // Update state
                 }
             }, ms)
@@ -99,8 +106,8 @@ class DeviceManager {
         }
         throw(Error('No registered device for that twin !'))
     }
-    public getTwin(device:Device):void | Device{
-        this.devices.get(device)
+    public getTwin(id:string):void | Twin{
+        return this.twins.get(id)
     }
 }
 

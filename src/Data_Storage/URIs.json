@@ -2,5 +2,6 @@
     "list":"axis-cgi/applications/list.cgi",
     "upload":"axis-cgi/applications/upload.cgi",
     "control":"axis-cgi/applications/control.cgi",
-    "basicdeviceinfo":"axis-cgi/basicdeviceinfo.cgi"
+    "basicdeviceinfo":"axis-cgi/basicdeviceinfo.cgi",
+    "lightcontrol":"axis-cgi/lightcontrol.cgi"
 }
