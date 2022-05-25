@@ -5,7 +5,6 @@ used to update the state of the Device twin and to interact
 with the physical device
 
 #########################################################*/
-import { time } from "console"
 import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
 import { State, Twin } from "./Twin"
@@ -75,7 +74,7 @@ class DeviceManager {
                 const timeStamp = Date.now()        // get current timestamp
                 if(res === 200){
                     twin.setState(State.CONNECTED)  // Update State
-                    console.log("connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     
                     if(timeStamp - twin.getLastSeen() > 2*ms){  // If device has been disconnected
                         twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
@@ -83,7 +82,7 @@ class DeviceManager {
                     twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
                     
                 }else{
-                    console.log("offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + "offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     twin.setState(State.OFFLINE)    // Update state
                 }
             }, ms)

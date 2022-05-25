@@ -19,9 +19,9 @@ class Twin {
     private ipAddress:string
     private properties: PropertyList | undefined
     private applications: (ApplicationEntity)[] | null
-    private lastseen:number
-    private lastentry:number
-    private state:State
+    private lastseen:number     // last time the device was online
+    private lastentry:number    // last time the device start connection with the system
+    private state:State         // Current state
     
     public constructor(ipAddress:string, deviceManager:DeviceManager){
         this.id = {} as string
