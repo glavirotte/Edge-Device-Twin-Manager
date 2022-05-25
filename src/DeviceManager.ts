@@ -40,18 +40,34 @@ class DeviceManager {
                     this.updateDeviceTwin(device, response)         // Update the twin properties
                     device.setID(deviceTwin.getID())                // set the id of of the device object
                     this.twins.set(deviceTwin.getID(), deviceTwin)
+                }else{
+                    deviceTwin.setState(State.OFFLINE)
+                    // @TODO create a new task to perform later
                 }
             })
         
-        device.getLightStatus().then((lightStatus) => {if(lightStatus !== undefined) {deviceTwin.setLightStatus(lightStatus)}}) // Get camera light status
-        device.listApplications()
-            .then(response => {if(response !== undefined) {this.updateDeviceTwin(device, response)}})
-            // .then(() => device.switchLight(false)) // just for testing !
-            // .then((currenLightStatus) => {console.log("Current light status: ", currenLightStatus)})// just for testing !
+        await device.getLightStatus() // @TODO will be removed in a futur implementation
+            .then(lightStatus => {     // Get camera light status
+                if(lightStatus !== undefined){
+                    deviceTwin.setLightStatus(lightStatus)
+                }else{
+                    deviceTwin.setState(State.OFFLINE)
+                    // @TODO create a new task to perform later
+                }
+            })
+
+        await device.listApplications()      //Get the list of applications
+            .then(response => {
+                if(response !== undefined){
+                    this.updateDeviceTwin(device, response)
+                }else{
+                    deviceTwin.setState(State.OFFLINE)
+                    // @TODO create a new task to perform later
+                }
+            })
         
         await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
-        
-        deviceTwin.storeTwinObject()    // Store the object locally
+        deviceTwin.storeTwinObject()
         const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
         this.proxies.set(twinProxy, deviceTwin)
 
