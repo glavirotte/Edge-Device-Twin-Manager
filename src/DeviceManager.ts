@@ -10,6 +10,8 @@ import { Device } from "./Device"
 import { IResponse } from "./interfaces/IResponse"
 import { State, Twin } from "./Twin"
 import { TwinHandler } from "./TwinHandler"
+import { Task } from "./Task"
+import { IDevice } from "./interfaces/IDevice"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -27,11 +29,10 @@ class DeviceManager {
     }
 
     // Create a twin, setup it and return a twin proxy for the user to be able to interract with it
-    public async createTwin(ipAddress:string):Promise<any>{
+    public async createTwin(ipAddress:string):Promise<Twin>{
         const deviceTwin = new Twin(ipAddress, this)
         const device = new Device(ipAddress)
         this.devices.set(device, deviceTwin)
-
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
         
         await device.getDeviceInfo()      // get the response from the device
@@ -80,18 +81,6 @@ class DeviceManager {
         const id = twin?.updateState(response)
     }
 
-    // Update state of device
-    public updatePhysicalDevice(twin:Twin){
-        let device:Device
-        for (let [key, value] of this.devices.entries()) {
-            if (Object.is(value, twin)){
-                device = key
-                device.setID(twin.getID())
-                console.log(device)
-                return
-            }
-        }
-    }
 
     // Send a http request every {{ ms }} second to check connectivity with device
     private async checkDeviceConnectivity(twin:Twin, ms:number){
@@ -105,9 +94,22 @@ class DeviceManager {
                     twin.setState(State.ONLINE)  // Update State
                     console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     
-                    if(timeStamp - twin.getLastSeen() > 2*ms){  // If device has been disconnected
+                    if(timeStamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
                         twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
+
+                        // Perform the tasks present in the task queue of the twin
+                        const taskQueue = twin.getTaskQueue()
+                        const device = this.getDevice(twin)
+                        const numberOfTasks = taskQueue.getArrayLength()
+
+                        for (let index = 0; index < numberOfTasks; index++) {
+                            const task = taskQueue.getNextTask()
+                            if(device !== undefined && task !== undefined){
+                                this.performTask(device, twin, task)
+                            }
+                        }
                     }
+                    
                     twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
                     
                 }else{
@@ -118,6 +120,20 @@ class DeviceManager {
         }
     }
 
+    public performTask(device:Device, twin:Twin, task:Task){
+        const m = task.getFunctionName()
+        const args = task.getArgs()
+        const ar0 = args[0]
+        const func = device[m as keyof IDevice]
+        var res:any
+
+        if(args.length !== 0){
+            res = func.bind(device)({} as never, "")
+        }else{
+            res = func.bind(device)({} as never, "")
+        }
+        return res
+    }
 
 /*------------------ Getters & Setters ------------------------ */
 

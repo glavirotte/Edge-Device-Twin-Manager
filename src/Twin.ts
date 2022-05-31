@@ -8,6 +8,7 @@ with the applications installed
 import { DeviceManager } from "./DeviceManager"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { ITwin, State } from "./interfaces/ITwin"
+import { TaskQueue } from "./TaskQueue"
 import { writeJSON } from "./Utils"
 
 class Twin implements ITwin{
@@ -19,6 +20,7 @@ class Twin implements ITwin{
     private lastentry:number    // last time the device start connection with the system
     private state:State         // Current state
     private lightStatus:boolean
+    private taskQueue:TaskQueue
     
     public constructor(ipAddress:string, deviceManager:DeviceManager){
         this.id = {} as string
@@ -29,6 +31,7 @@ class Twin implements ITwin{
         this.lastentry = 0
         this.state = State.OFFLINE
         this.lightStatus = {} as boolean
+        this.taskQueue = new TaskQueue()
     }
 
     // Update the state of the Twin by storing values from last request
@@ -87,8 +90,18 @@ class Twin implements ITwin{
     public getLightStatus():boolean{
         return this.lightStatus
     }
-    public setLightStatus(newLightStatus:boolean):void{
-        this.lightStatus = newLightStatus
+    public switchLight():void{
+        if(this.lightStatus){
+            this.lightStatus = false
+        }else{
+            this.lightStatus = true
+        }
+    }
+    public setLightStatus(status:boolean){
+        this.lightStatus = status
+    }
+    public getTaskQueue():TaskQueue{
+        return this.taskQueue
     }
 }
 

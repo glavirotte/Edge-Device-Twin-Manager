@@ -30,6 +30,8 @@ interface ITwin {
 
     setLightStatus(newLightStatus:boolean):void
 
+    switchLight():void
+
 }
 
 export { ITwin, State }

@@ -22,4 +22,6 @@ class TaskQueue {
 
 }
 
+// Interface that an item added to the queue needs to conform to
+
 export{ TaskQueue }

@@ -1,20 +1,21 @@
 class Task{
 
-    methodName:string
-    args:Array<string>
+    private args:Array<string>
+    private functionName:string
 
-    constructor(methodName:string, args:Array<string>){
-        this.methodName = methodName
+
+    constructor(args:Array<string>, functionName:string){
         this.args = args
-    }
-
-    public getMethodName():string{
-        return this.methodName
+        this.functionName = functionName
     }
 
     public getArgs():Array<string>{
         return this.args
     }
+    public getFunctionName(){
+        return this.functionName
+    }
+
 }
 
 export { Task }

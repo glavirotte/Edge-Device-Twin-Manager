@@ -6,7 +6,8 @@ interrcat with the twin proxy
 #########################################################*/
 
 import { DeviceManager } from "./DeviceManager";
-import { Twin } from "./Twin";
+import { Task } from "./Task";
+import { State, Twin } from "./Twin";
 
 class TwinHandler extends Object{
 
@@ -31,10 +32,20 @@ class TwinHandler extends Object{
         const property = prop as ObjectKey;
         console.log(`Setting property ${prop} as ${value} of ${twin.getID()}`)  // To be modified
         
-        // @TODO Has to be imrpoved
+        // @TODO Has to be improved
+
         if(prop === "lightStatus"){
-            this.deviceManager.getDevice(twin)?.switchLight(value)
-            .then((newLightStatus) => {twin[property] = newLightStatus as any})
+            this.deviceManager.getDevice(twin)?.switchLight()
+                .then((newLightStatus) => {
+                    if( newLightStatus !== undefined ){
+                        twin[property] = newLightStatus as any
+                    }else{
+                        console.log("Error in switch light !")      // If camera is currently unreachable
+                        twin.setState(State.OFFLINE)
+                        const task = new Task(new Array(value), "switchLight")  // We create a task and save it into the taskQueue of the twin
+                        twin.getTaskQueue().addTask(task)
+                        console.log("New task added to queue: ", task)
+                }})
         }
 
         /*

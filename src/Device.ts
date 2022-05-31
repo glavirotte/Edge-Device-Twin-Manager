@@ -13,14 +13,15 @@ import { Application } from './Application'
 import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
 import { IResponse } from './interfaces/IResponse'
+import { IDevice } from './interfaces/IDevice';
 
-class Device{
+class Device implements IDevice{
 
-    private id:string
-    private ipAddress:string
-    private username:string
-    private password:string
-    private URIs:IURIs
+    id:string
+    ipAddress:string
+    username:string
+    password:string
+    URIs:IURIs
 
     public constructor(ipAddress:string){
         this.ipAddress = ipAddress;
@@ -34,9 +35,8 @@ class Device{
 
     // Get json object from a Request sent to the Device
     
-    private async askDevice(req: Request):Promise<IResponse | undefined>{
+    async askDevice(req: Request):Promise<IResponse | undefined>{
         try {
-
         // Send request to the Device
         const res = await HttpClient.request(req.getURL(), req.getOptions())
         const contentType = res.headers['content-type'] as string
@@ -66,6 +66,7 @@ class Device{
             } else {
                 console.log('unexpected error: ', error);
             }
+            return undefined
         }
     }
 
@@ -224,23 +225,20 @@ class Device{
         if(response !== undefined){
             return response.data?.status
         }else{
-            throw new Error("Undefined response !")
+            return undefined
         }
     }
 
-    public async switchLight(wishedStatus:boolean):Promise<boolean | undefined>{
+    async switchLight():Promise<boolean | undefined>{
         const lightStatus = await this.getLightStatus()
         var body
 
-        if(wishedStatus === lightStatus){
-            console.log("Light status is already on:", lightStatus)
-            return lightStatus
-        }else if(lightStatus === true){
+        if(lightStatus === true){
             body = '{"apiVersion": "1.0","method": "deactivateLight","params": {"lightID": "led0"}}'
         }else if(lightStatus === false){
             body = '{"apiVersion": "1.0","method": "activateLight","params": {"lightID": "led0"}}'
         }else{
-            throw new Error("Error while requesting light status")
+            return undefined
         }
 
         const protocol = 'http'
@@ -262,7 +260,7 @@ class Device{
         if(newLightStatus !== undefined){
             return newLightStatus
         }else{
-            throw new Error("Undefined response !")
+            return undefined
         }
     }
 
@@ -281,6 +279,7 @@ class Device{
     public setID(id:string){
         this.id = id
     }
+
 }
 
 export { Device }
