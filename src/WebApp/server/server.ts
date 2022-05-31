@@ -6,7 +6,7 @@ const app: Express = express();
 const port = 8000;
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Express + TypeScript Server');
+    res.json({"users":["alphagone", "shundern", "naomi"]});
 });
 
 app.listen(port, () => {
