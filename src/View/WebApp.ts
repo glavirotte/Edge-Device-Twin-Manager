@@ -1,10 +1,9 @@
 import express, { Express, Request, Response } from 'express';
-import { document } from "Document"
+import dotenv from "dotenv"
 
 dotenv.config();
 const app: Express = express();
 const port = 8000;
-const twinDisplay = document.querySelector("#twin")  as HTMLInputElement | null;
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Express + TypeScript Server');
