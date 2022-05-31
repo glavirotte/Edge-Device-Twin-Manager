@@ -28,7 +28,7 @@ class Device implements IDevice{
         this.id = {} as string;
         this.username = {} as string
         this.password = {} as string
-        this.URIs = loadJSON('./src/Data_Storage/URIs.json')
+        this.URIs = loadJSON('./src/Model/Data_Storage/URIs.json')
     }
 
 /*-------------------------Device Methods-------------------------*/

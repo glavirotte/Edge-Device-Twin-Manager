@@ -54,7 +54,7 @@ class Twin implements ITwin{
     }
 
     public storeTwinObject(){
-        writeJSON(this, `./src/Data_Storage/Twins/${this.id}-Twin.json`)
+        writeJSON(this, `./src/Model/Data_Storage/Twins/${this.id}-Twin.json`)
         console.log(this)
     }
 
