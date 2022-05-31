@@ -44,7 +44,6 @@ class TwinHandler extends Object{
                         twin.setState(State.OFFLINE)
                         const task = new Task(new Array(value), "switchLight")  // We create a task and save it into the taskQueue of the twin
                         twin.getTaskQueue().addTask(task)
-                        console.log("New task added to queue: ", task)
                 }})
         }
 

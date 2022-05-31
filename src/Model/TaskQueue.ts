@@ -10,6 +10,7 @@ class TaskQueue {
 
     public addTask(task:Task){
         this.queue.unshift(task)
+        console.log("Adding task: ", task, ", to task queue !")
     }
 
     public getNextTask():Task | undefined{

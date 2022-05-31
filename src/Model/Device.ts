@@ -120,7 +120,7 @@ class Device implements IDevice{
         if(response !== undefined){
             return response
         }else{
-            throw new Error("Undefined response !")
+            return undefined
         }
     }
 
@@ -145,7 +145,7 @@ class Device implements IDevice{
         if(response !== undefined){
             return response
         }else{
-            throw new Error("Undefined response !")
+            return undefined
         }
     }
 
@@ -172,7 +172,7 @@ class Device implements IDevice{
         if(response !== undefined){
             return response
         }else{
-            throw new Error("Undefined response !")
+            return undefined
         }
     }
 
@@ -201,7 +201,7 @@ class Device implements IDevice{
         if(response !== undefined){
             return response
         }else{
-            throw new Error("Undefined response !")
+            return undefined
         }
     }
 

@@ -46,6 +46,7 @@ class Twin implements ITwin{
             if(response?.reply?.application?.[0].$ !== undefined){
                 this.applications = response?.reply?.application
             }
+            this.storeTwinObject()
         } catch (error) {
             console.log(error)
         }
@@ -96,6 +97,7 @@ class Twin implements ITwin{
         }else{
             this.lightStatus = true
         }
+        this.storeTwinObject()
     }
     public setLightStatus(status:boolean){
         this.lightStatus = status

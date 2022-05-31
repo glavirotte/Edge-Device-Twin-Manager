@@ -38,12 +38,13 @@ class DeviceManager {
         await device.getDeviceInfo()      // get the response from the device
             .then(response => {
                 if(response !== undefined){
-                    this.updateDeviceTwin(device, response)         // Update the twin properties
+                    this.updateDeviceTwin(deviceTwin, response)         // Update the twin properties
                     device.setID(deviceTwin.getID())                // set the id of of the device object
                     this.twins.set(deviceTwin.getID(), deviceTwin)
+                    deviceTwin.storeTwinObject()
                 }else{
                     deviceTwin.setState(State.OFFLINE)
-                    // @TODO create a new task to perform later
+                    deviceTwin.getTaskQueue().addTask(new Task(new Array(), "getDeviceInfo"))
                 }
             })
         
@@ -53,22 +54,21 @@ class DeviceManager {
                     deviceTwin.setLightStatus(lightStatus)
                 }else{
                     deviceTwin.setState(State.OFFLINE)
-                    // @TODO create a new task to perform later
+                    deviceTwin.getTaskQueue().addTask(new Task(new Array(), "getLightStatus"))
                 }
             })
 
         await device.listApplications()      //Get the list of applications
             .then(response => {
                 if(response !== undefined){
-                    this.updateDeviceTwin(device, response)
+                    this.updateDeviceTwin(deviceTwin, response)
                 }else{
                     deviceTwin.setState(State.OFFLINE)
-                    // @TODO create a new task to perform later
+                    deviceTwin.getTaskQueue().addTask(new Task(new Array(), "listApplications"))
                 }
             })
         
         await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
-        deviceTwin.storeTwinObject()
         const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
         this.proxies.set(twinProxy, deviceTwin)
 
@@ -76,9 +76,8 @@ class DeviceManager {
     }
 
     // Update state of the twin, called after a device API request
-    public updateDeviceTwin(device:Device, response:IResponse){
-        const twin = this.devices.get(device)
-        const id = twin?.updateState(response)
+    public updateDeviceTwin(twin:Twin, response:IResponse){
+        twin.updateState(response)
     }
 
 
@@ -92,7 +91,7 @@ class DeviceManager {
                 const timeStamp = Date.now()        // get current timestamp
                 if(res === 200){
                     twin.setState(State.ONLINE)  // Update State
-                    console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    // console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     
                     if(timeStamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
                         twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
@@ -113,26 +112,27 @@ class DeviceManager {
                     twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
                     
                 }else{
-                    console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    // console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     twin.setState(State.OFFLINE)    // Update state
                 }
             }, ms)
         }
     }
 
-    public performTask(device:Device, twin:Twin, task:Task){
+    public async performTask(device:Device, twin:Twin, task:Task){
         const m = task.getFunctionName()
         const args = task.getArgs()
         const ar0 = args[0]
         const func = device[m as keyof IDevice]
-        var res:any
 
-        if(args.length !== 0){
-            res = func.bind(device)({} as never, "")
-        }else{
-            res = func.bind(device)({} as never, "")
+        const res = await func.bind(device)({} as never, "")
+        console.log(res)
+        function isAnIReponse(obj: any): obj is IResponse {
+            return 'apiVersion' in obj || 'data' in obj || 'reply' in obj;
         }
-        return res
+        if(isAnIReponse(res)){
+            this.updateDeviceTwin(twin, res)
+        }
     }
 
 /*------------------ Getters & Setters ------------------------ */
