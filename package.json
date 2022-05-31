@@ -6,13 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsc && node dist/Model/main.js",
-    "server":"npx tsc && node dist/WebApp/server/server.js",
-    "client":"cd src/WebApp/client/ && npm start"
+    "server": "npx tsc && node dist/WebApp/server/server.js",
+    "client": "cd src/WebApp/client/ && npm start"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "nodemon": "^2.0.16",

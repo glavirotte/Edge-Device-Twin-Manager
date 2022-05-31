@@ -17,7 +17,7 @@ function App(){
       <body>
         <div>
             {
-              (backendData !== undefined)?(<p>{backendData?.users}</p>):(<p>Loading...</p>)
+              (backendData !== undefined)?(<p>{backendData?.users[0]}</p>):(<p>Loading...</p>)
             }
         </div>
       </body>
