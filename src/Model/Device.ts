@@ -205,7 +205,7 @@ class Device implements IDevice{
         }
     }
 
-    public async getLightStatus():Promise<boolean | undefined>{
+    public async getLightStatus():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.lightcontrol
@@ -223,15 +223,22 @@ class Device implements IDevice{
         const response:IResponse | undefined = await this.askDevice(request)
 
         if(response !== undefined){
-            return response.data?.status
+            return response
         }else{
             return undefined
         }
     }
 
-    async switchLight():Promise<boolean | undefined>{
-        const lightStatus = await this.getLightStatus()
+    async switchLight():Promise<IResponse | undefined>{
+        var response = await this.getLightStatus()
+        var lightStatus
         var body
+
+        if(response !== undefined){
+            lightStatus = response.data?.status
+        }else{
+            return undefined
+        }
 
         if(lightStatus === true){
             body = '{"apiVersion": "1.0","method": "deactivateLight","params": {"lightID": "led0"}}'
@@ -255,10 +262,10 @@ class Device implements IDevice{
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
-        const newLightStatus = await this.getLightStatus()
+        response = await this.getLightStatus()
         
-        if(newLightStatus !== undefined){
-            return newLightStatus
+        if(response !== undefined){
+            return response
         }else{
             return undefined
         }

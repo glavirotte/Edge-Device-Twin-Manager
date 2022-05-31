@@ -17,9 +17,9 @@ export interface IDevice {
 
     removeApplication(application:Application):Promise<IResponse | undefined>
 
-    getLightStatus():Promise<boolean | undefined>
+    getLightStatus():Promise<IResponse | undefined>
 
-    switchLight(wishedStatus:boolean):Promise<boolean | undefined>
+    switchLight(wishedStatus:boolean):Promise<IResponse | undefined>
 
     getID(): string
 

@@ -1,6 +1,6 @@
 /*#######################################################  
 
-This class describes the Device Manager object, which is
+This class describes the Device Manager resect, which is
 used to update the state of the Device twin and to interact
 with the physical device
 
@@ -33,13 +33,13 @@ class DeviceManager {
         const deviceTwin = new Twin(ipAddress, this)
         const device = new Device(ipAddress)
         this.devices.set(device, deviceTwin)
-        device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device object
+        device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
         
         await device.getDeviceInfo()      // get the response from the device
             .then(response => {
                 if(response !== undefined){
                     this.updateDeviceTwin(deviceTwin, response)         // Update the twin properties
-                    device.setID(deviceTwin.getID())                // set the id of of the device object
+                    device.setID(deviceTwin.getID())                // set the id of of the device resect
                     this.twins.set(deviceTwin.getID(), deviceTwin)
                     deviceTwin.storeTwinObject()
                 }else{
@@ -49,9 +49,9 @@ class DeviceManager {
             })
         
         await device.getLightStatus() // @TODO will be removed in a futur implementation
-            .then(lightStatus => {     // Get camera light status
-                if(lightStatus !== undefined){
-                    deviceTwin.setLightStatus(lightStatus)
+            .then(response => {     // Get camera light status
+                if(response !== undefined){
+                    this.updateDeviceTwin(deviceTwin, response)
                 }else{
                     deviceTwin.setState(State.OFFLINE)
                     deviceTwin.getTaskQueue().addTask(new Task(new Array(), "getLightStatus"))
@@ -126,9 +126,8 @@ class DeviceManager {
         const func = device[m as keyof IDevice]
 
         const res = await func.bind(device)({} as never, "")
-        console.log(res)
-        function isAnIReponse(obj: any): obj is IResponse {
-            return 'apiVersion' in obj || 'data' in obj || 'reply' in obj;
+        function isAnIReponse(res: any): res is IResponse {
+            return 'apiVersion' in res || 'data' in res || 'reply' in res || 'method' in res;
         }
         if(isAnIReponse(res)){
             this.updateDeviceTwin(twin, res)

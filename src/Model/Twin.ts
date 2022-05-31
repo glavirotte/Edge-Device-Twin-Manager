@@ -21,7 +21,8 @@ class Twin implements ITwin{
     private state:State         // Current state
     private lightStatus:boolean
     private taskQueue:TaskQueue
-    
+    public proxySwitchLight:boolean
+
     public constructor(ipAddress:string, deviceManager:DeviceManager){
         this.id = {} as string
         this.ipAddress = ipAddress
@@ -32,6 +33,8 @@ class Twin implements ITwin{
         this.state = State.OFFLINE
         this.lightStatus = {} as boolean
         this.taskQueue = new TaskQueue()
+
+        this.proxySwitchLight = {} as boolean
     }
 
     // Update the state of the Twin by storing values from last request
@@ -45,6 +48,9 @@ class Twin implements ITwin{
             }
             if(response?.reply?.application?.[0].$ !== undefined){
                 this.applications = response?.reply?.application
+            }
+            if(response?.data?.status !== undefined && response.method === 'getLightStatus'){
+                this.lightStatus = response.data.status
             }
             this.storeTwinObject()
         } catch (error) {
@@ -105,6 +111,9 @@ class Twin implements ITwin{
     public getTaskQueue():TaskQueue{
         return this.taskQueue
     }
+
+    //Method used by the proxy (May be improved)
+
 }
 
 export { Twin, State }

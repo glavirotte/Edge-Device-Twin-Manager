@@ -14,7 +14,7 @@ function recursiveAsyncReadLine(twinProxy:Twin) {
     rl.question('Do you want to switch the light? [y/n] ', (answer) => {
         switch(answer.toLowerCase()) {
             case 'y':
-                twinProxy.switchLight()
+                twinProxy.proxySwitchLight = true
                 break;
             case 'n':
                 console.log('Sorry! :(')

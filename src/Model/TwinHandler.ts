@@ -30,19 +30,18 @@ class TwinHandler extends Object{
     set(twin:Twin, prop:string, value:any) {    //  Called when the user wants to set the value of a field
         type ObjectKey = keyof typeof twin;
         const property = prop as ObjectKey;
-        console.log(`Setting property ${prop} as ${value} of ${twin.getID()}`)  // To be modified
         
         // @TODO Has to be improved
 
-        if(prop === "lightStatus"){
+        if(prop === "proxySwitchLight"){
             this.deviceManager.getDevice(twin)?.switchLight()
-                .then((newLightStatus) => {
-                    if( newLightStatus !== undefined ){
-                        twin[property] = newLightStatus as any
+                .then((response) => {
+                    if(response !== undefined ){
+                        this.deviceManager.updateDeviceTwin(twin, response)
                     }else{
-                        console.log("Error in switch light !")      // If camera is currently unreachable
+                        console.log("Error in switch light ! -> Device unreachable")      // If camera is currently unreachable
                         twin.setState(State.OFFLINE)
-                        const task = new Task(new Array(value), "switchLight")  // We create a task and save it into the taskQueue of the twin
+                        const task = new Task(new Array(), "switchLight")  // We create a task and save it into the taskQueue of the twin
                         twin.getTaskQueue().addTask(task)
                 }})
         }

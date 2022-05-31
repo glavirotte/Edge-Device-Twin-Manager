@@ -11,7 +11,6 @@ export interface IResponse {
     data?: Data;
     reply?: Reply;
     method: string;
-    lightStatus?:boolean
   }
   export interface Data {
     status: boolean;
