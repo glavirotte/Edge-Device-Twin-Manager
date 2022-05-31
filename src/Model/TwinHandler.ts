@@ -1,7 +1,7 @@
 /*#######################################################  
 
-An instance  of this class will be called when the user
-interrcat with the twin proxy
+An instance of this class linked with a specific twin will 
+be called when the user interrcats with the twin proxy
 
 #########################################################*/
 

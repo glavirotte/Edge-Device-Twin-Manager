@@ -21,6 +21,8 @@ class Twin implements ITwin{
     private state:State         // Current state
     private lightStatus:boolean
     private taskQueue:TaskQueue
+
+    // The followings fields are used to handle changes via the proxy
     public proxySwitchLight:boolean
 
     public constructor(ipAddress:string, deviceManager:DeviceManager){
@@ -111,8 +113,6 @@ class Twin implements ITwin{
     public getTaskQueue():TaskQueue{
         return this.taskQueue
     }
-
-    //Method used by the proxy (May be improved)
 
 }
 
