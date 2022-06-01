@@ -19,7 +19,7 @@ class Twin implements ITwin{
     private lastseen:number     // last time the device was online
     private lastentry:number    // last time the device start connection with the system
     private state:State         // Current state
-    private lightStatus:boolean
+    public  lightStatus:boolean
     private taskQueue:TaskQueue
 
     // The followings fields are used to handle changes via the proxy

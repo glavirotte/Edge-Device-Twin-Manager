@@ -1,3 +1,10 @@
+/*#######################################################  
+
+This class describes the server which provides APIs for
+the React Application
+
+#########################################################*/
+
 import { DeviceManager } from './DeviceManager'
 import { Twin } from './Twin'
 import * as readline from 'readline'
@@ -27,7 +34,11 @@ function recursiveAsyncReadLine(twinProxy:Twin) {
         }
     )
 }
-const server = new Server(8000)
 
 // deviceManager.createTwin(cameraIP)
 //     .then((twinProxy:Twin) => {recursiveAsyncReadLine(twinProxy)})
+
+const server = new Server(8000)
+
+deviceManager.createTwin(cameraIP)
+    .then((twinProxy:Twin) => {server.addTwinProxy(twinProxy)})
