@@ -38,7 +38,8 @@ class Server {
             res.send('<p>'+lightStatus+'<p>')
         });
         this.app.get('/devices/'+id+'/connected', (req: Request, res: Response) => {
-            res.send('<p>'+twin.getState()+'<p>')
+            const status = (twin.getState() === 0)?("Offline"):("Connected")
+            res.send('<p>'+status+'<p>')
         });
     }
 
