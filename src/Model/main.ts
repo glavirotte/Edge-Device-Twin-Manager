@@ -1,7 +1,7 @@
 import { DeviceManager } from './DeviceManager'
 import { Twin } from './Twin'
-import * as readline from 'readline';
-
+import * as readline from 'readline'
+import { Server } from './server/Server'
 const cameraIP = '192.168.50.34'
 const deviceManager = new DeviceManager()
 
@@ -27,6 +27,7 @@ function recursiveAsyncReadLine(twinProxy:Twin) {
         }
     )
 }
+const server = new Server(8000)
 
-deviceManager.createTwin(cameraIP)
-    .then((twinProxy:Twin) => {recursiveAsyncReadLine(twinProxy)})
+// deviceManager.createTwin(cameraIP)
+//     .then((twinProxy:Twin) => {recursiveAsyncReadLine(twinProxy)})
