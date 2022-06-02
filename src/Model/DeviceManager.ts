@@ -91,7 +91,7 @@ class DeviceManager {
                 const timeStamp = Date.now()        // get current timestamp
                 if(res === 200){
                     twin.setState(State.ONLINE)  // Update State
-                    // console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     
                     if(timeStamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
                         twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
@@ -112,7 +112,7 @@ class DeviceManager {
                     twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
                     
                 }else{
-                    // console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     twin.setState(State.OFFLINE)    // Update state
                 }
             }, ms)
@@ -126,7 +126,9 @@ class DeviceManager {
         const func = device[m as keyof IDevice]
 
         const res = await func.bind(device)({} as never, "")
+
         function isAnIReponse(res: any): res is IResponse {
+            console.log(res)
             return 'apiVersion' in res || 'data' in res || 'reply' in res || 'method' in res;
         }
         if(isAnIReponse(res)){

@@ -12,7 +12,7 @@ const DeviceDisplayer = (props) =>{
     useEffect(() => {
         fetch(url+'/devices/B8A44F3A42AB')
         .then((response) => response.json())
-        .then(res => {setTwin(res); console.log(twin)})
+        .then(res => {setTwin(res); console.log(res)})
     },[])
 
     return(
@@ -32,7 +32,7 @@ const DeviceDisplayer = (props) =>{
                     (<tr>
                         <td>{twin.id}</td>
                         <td>{twin.ipAddress}</td>
-                        <td>{(twin.state === 0) ? "Disabled" : "Active"}</td>
+                        <td >{(twin.state === 0) ? "Offline" : "Online"}</td>
                         <td>{(twin.lightStatus === true) ? "Active":"Disabled"}</td>
                         <td>
                             <tr><td>{twin.properties?.Architecture}</td></tr>
@@ -51,7 +51,8 @@ const DeviceDisplayer = (props) =>{
                             <tr><td>{twin.properties?.BuildDate}</td></tr>
                         </td>
                     </tr>
-                    ) : ('Loading ...')}
+                    )
+                    : ('Loading ...')}
                 </tbody>
             </table>
             <div className="btns">
