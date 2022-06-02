@@ -22,8 +22,8 @@ const DeviceDisplayer = (props) =>{
                     <tr>
                         <th>id</th>
                         <th>ip Address</th>
-                        <th>State</th>
-                        <th>Light Status</th>
+                        <th>Status</th>
+                        <th>Black and White mode</th>
                         <th>Properties</th>
                     </tr>
                 </thead>
@@ -33,7 +33,7 @@ const DeviceDisplayer = (props) =>{
                         <td>{twin.id}</td>
                         <td>{twin.ipAddress}</td>
                         <td >{(twin.state === 0) ? "Offline" : "Online"}</td>
-                        <td>{(twin.lightStatus === true) ? "Active":"Disabled"}</td>
+                        <td>{(twin.lightStatus === true) ? "On":"Off"}</td>
                         <td>
                             <tr><td>{twin.properties?.Architecture}</td></tr>
                             <tr><td>{twin.properties?.ProdNbr}</td></tr>
