@@ -12,11 +12,9 @@ class TaskQueue {
         this.queue.unshift(task)
         console.log("Adding task: ", task, ", to task queue !")
     }
-
     public getNextTask():Task | undefined{
         return this.queue.pop()
     }
-
     public getArrayLength():number{
         return this.queue.length
     }

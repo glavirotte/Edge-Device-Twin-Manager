@@ -14,6 +14,8 @@ import { Task } from "./Task"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
+var date = ""
+// date = "06/03/2022 16:01:00"
 
 class DeviceManager {
     
@@ -34,21 +36,21 @@ class DeviceManager {
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
         
-        const getDeviceInfo = new Task(device, device.getDeviceInfo, new Array(), 0)
-        await getDeviceInfo.execute()
+        const getDeviceInfo = new Task(device, device.getDeviceInfo, new Array(), date)
+        getDeviceInfo.execute()
             .then(response => {
                 this.handleRespone(deviceTwin, response, getDeviceInfo)
                 device.setID(deviceTwin.getID())
             })
         
-        const getLightStatus = new Task(device, device.getLightStatus, new Array(), 0)
-        await getLightStatus.execute() // @TODO will be removed in a futur implementation
+        const getLightStatus = new Task(device, device.getLightStatus, new Array(), date)
+        getLightStatus.execute() // @TODO will be removed in a futur implementation
             .then(response => {     // Get camera light status
                 this.handleRespone(deviceTwin, response, getLightStatus)
             })
         
-        const listApplications = new Task(device, device.listApplications, new Array(), 0)
-        await listApplications.execute()      //Get the list of applications
+        const listApplications = new Task(device, device.listApplications, new Array(), date)
+        listApplications.execute()      //Get the list of applications
             .then(response => {
                 this.handleRespone(deviceTwin, response, listApplications)
             })
@@ -82,13 +84,13 @@ class DeviceManager {
         if(device !== undefined){
             setInterval(async () => {
                 const res = await device.ping()     // Send "ping" request and wait for the result status code
-                const timeStamp = Date.now()        // get current timestamp
+                const timestamp = Date.now()        // get current timestamp
                 if(res === 200){
                     twin.setState(State.ONLINE)  // Update State
-                    console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
                     
-                    if(timeStamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
-                        twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
+                    if(timestamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
+                        twin.setLastEntry(timestamp)    // Update last entry with current timestamp
 
                         // Perform the tasks present in the task queue of the twin
                         const taskQueue = twin.getTaskQueue()
@@ -105,10 +107,10 @@ class DeviceManager {
                         }
                     }
                     
-                    twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
+                    twin.setLastSeen(timestamp)     // Update last seen with current timestamp
                     
                 }else{
-                    console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " is offline ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
                     twin.setState(State.OFFLINE)    // Update state
                 }
             }, ms)

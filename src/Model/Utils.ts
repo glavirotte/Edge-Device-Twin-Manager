@@ -33,5 +33,14 @@ function writeJSON(obj:any, address:string){
     })
 }
 
+function toTimestamp(strDate:string):Number{
+    var datum = Date.parse(strDate);
+    if(isNaN(datum)){
+        return 0
+    }else{
+        return datum/1000
+    }
+}
 
-export { xml2json, loadJSON, writeJSON }
+
+export { xml2json, loadJSON, writeJSON, toTimestamp}

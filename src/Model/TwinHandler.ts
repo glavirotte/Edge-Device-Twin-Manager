@@ -48,7 +48,7 @@ class TwinHandler extends Object{
                         console.log("Error in " + properties[i] + " ! -> Device unreachable")      // If camera is currently unreachable
                         twin.setState(State.OFFLINE)
                         const device = this.deviceManager.getDevice(twin) as Device
-                        twin.getTaskQueue().addTask(new Task(device, method, new Array(), 0))  // We create a task and save it into the taskQueue of the twin
+                        twin.getTaskQueue().addTask(new Task(device, method, new Array(),  ""))  // We create a task and save it into the taskQueue of the twin
                 }})
             }
         }
