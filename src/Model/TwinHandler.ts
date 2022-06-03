@@ -5,6 +5,7 @@ be called when the user interrcats with the twin proxy
 
 #########################################################*/
 
+import { Device } from "./Device";
 import { DeviceManager } from "./DeviceManager";
 import { Task } from "./Task";
 import { State, Twin } from "./Twin";
@@ -41,8 +42,8 @@ class TwinHandler extends Object{
                     }else{
                         console.log("Error in switch light ! -> Device unreachable")      // If camera is currently unreachable
                         twin.setState(State.OFFLINE)
-                        const task = new Task(new Array(), "switchLight")  // We create a task and save it into the taskQueue of the twin
-                        twin.getTaskQueue().addTask(task)
+                        const device = this.deviceManager.getDevice(twin) as Device
+                        twin.getTaskQueue().addTask(new Task(device, device.switchLight, new Array(), 0))  // We create a task and save it into the taskQueue of the twin
                 }})
         }
 
