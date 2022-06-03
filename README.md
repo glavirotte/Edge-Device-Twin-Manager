@@ -3,4 +3,3 @@ Automate the deployment and maintenance of a local Camera network with device tw
 
 - Installing dependencies: ``` npm install ```
 - Running the project: ``` npm run dev ```
-- 
