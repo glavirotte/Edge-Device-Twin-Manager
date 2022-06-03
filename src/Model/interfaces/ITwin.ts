@@ -1,8 +1,8 @@
 import { ApplicationEntity, IResponse } from "./IResponse"
 
 enum State {
-    ONLINE,
     OFFLINE,
+    ONLINE,
 }
 
 interface ITwin {

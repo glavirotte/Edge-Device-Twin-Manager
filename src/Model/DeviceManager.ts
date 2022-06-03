@@ -12,6 +12,7 @@ import { State, Twin } from "./Twin"
 import { TwinHandler } from "./TwinHandler"
 import { Task } from "./Task"
 import { IDevice } from "./interfaces/IDevice"
+import { response } from "express"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -44,7 +45,7 @@ class DeviceManager {
                     deviceTwin.storeTwinObject()
                 }else{
                     deviceTwin.setState(State.OFFLINE)
-                    deviceTwin.getTaskQueue().addTask(new Task(new Array(), "getDeviceInfo"))
+                    deviceTwin.getTaskQueue().addTask(new Task(device, device.getDeviceInfo, new Array(), 0))
                 }
             })
         
@@ -54,7 +55,7 @@ class DeviceManager {
                     this.updateDeviceTwin(deviceTwin, response)
                 }else{
                     deviceTwin.setState(State.OFFLINE)
-                    deviceTwin.getTaskQueue().addTask(new Task(new Array(), "getLightStatus"))
+                    deviceTwin.getTaskQueue().addTask(new Task(device, device.getLightStatus, new Array(), 0))
                 }
             })
 
@@ -64,7 +65,7 @@ class DeviceManager {
                     this.updateDeviceTwin(deviceTwin, response)
                 }else{
                     deviceTwin.setState(State.OFFLINE)
-                    deviceTwin.getTaskQueue().addTask(new Task(new Array(), "listApplications"))
+                    deviceTwin.getTaskQueue().addTask(new Task(device, device.listApplications, new Array(), 0))
                 }
             })
         
@@ -91,20 +92,19 @@ class DeviceManager {
                 const timeStamp = Date.now()        // get current timestamp
                 if(res === 200){
                     twin.setState(State.ONLINE)  // Update State
-                    // console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " is connected ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     
                     if(timeStamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
                         twin.setLastEntry(timeStamp)    // Update last entry with current timestamp
 
                         // Perform the tasks present in the task queue of the twin
                         const taskQueue = twin.getTaskQueue()
-                        const device = this.getDevice(twin)
                         const numberOfTasks = taskQueue.getArrayLength()
 
                         for (let index = 0; index < numberOfTasks; index++) {
                             const task = taskQueue.getNextTask()
-                            if(device !== undefined && task !== undefined){
-                                this.performTask(device, twin, task)
+                            if(task !== undefined){
+                                this.performTask(twin, task)
                             }
                         }
                     }
@@ -112,26 +112,16 @@ class DeviceManager {
                     twin.setLastSeen(timeStamp)     // Update last seen with current timestamp
                     
                 }else{
-                    // console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
+                    console.log(twin.getID() + " is offline ! Lastseen:", timeStamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timeStamp - twin.getLastEntry(), "s ago")
                     twin.setState(State.OFFLINE)    // Update state
                 }
             }, ms)
         }
     }
 
-    public async performTask(device:Device, twin:Twin, task:Task){
-        const m = task.getFunctionName()
-        const args = task.getArgs()
-        const ar0 = args[0]
-        const func = device[m as keyof IDevice]
-
-        const res = await func.bind(device)({} as never, "")
-        function isAnIReponse(res: any): res is IResponse {
-            return 'apiVersion' in res || 'data' in res || 'reply' in res || 'method' in res;
-        }
-        if(isAnIReponse(res)){
-            this.updateDeviceTwin(twin, res)
-        }
+    public async performTask(twin:Twin, task:Task){
+        const response = await task.execute()
+        this.updateDeviceTwin(twin, response)
     }
 
 /*------------------ Getters & Setters ------------------------ */
