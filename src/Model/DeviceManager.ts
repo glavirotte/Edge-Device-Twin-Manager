@@ -14,8 +14,6 @@ import { Task } from "./Task"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
-var date = ""
-// date = "06/03/2022 16:01:00"
 
 class DeviceManager {
     
@@ -35,7 +33,9 @@ class DeviceManager {
         const device = new Device(ipAddress)
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
-        
+        var date = ""
+        // date = "06/03/2022 16:21:00"
+
         const getDeviceInfo = new Task(device, device.getDeviceInfo, new Array(), date)
         getDeviceInfo.execute()
             .then(response => {

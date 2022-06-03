@@ -27,15 +27,16 @@ class Task{
         }
         async function sleep(s:number) {
             await timeout(s);
+            console.log("Finished waiting !")
         }
 
         const timeToWait = this.computeTimeToWait()
-        console.log("Time to wait: ", timeToWait)
         if(timeToWait > 0){
-            console.log("Waiting for "+timeToWait+"s ...")
+            console.log("Waiting for ", timeToWait, "s ...")
             await sleep(Number(timeToWait))
             const boundFunction = this.method.bind(this.device)
             const res:IResponse | undefined = await boundFunction()
+            console.log(res)
             return res
         }else{
             const boundFunction = this.method.bind(this.device)
