@@ -15,9 +15,9 @@ class Task{
         this.executionTimestamp = executionTimestamp
     }
 
-    public async execute():Promise<IResponse>{
+    public async execute():Promise<IResponse | undefined>{
         const boundFunction = this.method.bind(this.device)
-        const res:IResponse = await boundFunction()
+        const res:IResponse | undefined = await boundFunction()
         console.log(res)
         return res
     }

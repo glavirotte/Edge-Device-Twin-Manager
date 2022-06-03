@@ -11,8 +11,6 @@ import { IResponse } from "./interfaces/IResponse"
 import { State, Twin } from "./Twin"
 import { TwinHandler } from "./TwinHandler"
 import { Task } from "./Task"
-import { IDevice } from "./interfaces/IDevice"
-import { response } from "express"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -36,39 +34,25 @@ class DeviceManager {
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
         
-        await device.getDeviceInfo()      // get the response from the device
+        const getDeviceInfo = new Task(device, device.getDeviceInfo, new Array(), 0)
+        await getDeviceInfo.execute()
             .then(response => {
-                if(response !== undefined){
-                    this.updateDeviceTwin(deviceTwin, response)         // Update the twin properties
-                    device.setID(deviceTwin.getID())                // set the id of of the device resect
-                    this.twins.set(deviceTwin.getID(), deviceTwin)
-                    deviceTwin.storeTwinObject()
-                }else{
-                    deviceTwin.setState(State.OFFLINE)
-                    deviceTwin.getTaskQueue().addTask(new Task(device, device.getDeviceInfo, new Array(), 0))
-                }
+                this.handleRespone(deviceTwin, response, getDeviceInfo)
+                device.setID(deviceTwin.getID())
             })
         
-        await device.getLightStatus() // @TODO will be removed in a futur implementation
+        const getLightStatus = new Task(device, device.getLightStatus, new Array(), 0)
+        await getLightStatus.execute() // @TODO will be removed in a futur implementation
             .then(response => {     // Get camera light status
-                if(response !== undefined){
-                    this.updateDeviceTwin(deviceTwin, response)
-                }else{
-                    deviceTwin.setState(State.OFFLINE)
-                    deviceTwin.getTaskQueue().addTask(new Task(device, device.getLightStatus, new Array(), 0))
-                }
+                this.handleRespone(deviceTwin, response, getLightStatus)
+            })
+        
+        const listApplications = new Task(device, device.listApplications, new Array(), 0)
+        await listApplications.execute()      //Get the list of applications
+            .then(response => {
+                this.handleRespone(deviceTwin, response, listApplications)
             })
 
-        await device.listApplications()      //Get the list of applications
-            .then(response => {
-                if(response !== undefined){
-                    this.updateDeviceTwin(deviceTwin, response)
-                }else{
-                    deviceTwin.setState(State.OFFLINE)
-                    deviceTwin.getTaskQueue().addTask(new Task(device, device.listApplications, new Array(), 0))
-                }
-            })
-        
         await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
         const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
         this.proxies.set(twinProxy, deviceTwin)
@@ -79,6 +63,15 @@ class DeviceManager {
     // Update state of the twin, called after a device API request
     public updateDeviceTwin(twin:Twin, response:IResponse){
         twin.updateState(response)
+    }
+
+    public handleRespone(twin:Twin, response:IResponse| undefined, task:Task){
+        if(response !== undefined){
+            this.updateDeviceTwin(twin, response)
+        }else{
+            twin.setState(State.OFFLINE)
+            twin.getTaskQueue().addTask(task)
+        }
     }
 
 
@@ -104,7 +97,10 @@ class DeviceManager {
                         for (let index = 0; index < numberOfTasks; index++) {
                             const task = taskQueue.getNextTask()
                             if(task !== undefined){
-                                this.performTask(twin, task)
+                                const res = await task.execute()
+                                if(res !== undefined){
+                                    this.updateDeviceTwin(twin, res)
+                                }
                             }
                         }
                     }
@@ -117,11 +113,6 @@ class DeviceManager {
                 }
             }, ms)
         }
-    }
-
-    public async performTask(twin:Twin, task:Task){
-        const response = await task.execute()
-        this.updateDeviceTwin(twin, response)
     }
 
 /*------------------ Getters & Setters ------------------------ */
