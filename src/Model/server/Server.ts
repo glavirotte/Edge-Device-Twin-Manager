@@ -30,7 +30,7 @@ class Server {
             res.json(twin);
         });
         this.app.get('/devices/'+id+'/light/switch', (req: Request, res: Response) => {
-            twin.proxySwitchLight = true
+            twin.proxyswitchLight = true
             res.send("light switched")
         });
         this.app.get('/devices/'+id+'/light/status', (req: Request, res: Response) => {

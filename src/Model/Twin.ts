@@ -23,7 +23,7 @@ class Twin implements ITwin{
     private taskQueue:TaskQueue
 
     // The followings fields are used to handle changes via the proxy
-    public proxySwitchLight:boolean
+    public proxyswitchLight:boolean
 
     public constructor(ipAddress:string, deviceManager:DeviceManager){
         this.id = {} as string
@@ -35,8 +35,7 @@ class Twin implements ITwin{
         this.state = State.OFFLINE
         this.lightStatus = {} as boolean
         this.taskQueue = new TaskQueue()
-
-        this.proxySwitchLight = {} as boolean
+        this.proxyswitchLight = {} as boolean
     }
 
     // Update the state of the Twin by storing values from last request

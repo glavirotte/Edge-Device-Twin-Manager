@@ -7,6 +7,7 @@ be called when the user interrcats with the twin proxy
 
 import { Device } from "./Device";
 import { DeviceManager } from "./DeviceManager";
+import { IResponse } from "./interfaces/IResponse";
 import { Task } from "./Task";
 import { State, Twin } from "./Twin";
 
@@ -32,19 +33,24 @@ class TwinHandler extends Object{
         type ObjectKey = keyof typeof twin;
         const property = prop as ObjectKey;
         
-        // @TODO Has to be improved
+        const device = this.deviceManager.getDevice(twin) as Device
+        const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(device))
 
-        if(prop === "proxySwitchLight"){
-            this.deviceManager.getDevice(twin)?.switchLight()
-                .then((response) => {
+        for(var i = 0; i < properties.length; i++){
+            if(prop === "proxy"+properties[i]){
+                const method = device[properties[i] as keyof Device] as Function
+                const boundFunction = method.bind(device)
+                boundFunction()
+                .then((response:IResponse) => {
                     if(response !== undefined ){
                         this.deviceManager.updateDeviceTwin(twin, response)
                     }else{
-                        console.log("Error in switch light ! -> Device unreachable")      // If camera is currently unreachable
+                        console.log("Error in " + properties[i] + " ! -> Device unreachable")      // If camera is currently unreachable
                         twin.setState(State.OFFLINE)
                         const device = this.deviceManager.getDevice(twin) as Device
-                        twin.getTaskQueue().addTask(new Task(device, device.switchLight, new Array(), 0))  // We create a task and save it into the taskQueue of the twin
+                        twin.getTaskQueue().addTask(new Task(device, method, new Array(), 0))  // We create a task and save it into the taskQueue of the twin
                 }})
+            }
         }
 
         /*
