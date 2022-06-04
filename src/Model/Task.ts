@@ -67,6 +67,9 @@ class Task{
             return result
         }
     }
+    public getCreationTimestamp(){
+        return this.creationTimestamp
+    }
 }
 
 export { Task }
