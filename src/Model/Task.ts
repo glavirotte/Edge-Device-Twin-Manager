@@ -50,15 +50,17 @@ class Task{
     public getArgs():Array<string>{
         return this.args
     }
-
     public getExecutionTimestamp():Number{
         return this.executionTimestamp
     }
-
     public getDate():string{
         return this.date
     }
+    public setDate(date:string){
+        this.date = date
+    }
 
+/*------------------ Utils ------------------------ */
     public computeTimeToWait():number{
         const result = Number(this.executionTimestamp) - Date.now()/1000
         if(result < 0) {
