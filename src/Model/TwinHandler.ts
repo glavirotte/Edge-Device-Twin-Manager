@@ -6,7 +6,7 @@ be called when the user interrcats with the twin proxy
 #########################################################*/
 
 import { Device } from "./Device";
-import { Synchronizer } from "./DeviceManager";
+import { Synchronizer } from "./Synchronizer";
 import { IResponse } from "./interfaces/IResponse";
 import { Task } from "./Task";
 import { State, Twin } from "./Twin";

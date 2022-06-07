@@ -5,7 +5,7 @@ with the applications installed
 
 #########################################################*/
 
-import { Synchronizer } from "./DeviceManager"
+import { Synchronizer } from "./Synchronizer"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { ITwin, State } from "./interfaces/ITwin"
 import { TaskQueue } from "./TaskQueue"

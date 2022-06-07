@@ -5,7 +5,7 @@ the React Application
 
 #########################################################*/
 
-import { Synchronizer } from './DeviceManager'
+import { Synchronizer } from './Synchronizer'
 import { Twin } from './Twin'
 import { Server } from './server/Server'
 const cameraIP = '192.168.50.34'
