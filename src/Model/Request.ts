@@ -3,12 +3,12 @@ import { HttpMethod } from 'urllib';
 // Class that defines a request
 
 class Request {
-    private url: string;
-    private username: string;
-    private password: string;
-    private method: HttpMethod;
-    private args: Map <string, string>;
-    private options:urllib.RequestOptions;
+    private url: string
+    private username: string
+    private password: string
+    private method: HttpMethod
+    private args: Map <string, string>
+    private options:urllib.RequestOptions
 
     public constructor(url:string, method:HttpMethod, username:string, password:string, args:Map<string, string>, options:urllib.RequestOptions){
       this.url = url;

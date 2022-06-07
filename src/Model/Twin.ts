@@ -19,7 +19,7 @@ class Twin implements ITwin{
     private lastentry:number    // last time the device start connection with the system
     private state:State         // Current state
     public  lightStatus:boolean
-    private taskQueue:TaskQueue
+    private waitingQueue:TaskQueue
 
     // The followings fields are used to handle changes via the proxy
     public proxyswitchLight:boolean
@@ -33,7 +33,7 @@ class Twin implements ITwin{
         this.lastentry = 0
         this.state = State.OFFLINE
         this.lightStatus = {} as boolean
-        this.taskQueue = new TaskQueue()
+        this.waitingQueue = new TaskQueue()
         this.proxyswitchLight = {} as boolean
     }
 
@@ -108,8 +108,8 @@ class Twin implements ITwin{
     public setLightStatus(status:boolean){
         this.lightStatus = status
     }
-    public getTaskQueue():TaskQueue{
-        return this.taskQueue
+    public getWaitingQueue():TaskQueue{
+        return this.waitingQueue
     }
 
 }

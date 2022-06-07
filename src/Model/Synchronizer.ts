@@ -73,7 +73,7 @@ class Synchronizer {
             this.updateDeviceTwin(twin, response)
         }else if(task !== undefined){
             twin.setState(State.OFFLINE)
-            twin.getTaskQueue().addTask(task)
+            twin.getWaitingQueue().addTask(task)
         }else{
             throw new Error("Task is undefined ! Cannot add it to task queue")
         }
@@ -96,7 +96,7 @@ class Synchronizer {
                         twin.setLastEntry(timestamp)    // Update last entry with current timestamp
 
                         // Perform the tasks present in the task queue of the twin
-                        const taskQueue = twin.getTaskQueue()
+                        const taskQueue = twin.getWaitingQueue()
                         const numberOfTasks = taskQueue.getArrayLength()
 
                         for (let index = 0; index < numberOfTasks; index++) {

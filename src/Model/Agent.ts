@@ -5,9 +5,9 @@ with a physical device on the local network
 
 #########################################################*/
 
-import  { Request } from './Request';
-import  { HttpMethod } from 'urllib';
-import HttpClient from 'urllib';
+import  { Request } from './Request'
+import  { HttpMethod } from 'urllib'
+import HttpClient from 'urllib'
 import { xml2json } from './Utils'
 import { Application } from './Application'
 import { loadJSON } from './Utils'

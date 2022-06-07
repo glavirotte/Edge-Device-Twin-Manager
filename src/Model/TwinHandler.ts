@@ -5,11 +5,11 @@ be called when the user interrcats with the twin proxy
 
 #########################################################*/
 
-import { Agent } from "./Agent";
-import { Synchronizer } from "./Synchronizer";
-import { IResponse } from "./interfaces/IResponse";
-import { Task } from "./Task";
-import { State, Twin } from "./Twin";
+import { Agent } from "./Agent"
+import { Synchronizer } from "./Synchronizer"
+import { IResponse } from "./interfaces/IResponse"
+import { Task } from "./Task"
+import { State, Twin } from "./Twin"
 
 class TwinHandler extends Object{
 
@@ -48,7 +48,7 @@ class TwinHandler extends Object{
                         console.log("Error in " + properties[i] + " ! -> Device unreachable")      // If camera is currently unreachable
                         twin.setState(State.OFFLINE)
                         const agent = this.synchronizer.getAgent(twin) as Agent
-                        twin.getTaskQueue().addTask(new Task(agent, method, new Array(),  ""))  // We create a task and save it into the taskQueue of the twin
+                        twin.getWaitingQueue().addTask(new Task(agent, method, new Array(),  ""))  // We create a task and save it into the taskQueue of the twin
                 }})
             }
         }
