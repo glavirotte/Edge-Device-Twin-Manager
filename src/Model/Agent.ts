@@ -13,9 +13,8 @@ import { Application } from './Application'
 import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
 import { IResponse } from './interfaces/IResponse'
-import { IDevice } from './interfaces/IDevice';
 
-class Device implements IDevice{
+class Agent {
 
     id:string
     ipAddress:string
@@ -289,4 +288,4 @@ class Device implements IDevice{
 
 }
 
-export { Device }
+export { Agent }

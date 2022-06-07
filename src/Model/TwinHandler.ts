@@ -5,7 +5,7 @@ be called when the user interrcats with the twin proxy
 
 #########################################################*/
 
-import { Device } from "./Device";
+import { Agent } from "./Agent";
 import { Synchronizer } from "./Synchronizer";
 import { IResponse } from "./interfaces/IResponse";
 import { Task } from "./Task";
@@ -33,13 +33,13 @@ class TwinHandler extends Object{
         type ObjectKey = keyof typeof twin;
         const property = prop as ObjectKey;
         
-        const device = this.synchronizer.getDevice(twin) as Device
-        const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(device))
+        const agent = this.synchronizer.getAgent(twin) as Agent
+        const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(agent))
 
         for(var i = 0; i < properties.length; i++){
             if(prop === "proxy"+properties[i]){
-                const method = device[properties[i] as keyof Device] as Function
-                const boundFunction = method.bind(device)
+                const method = agent[properties[i] as keyof Agent] as Function
+                const boundFunction = method.bind(agent)
                 boundFunction()
                 .then((response:IResponse) => {
                     if(response !== undefined ){
@@ -47,8 +47,8 @@ class TwinHandler extends Object{
                     }else{
                         console.log("Error in " + properties[i] + " ! -> Device unreachable")      // If camera is currently unreachable
                         twin.setState(State.OFFLINE)
-                        const device = this.synchronizer.getDevice(twin) as Device
-                        twin.getTaskQueue().addTask(new Task(device, method, new Array(),  ""))  // We create a task and save it into the taskQueue of the twin
+                        const agent = this.synchronizer.getAgent(twin) as Agent
+                        twin.getTaskQueue().addTask(new Task(agent, method, new Array(),  ""))  // We create a task and save it into the taskQueue of the twin
                 }})
             }
         }

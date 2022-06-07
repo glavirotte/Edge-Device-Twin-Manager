@@ -1,4 +1,4 @@
-import { Device } from "./Device"
+import { Agent } from "./Agent"
 import { IResponse } from "./interfaces/IResponse"
 import { toTimestamp } from "./Utils"
 
@@ -6,20 +6,19 @@ class Task{
 
     private args:Array<string>
     private method:Function
-    private device:Device
+    private agent:Agent
     private executionTimestamp:Number
     private creationTimestamp:Number
     private date:string
 
-    constructor( device:Device, method:Function, args:Array<string>, date:string){
+    constructor( agent:Agent, method:Function, args:Array<string>, date:string){
         this.date = date
         this.creationTimestamp = Date.now()/1000
         this.args = args
         this.method = method
-        this.device = device
+        this.agent = agent
         this.executionTimestamp = toTimestamp(date)     // If error in date parsing, executionTimeStamp = 0
     }
-
 
     public async execute():Promise<IResponse | undefined>{  // This method is called when its time to perform a task
         function timeout(s:number) {
@@ -34,12 +33,12 @@ class Task{
         if(timeToWait > 0){     // If the task has to before executing
             console.log("Waiting for ", timeToWait, "s ...")
             await sleep(Number(timeToWait))
-            const boundFunction = this.method.bind(this.device)
+            const boundFunction = this.method.bind(this.agent)
             const res:IResponse | undefined = await boundFunction()
             // console.log(res)
             return res
         }else{  // If the task can be performed immediatly
-            const boundFunction = this.method.bind(this.device)     // Bind method to the device
+            const boundFunction = this.method.bind(this.agent)     // Bind method to the agent
             const res:IResponse | undefined = await boundFunction() // Call the method and get the response
             return res
         }

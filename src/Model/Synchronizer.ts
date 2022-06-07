@@ -6,7 +6,7 @@ with the physical device
 
 #########################################################*/
 
-import { Device } from "./Device"
+import { Agent } from "./Agent"
 import { IResponse } from "./interfaces/IResponse"
 import { State, Twin } from "./Twin"
 import { TwinHandler } from "./TwinHandler"
@@ -18,12 +18,12 @@ const defaultPassword = 'pass'
 
 class Synchronizer {
     
-    private devices:Map<Device, Twin>
+    private agents:Map<Agent, Twin>
     private twins:Map<string, Twin>
     private proxies:Map<any, Twin>
 
     public constructor(){
-        this.devices = new Map()
+        this.agents = new Map()
         this.twins = new Map()
         this.proxies = new Map()
     }
@@ -31,23 +31,23 @@ class Synchronizer {
     // Create a twin, setup it and return a twin proxy for the user to be able to interract with it
     public async createTwin(ipAddress:string):Promise<Twin>{
         const deviceTwin = new Twin(ipAddress)
-        const device = new Device(ipAddress)
-        this.devices.set(device, deviceTwin)
-        device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
+        const agent = new Agent(ipAddress)
+        this.agents.set(agent, deviceTwin)
+        agent.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
         var date = ""
         date = "06/07/2022 11:25:00"    //@TODO Just for testing 
 
-        const getDeviceInfo = new Task(device, device.getDeviceInfo, new Array(), date)
+        const getDeviceInfo = new Task(agent, agent.getDeviceInfo, new Array(), date)
         getDeviceInfo.execute()
             .then(response => {
                 this.handleRespone(deviceTwin, response, getDeviceInfo)
-                device.setID(deviceTwin.getID())
+                agent.setID(deviceTwin.getID())
             })
 
         const routine = new Routine(date)
         routine.setDate(date)
-        const getLightStatus = new Task(device, device.getLightStatus, new Array(), date)        
-        const listApplications = new Task(device, device.listApplications, new Array(), date)
+        const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
+        const listApplications = new Task(agent, agent.listApplications, new Array(), date)
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
         const responses:IResponse | undefined [] = await routine.execute()
@@ -82,11 +82,11 @@ class Synchronizer {
 
     // Send a http request every {{ ms }} second to check connectivity with device
     private async checkDeviceConnectivity(twin:Twin, ms:number){
-        const device = this.getDevice(twin)
+        const agent = this.getAgent(twin)
 
-        if(device !== undefined){
+        if(agent !== undefined){
             setInterval(async () => {
-                const res = await device.ping()     // Send "ping" request and wait for the result status code
+                const res = await agent.ping()     // Send "ping" request and wait for the result status code
                 const timestamp = Date.now()        // get current timestamp
                 if(res === 200){
                     twin.setState(State.ONLINE)  // Update State
@@ -123,10 +123,10 @@ class Synchronizer {
 
 /*------------------ Getters & Setters ------------------------ */
 
-    public getDevice(deviceTwin:Twin):Device | undefined{
-        for (let [device, twin] of this.devices) {
+    public getAgent(deviceTwin:Twin):Agent | undefined{
+        for (let [agent, twin] of this.agents) {
             if(twin === deviceTwin){
-                return device
+                return agent
             }
         }
         throw(Error('No registered device for that twin !'))
