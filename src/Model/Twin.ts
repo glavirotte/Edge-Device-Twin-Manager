@@ -5,7 +5,7 @@ with the applications installed
 
 #########################################################*/
 
-import { DeviceManager } from "./DeviceManager"
+import { Synchronizer } from "./DeviceManager"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { ITwin, State } from "./interfaces/ITwin"
 import { TaskQueue } from "./TaskQueue"
@@ -25,7 +25,7 @@ class Twin implements ITwin{
     // The followings fields are used to handle changes via the proxy
     public proxyswitchLight:boolean
 
-    public constructor(ipAddress:string, deviceManager:DeviceManager){
+    public constructor(ipAddress:string){
         this.id = {} as string
         this.ipAddress = ipAddress
         this.properties = {} as PropertyList | undefined

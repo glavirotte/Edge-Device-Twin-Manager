@@ -16,7 +16,7 @@ import { Routine } from "./Routine"
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
 
-class DeviceManager {
+class Synchronizer {
     
     private devices:Map<Device, Twin>
     private twins:Map<string, Twin>
@@ -30,7 +30,7 @@ class DeviceManager {
 
     // Create a twin, setup it and return a twin proxy for the user to be able to interract with it
     public async createTwin(ipAddress:string):Promise<Twin>{
-        const deviceTwin = new Twin(ipAddress, this)
+        const deviceTwin = new Twin(ipAddress)
         const device = new Device(ipAddress)
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
@@ -67,7 +67,7 @@ class DeviceManager {
         twin.updateState(response)
     }
 
-    // If response is not undefined, we synchronize the twin otherwise, we add task to twin task queue and twin is set to offline
+    // If response is not undefined, we synchronize the twin, otherwise we add task to twin task queue and twin is set to offline
     public handleRespone(twin:Twin, response:IResponse| undefined, task:Task | undefined){
         if(response !== undefined){
             this.updateDeviceTwin(twin, response)
@@ -136,4 +136,4 @@ class DeviceManager {
     }
 }
 
-export { DeviceManager }
+export { Synchronizer }

@@ -6,18 +6,18 @@ be called when the user interrcats with the twin proxy
 #########################################################*/
 
 import { Device } from "./Device";
-import { DeviceManager } from "./DeviceManager";
+import { Synchronizer } from "./DeviceManager";
 import { IResponse } from "./interfaces/IResponse";
 import { Task } from "./Task";
 import { State, Twin } from "./Twin";
 
 class TwinHandler extends Object{
 
-    deviceManager:DeviceManager
+    synchronizer:Synchronizer
 
-    constructor(deviceManager:DeviceManager){
+    constructor(synchronizer:Synchronizer){
         super()
-        this.deviceManager = deviceManager
+        this.synchronizer = synchronizer
     }
 
     // Handler to control object via Proxy. The user interract via the proxy
@@ -33,7 +33,7 @@ class TwinHandler extends Object{
         type ObjectKey = keyof typeof twin;
         const property = prop as ObjectKey;
         
-        const device = this.deviceManager.getDevice(twin) as Device
+        const device = this.synchronizer.getDevice(twin) as Device
         const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(device))
 
         for(var i = 0; i < properties.length; i++){
@@ -43,11 +43,11 @@ class TwinHandler extends Object{
                 boundFunction()
                 .then((response:IResponse) => {
                     if(response !== undefined ){
-                        this.deviceManager.updateDeviceTwin(twin, response)
+                        this.synchronizer.updateDeviceTwin(twin, response)
                     }else{
                         console.log("Error in " + properties[i] + " ! -> Device unreachable")      // If camera is currently unreachable
                         twin.setState(State.OFFLINE)
-                        const device = this.deviceManager.getDevice(twin) as Device
+                        const device = this.synchronizer.getDevice(twin) as Device
                         twin.getTaskQueue().addTask(new Task(device, method, new Array(),  ""))  // We create a task and save it into the taskQueue of the twin
                 }})
             }
