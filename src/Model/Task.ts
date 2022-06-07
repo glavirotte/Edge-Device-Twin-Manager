@@ -5,6 +5,7 @@ import { toTimestamp } from "./Utils"
 enum State{
     READY,
     EXECUTING,
+    SLEEPING,
     WAITING,
     COMPLETED,
 }
@@ -30,7 +31,6 @@ class Task{
     }
 
     public async execute():Promise<IResponse | undefined>{  // This method is called when its time to perform a task
-        this.state = State.EXECUTING
         function timeout(s:number) {
             return new Promise(resolve => setTimeout(resolve, s*1000));
         }
@@ -38,15 +38,17 @@ class Task{
             await timeout(s);
             console.log("Finished waiting !")
         }
-
+        
+        this.state = State.EXECUTING
         const timeToWait = this.computeTimeToWait()
         if(timeToWait > 0){     // If the task has to before executing
             console.log("Waiting for ", timeToWait, "s ...")
-            this.state = State.WAITING
+            this.state = State.SLEEPING
             await sleep(Number(timeToWait))
+            this.state = State.EXECUTING
             const boundFunction = this.method.bind(this.agent)
             const res:IResponse | undefined = await boundFunction()
-            this.state = State.COMPLETED
+            res !== undefined ? this.state = State.COMPLETED : this.state = State.WAITING
             return res
         }else{  // If the task can be performed immediatly
             const boundFunction = this.method.bind(this.agent)     // Bind method to the agent
