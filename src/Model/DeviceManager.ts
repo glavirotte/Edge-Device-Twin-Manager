@@ -11,6 +11,7 @@ import { IResponse } from "./interfaces/IResponse"
 import { State, Twin } from "./Twin"
 import { TwinHandler } from "./TwinHandler"
 import { Task } from "./Task"
+import { Routine } from "./Routine"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -34,7 +35,8 @@ class DeviceManager {
         this.devices.set(device, deviceTwin)
         device.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
         var date = ""
-        // date = "06/03/2022 16:21:00"
+        // date = "06/07/2022 09:28:00"
+
 
         const getDeviceInfo = new Task(device, device.getDeviceInfo, new Array(), date)
         getDeviceInfo.execute()

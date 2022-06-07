@@ -21,7 +21,7 @@ class Task{
     }
 
 
-    public async execute():Promise<IResponse | undefined>{
+    public async execute():Promise<IResponse | undefined>{  // This method is called when its time to perform a task
         function timeout(s:number) {
             return new Promise(resolve => setTimeout(resolve, s*1000));
         }
@@ -31,16 +31,16 @@ class Task{
         }
 
         const timeToWait = this.computeTimeToWait()
-        if(timeToWait > 0){
+        if(timeToWait > 0){     // If the task has to before executing
             console.log("Waiting for ", timeToWait, "s ...")
             await sleep(Number(timeToWait))
             const boundFunction = this.method.bind(this.device)
             const res:IResponse | undefined = await boundFunction()
-            console.log(res)
+            // console.log(res)
             return res
-        }else{
-            const boundFunction = this.method.bind(this.device)
-            const res:IResponse | undefined = await boundFunction()
+        }else{  // If the task can be performed immediatly
+            const boundFunction = this.method.bind(this.device)     // Bind method to the device
+            const res:IResponse | undefined = await boundFunction() // Call the method and get the response
             return res
         }
     }
