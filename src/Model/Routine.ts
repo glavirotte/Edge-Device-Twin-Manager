@@ -2,6 +2,7 @@ import { IResponse } from "./interfaces/IResponse";
 import { Task } from "./Task";
 import { toTimestamp } from "./Utils";
 
+
 class Routine {
     private date:string
     private tasks:Array<Task>
@@ -20,48 +21,6 @@ class Routine {
     public addTask(task:Task){
         this.tasks.push(task)
         task.setDate(this.date) // Every task are performed at the date of the routine
-    }
-
-    public async execute(){
-
-        function timeout(s:number) {
-            return new Promise(resolve => setTimeout(resolve, s*1000));
-        }
-        async function sleep(s:number) {
-            await timeout(s);
-            console.log("Finished waiting !")
-        }
-
-        const timeToWait = this.computeTimeToWait()
-        if(timeToWait > 0){     // If the task has to before executing
-            console.log("Waiting for ", timeToWait, "s ...")
-            await sleep(Number(timeToWait))
-
-            const promises = new Array()
-            this.tasks.forEach(task => {
-                promises.push(task.execute())
-            });
-            var responses:IResponse | undefined [] = new Array()
-            await Promise.all(promises).then((values:IResponse | undefined []) => {responses = values})
-            
-            for(var i = 0; i<responses.length; i++){
-                this.resultTaskMap.set(responses[i], this.tasks[i])
-            }
-            return responses
-        }else{
-            const promises = new Array()
-            this.tasks.forEach(task => {
-                promises.push(task.execute())
-            });
-            var responses:IResponse | undefined [] = new Array()
-            await Promise.all(promises).then((values:IResponse | undefined []) => {responses = values})
-            
-            for(var i = 0; i<responses.length; i++){
-                this.resultTaskMap.set(responses[i], this.tasks[i])
-            }
-            return responses
-        }
-
     }
 
     public destruct(){

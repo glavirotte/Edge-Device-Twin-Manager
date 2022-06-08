@@ -1,42 +1,38 @@
-import { response } from "express"
+import { addListener } from "process"
 import { IResponse } from "./interfaces/IResponse"
 import { Routine } from "./Routine"
 import { Task, TaskState } from "./Task"
 import { TaskQueue } from "./TaskQueue"
+import { Twin } from "./Twin"
 
 class TaskManager{
     private taskList:Array<Task>
     private waitingQueue:TaskQueue
-    constructor(){
+    private twin:Twin
+    constructor(twin:Twin){
+        this.twin = twin
         this.waitingQueue = new TaskQueue()
         this.taskList = new Array()
-        this.manageTasks()
+        this.manageTasks(1000)
     }
 
-    public async registerTask(task:Task):Promise<IResponse | undefined>{
+    public async registerTask(task:Task, handleResponse:(twin: Twin, response: IResponse | undefined, task: Task) => void):Promise<void>{
         this.taskList.push(task)
         const response = await task.execute()
         if(response === undefined){
             this.waitingQueue.addTask(task)
-            this.removeTaskFromTaskList(task)
+            console.log("Task added to waiting queue", task)
         }
-        return response
+        handleResponse(this.twin, response, task)
     }
 
-    public async registerRoutine(routine:Routine){
+    public async registerRoutine(routine:Routine, handleResponse:(twin: Twin, response: IResponse | undefined, task: Task) => void):Promise<void>{
         const tasks = routine.destruct()
         var responses:IResponse | undefined [] = new Array()
         const promises = new Array()
         tasks.forEach(task => {
-            promises.push(this.registerTask(task))
+            promises.push(this.registerTask(task, handleResponse))
         });
-
-        await Promise.all(promises).then((values:IResponse | undefined []) => {responses = values})
-        
-        for(var i = 0; i<responses.length; i++){
-            routine.getResultTaskMap().set(responses[i], tasks[i])
-        }
-        return responses
     }
 
     public removeTaskFromTaskList(task:Task){
@@ -45,11 +41,10 @@ class TaskManager{
     }
 
     // Check every x seconds the state of every task
-    private async manageTasks(){
+    private async manageTasks(ms:number){
 
         setInterval(async () => {
-            this.taskList.forEach(task => {
-
+            for (const task of this.taskList){
                 switch (task.getState()) {
                     case TaskState.COMPLETED:
                         this.removeTaskFromTaskList(task)
@@ -58,13 +53,12 @@ class TaskManager{
                     default:
                         break;
                 }
-            });
-        }, 100)
+            }
+        }, ms)
     }
     
-    // Performs the tasks present in the task queue
+    // Performs the tasks present in the task queue one by one
     public async executeTasksInWaitingQueue():Promise<Array<IResponse | undefined>>{    // Concurent modifications possible !!!
-        
         const responses:(IResponse | undefined) [] = new Array()
         const tasks = this.waitingQueue.getArray().slice().reverse()
         for (const task of tasks){
@@ -73,7 +67,7 @@ class TaskManager{
                 this.waitingQueue.pop()
                 responses.push(res)
             }
-        }        
+        }
         return responses
     }
 

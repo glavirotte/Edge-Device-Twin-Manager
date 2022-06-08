@@ -6,7 +6,7 @@ enum DeviceState {
 }
 
 interface ITwin {
-    updateState(response: IResponse):string
+    updateState(response: IResponse):void
 
     getApplications():(ApplicationEntity)[] | null
 

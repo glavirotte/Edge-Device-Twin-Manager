@@ -19,7 +19,6 @@ class Twin implements ITwin{
     private lastentry:number    // last time the device start connection with the system
     private state:DeviceState         // Current state
     public  lightStatus:boolean
-    private taskManager:TaskManager
 
     // The followings fields are used to handle changes via the proxy
     public proxyswitchLight:boolean
@@ -33,18 +32,15 @@ class Twin implements ITwin{
         this.lastentry = 0
         this.state = DeviceState.OFFLINE
         this.lightStatus = {} as boolean
-        this.taskManager = new TaskManager()
         this.proxyswitchLight = {} as boolean
     }
 
     // Update the state of the Twin by storing values from last request
-    updateState(response: IResponse):string{
-        var result:string = ""
+    updateState(response: IResponse){
         try {
             if(response?.data?.propertyList !== undefined){
                 this.properties = response?.data?.propertyList
                 this.id = this.properties.SerialNumber
-                result = this.id
             }
             if(response?.reply?.application?.[0].$ !== undefined){
                 this.applications = response?.reply?.application
@@ -56,8 +52,6 @@ class Twin implements ITwin{
         } catch (error) {
             console.log(error)
         }
-        return result
-
     }
 
     public storeTwinObject(){
@@ -107,9 +101,6 @@ class Twin implements ITwin{
     }
     public setLightStatus(status:boolean){
         this.lightStatus = status
-    }
-    public getTaskManager():TaskManager{
-        return this.taskManager
     }
 
 }

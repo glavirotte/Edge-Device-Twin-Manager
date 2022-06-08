@@ -12,6 +12,7 @@ import { DeviceState, Twin } from "./Twin"
 import { TwinHandler } from "./TwinHandler"
 import { Task, TaskState } from "./Task"
 import { Routine } from "./Routine"
+import { TaskManager } from "./TaskManager"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -21,11 +22,13 @@ class Synchronizer {
     private agents:Map<Agent, Twin>
     private twins:Map<string, Twin>
     private proxies:Map<any, Twin>
+    private taskManagers:Map<Twin, TaskManager>
 
     public constructor(){
         this.agents = new Map()
         this.twins = new Map()
         this.proxies = new Map()
+        this.taskManagers = new Map()
     }
 
     // Create a twin, setup it and return a twin proxy for the user to be able to interract with it
@@ -34,14 +37,14 @@ class Synchronizer {
         const agent = new Agent(ipAddress)
         this.agents.set(agent, deviceTwin)
         agent.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
+
+        const taskManager = new TaskManager(deviceTwin)
+        this.taskManagers.set(deviceTwin, taskManager)
         var date = ""
-        date = "06/07/2022 11:25:00"    //@TODO Just for testing 
+        date = "06/08/2022 15:17:00"    //@TODO Just for testing 
 
         const getDeviceInfo = new Task(agent, agent.getDeviceInfo, new Array(), date)
-        await deviceTwin.getTaskManager().registerTask(getDeviceInfo)
-            .then(response => {
-                this.handleRespone(deviceTwin, response, getDeviceInfo)
-            })
+        taskManager.registerTask(getDeviceInfo, this.handleResponse)
 
         const routine = new Routine(date)
         routine.setDate(date)
@@ -49,10 +52,7 @@ class Synchronizer {
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
-        const responses:IResponse | undefined [] = await deviceTwin.getTaskManager().registerRoutine(routine)
-        responses.forEach((response:IResponse | undefined) => {
-            this.handleRespone(deviceTwin, response, routine.getResultTaskMap().get(response))
-        });
+        taskManager.registerRoutine(routine, this.handleResponse)
 
         await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
         const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
@@ -61,15 +61,11 @@ class Synchronizer {
         return twinProxy
     }
 
-    // Update state of the twin, called after a device API request
-    public updateDeviceTwin(twin:Twin, response:IResponse){
-        twin.updateState(response)
-    }
 
     // If response is not undefined, we synchronize the twin, otherwise we add task to twin task queue and twin is set to offline
-    public handleRespone(twin:Twin, response:IResponse| undefined, task:Task | undefined){
+    public handleResponse(twin:Twin, response:IResponse| undefined, task:Task | undefined){
         if(response !== undefined){
-            this.updateDeviceTwin(twin, response)
+            twin.updateState(response)
         }else if(task !== undefined){
             twin.setState(DeviceState.OFFLINE)
             task.setState(TaskState.WAITING)
@@ -94,11 +90,11 @@ class Synchronizer {
                         twin.setLastEntry(timestamp)    // Update last entry with current timestamp
 
                         // Perform the tasks present in the task queue of the twin
-                        const taskManager = twin.getTaskManager()
+                        const taskManager = this.taskManagers.get(twin) as TaskManager
                         const responses = await taskManager.executeTasksInWaitingQueue()
                         responses.forEach(response => {
                             if(response !== undefined){
-                                this.updateDeviceTwin(twin, response)
+                                twin.updateState(response)
                             }
                         });
 
@@ -126,6 +122,9 @@ class Synchronizer {
     }
     public getTwin(id:string):void | Twin{
         return this.twins.get(id)
+    }
+    public getTaskManager(twin:Twin){
+        return this.taskManagers.get(twin)
     }
 }
 
