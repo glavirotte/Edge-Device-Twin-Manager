@@ -6,8 +6,8 @@ with the applications installed
 #########################################################*/
 
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
-import { ITwin, State } from "./interfaces/ITwin"
-import { TaskQueue } from "./TaskQueue"
+import { ITwin, DeviceState } from "./interfaces/ITwin"
+import { TaskManager } from "./TaskManager"
 import { writeJSON } from "./Utils"
 
 class Twin implements ITwin{
@@ -17,9 +17,9 @@ class Twin implements ITwin{
     private applications: (ApplicationEntity)[] | null
     private lastseen:number     // last time the device was online
     private lastentry:number    // last time the device start connection with the system
-    private state:State         // Current state
+    private state:DeviceState         // Current state
     public  lightStatus:boolean
-    private waitingQueue:TaskQueue
+    private taskManager:TaskManager
 
     // The followings fields are used to handle changes via the proxy
     public proxyswitchLight:boolean
@@ -31,9 +31,9 @@ class Twin implements ITwin{
         this.applications = {} as (ApplicationEntity)[] | null
         this.lastseen = 0
         this.lastentry = 0
-        this.state = State.OFFLINE
+        this.state = DeviceState.OFFLINE
         this.lightStatus = {} as boolean
-        this.waitingQueue = new TaskQueue()
+        this.taskManager = new TaskManager()
         this.proxyswitchLight = {} as boolean
     }
 
@@ -88,10 +88,10 @@ class Twin implements ITwin{
     public setLastEntry(timeStamp:number):void{
         this.lastentry = timeStamp
     }
-    public getState():State{
+    public getState():DeviceState{
         return this.state
     }
-    public setState(s:State):void{
+    public setState(s:DeviceState):void{
         this.state = s
     }
     public getLightStatus():boolean{
@@ -108,10 +108,10 @@ class Twin implements ITwin{
     public setLightStatus(status:boolean){
         this.lightStatus = status
     }
-    public getWaitingQueue():TaskQueue{
-        return this.waitingQueue
+    public getTaskManager():TaskManager{
+        return this.taskManager
     }
 
 }
 
-export { Twin, State }
+export { Twin, DeviceState }

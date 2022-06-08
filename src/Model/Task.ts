@@ -2,7 +2,7 @@ import { Agent } from "./Agent"
 import { IResponse } from "./interfaces/IResponse"
 import { toTimestamp } from "./Utils"
 
-enum State{
+enum TaskState{
     READY,
     EXECUTING,
     SLEEPING,   // Waiting for the right timestamp to continue the execution
@@ -18,7 +18,7 @@ class Task{
     private executionTimestamp:Number
     private creationTimestamp:Number
     private date:string
-    private state:State
+    private state:TaskState
 
     constructor(agent:Agent, method:Function, args:Array<string>, date:string){
         this.date = date
@@ -27,7 +27,7 @@ class Task{
         this.method = method
         this.agent = agent
         this.executionTimestamp = toTimestamp(date)     // If error in date parsing, executionTimeStamp = 0
-        this.state = State.READY
+        this.state = TaskState.READY
     }
 
     public async execute():Promise<IResponse | undefined>{  // This method is called when its time to perform a task
@@ -39,21 +39,21 @@ class Task{
             console.log("Finished waiting !")
         }
 
-        this.state = State.EXECUTING
+        this.state = TaskState.EXECUTING
         const timeToWait = this.computeTimeToWait()
         if(timeToWait > 0){     // If the task has to before executing
             console.log("Waiting for ", timeToWait, "s ...")
-            this.state = State.SLEEPING
+            this.state = TaskState.SLEEPING
             await sleep(Number(timeToWait))
-            this.state = State.EXECUTING
+            this.state = TaskState.EXECUTING
             const boundFunction = this.method.bind(this.agent)
             const res:IResponse | undefined = await boundFunction()
-            res !== undefined ? this.state = State.COMPLETED : this.state = State.WAITING
+            res !== undefined ? this.state = TaskState.COMPLETED : this.state = TaskState.WAITING
             return res
         }else{  // If the task can be performed immediatly
             const boundFunction = this.method.bind(this.agent)     // Bind method to the agent
             const res:IResponse | undefined = await boundFunction() // Call the method and get the response
-            res !== undefined ? this.state = State.COMPLETED : this.state = State.WAITING
+            res !== undefined ? this.state = TaskState.COMPLETED : this.state = TaskState.WAITING
             return res
         }
     }
@@ -86,8 +86,14 @@ class Task{
         return this.creationTimestamp
     }
     public cancelTask(){
-        this.state = State.ABORTED
+        this.state = TaskState.ABORTED
+    }
+    public getState(){
+        return this.state
+    }
+    public setState(state:TaskState){
+        this.state = state
     }
 }
 
-export { Task, State}
+export { Task, TaskState}

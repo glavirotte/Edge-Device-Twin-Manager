@@ -16,7 +16,6 @@ import { IResponse } from './interfaces/IResponse'
 
 class Agent {
 
-    id:string
     ipAddress:string
     username:string
     password:string
@@ -24,7 +23,6 @@ class Agent {
 
     public constructor(ipAddress:string){
         this.ipAddress = ipAddress;
-        this.id = {} as string;
         this.username = {} as string
         this.password = {} as string
         this.URIs = loadJSON('./src/Model/Data_Storage/URIs.json')
@@ -272,18 +270,12 @@ class Agent {
 
 /*-------------------------Getters & Setters-------------------------*/
 
-    public getID(): string{
-        return  this.id
-    }
     public getIPAddress():string{
         return this.ipAddress;
     }
     public setLoginCredentials(username:string, password:string){
         this.username = username
         this.password = password
-    }
-    public setID(id:string){
-        this.id = id
     }
 
 }

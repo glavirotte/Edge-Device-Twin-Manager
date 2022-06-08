@@ -9,7 +9,7 @@ import { Agent } from "./Agent"
 import { Synchronizer } from "./Synchronizer"
 import { IResponse } from "./interfaces/IResponse"
 import { Task } from "./Task"
-import { State, Twin } from "./Twin"
+import { Twin } from "./Twin"
 
 class TwinHandler extends Object{
 
@@ -39,17 +39,7 @@ class TwinHandler extends Object{
         for(var i = 0; i < properties.length; i++){
             if(prop === "proxy"+properties[i]){
                 const method = agent[properties[i] as keyof Agent] as Function
-                const boundFunction = method.bind(agent)
-                boundFunction()
-                .then((response:IResponse) => {
-                    if(response !== undefined ){
-                        this.synchronizer.updateDeviceTwin(twin, response)
-                    }else{
-                        console.log("Error in " + properties[i] + " ! -> Device unreachable")      // If camera is currently unreachable
-                        twin.setState(State.OFFLINE)
-                        const agent = this.synchronizer.getAgent(twin) as Agent
-                        twin.getWaitingQueue().addTask(new Task(agent, method, new Array(),  ""))  // We create a task and save it into the taskQueue of the twin
-                }})
+                twin.getTaskManager().registerTask(new Task(agent, method, new Array(),  ""))
             }
         }
 

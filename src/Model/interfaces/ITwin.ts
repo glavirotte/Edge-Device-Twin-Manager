@@ -1,6 +1,6 @@
 import { ApplicationEntity, IResponse } from "./IResponse"
 
-enum State {
+enum DeviceState {
     OFFLINE,
     ONLINE,
 }
@@ -22,9 +22,9 @@ interface ITwin {
 
     setLastEntry(timeStamp:number):void
 
-    getState():State
+    getState():DeviceState
 
-    setState(s:State):void
+    setState(s:DeviceState):void
 
     getLightStatus():boolean
 
@@ -34,4 +34,4 @@ interface ITwin {
 
 }
 
-export { ITwin, State }
+export { ITwin, DeviceState }

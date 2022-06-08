@@ -8,9 +8,9 @@ with the physical device
 
 import { Agent } from "./Agent"
 import { IResponse } from "./interfaces/IResponse"
-import { State, Twin } from "./Twin"
+import { DeviceState, Twin } from "./Twin"
 import { TwinHandler } from "./TwinHandler"
-import { Task } from "./Task"
+import { Task, TaskState } from "./Task"
 import { Routine } from "./Routine"
 
 const defautlUsername = 'root'
@@ -38,10 +38,9 @@ class Synchronizer {
         date = "06/07/2022 11:25:00"    //@TODO Just for testing 
 
         const getDeviceInfo = new Task(agent, agent.getDeviceInfo, new Array(), date)
-        getDeviceInfo.execute()
+        await deviceTwin.getTaskManager().registerTask(getDeviceInfo)
             .then(response => {
                 this.handleRespone(deviceTwin, response, getDeviceInfo)
-                agent.setID(deviceTwin.getID())
             })
 
         const routine = new Routine(date)
@@ -50,7 +49,7 @@ class Synchronizer {
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
-        const responses:IResponse | undefined [] = await routine.execute()
+        const responses:IResponse | undefined [] = await deviceTwin.getTaskManager().registerRoutine(routine)
         responses.forEach((response:IResponse | undefined) => {
             this.handleRespone(deviceTwin, response, routine.getResultTaskMap().get(response))
         });
@@ -72,8 +71,8 @@ class Synchronizer {
         if(response !== undefined){
             this.updateDeviceTwin(twin, response)
         }else if(task !== undefined){
-            twin.setState(State.OFFLINE)
-            twin.getWaitingQueue().addTask(task)
+            twin.setState(DeviceState.OFFLINE)
+            task.setState(TaskState.WAITING)
         }else{
             throw new Error("Task is undefined ! Cannot add it to task queue")
         }
@@ -89,33 +88,27 @@ class Synchronizer {
                 const res = await agent.ping()     // Send "ping" request and wait for the result status code
                 const timestamp = Date.now()        // get current timestamp
                 if(res === 200){
-                    twin.setState(State.ONLINE)  // Update State
+                    twin.setState(DeviceState.ONLINE)  // Update State
                     console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
-                    
                     if(timestamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
                         twin.setLastEntry(timestamp)    // Update last entry with current timestamp
 
                         // Perform the tasks present in the task queue of the twin
-                        const taskQueue = twin.getWaitingQueue()
-                        const numberOfTasks = taskQueue.getArrayLength()
-
-                        for (let index = 0; index < numberOfTasks; index++) {
-                            const task = taskQueue.getNextTask()
-                            if(task !== undefined){
-                                const res = await task.execute()
-                                console.log(res)
-                                if(res !== undefined){
-                                    this.updateDeviceTwin(twin, res)
-                                }
+                        const taskManager = twin.getTaskManager()
+                        const responses = await taskManager.executeTasksInWaitingQueue()
+                        responses.forEach(response => {
+                            if(response !== undefined){
+                                this.updateDeviceTwin(twin, response)
                             }
-                        }
+                        });
+
                     }
                     
                     twin.setLastSeen(timestamp)     // Update last seen with current timestamp
                     
                 }else{
                     console.log(twin.getID() + " is offline ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
-                    twin.setState(State.OFFLINE)    // Update state
+                    twin.setState(DeviceState.OFFLINE)    // Update state
                 }
             }, ms)
         }

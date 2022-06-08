@@ -64,6 +64,14 @@ class Routine {
 
     }
 
+    public destruct(){
+        const tasks = new Array()
+        this.tasks.forEach(task => {
+            tasks.push(task)
+        });
+        return tasks
+    }
+
 /*------------------ Getters & Setters ------------------------ */
     public getResultTaskMap(){
         return this.resultTaskMap
