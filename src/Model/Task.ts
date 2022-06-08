@@ -5,13 +5,13 @@ import { toTimestamp } from "./Utils"
 enum State{
     READY,
     EXECUTING,
-    SLEEPING,
-    WAITING,
-    COMPLETED,
+    SLEEPING,   // Waiting for the right timestamp to continue the execution
+    WAITING,    // Waiting for the device to be available
+    COMPLETED,  // Valid response from the device
+    ABORTED,    // Task canceled by the user
 }
 
 class Task{
-
     private args:Array<string>
     private method:Function
     private agent:Agent
@@ -38,7 +38,7 @@ class Task{
             await timeout(s);
             console.log("Finished waiting !")
         }
-        
+
         this.state = State.EXECUTING
         const timeToWait = this.computeTimeToWait()
         if(timeToWait > 0){     // If the task has to before executing
@@ -84,6 +84,9 @@ class Task{
     }
     public getCreationTimestamp(){
         return this.creationTimestamp
+    }
+    public cancelTask(){
+        this.state = State.ABORTED
     }
 }
 
