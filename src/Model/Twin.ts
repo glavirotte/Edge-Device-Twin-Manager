@@ -21,7 +21,7 @@ class Twin implements ITwin{
     public  lightStatus:boolean
 
     // The followings fields are used to handle changes via the proxy
-    public proxyswitchLight:boolean
+    public proxyswitchLight:string
 
     public constructor(ipAddress:string){
         this.id = {} as string
@@ -32,7 +32,7 @@ class Twin implements ITwin{
         this.lastentry = 0
         this.state = DeviceState.OFFLINE
         this.lightStatus = {} as boolean
-        this.proxyswitchLight = {} as boolean
+        this.proxyswitchLight = {} as string
     }
 
     // Update the state of the Twin by storing values from last request

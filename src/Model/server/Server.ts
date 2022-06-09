@@ -3,6 +3,10 @@ import dotenv from "dotenv"
 import { Twin } from '../Twin';
 const cors = require("cors")
 
+interface Body {
+    value:string
+}
+
 class Server {
 
     private app:Express
@@ -10,9 +14,10 @@ class Server {
 
     constructor(port:Number){
         this.port = port
-
         dotenv.config();
         this.app = express();
+        this.app.use(express.json());
+        this.app.use(express.urlencoded({extended:false}))
         this.app.use(cors())
         this.app.listen(this.port, () => {
             console.log(`⚡️[server]: Server is running at https://localhost:${this.port}`);
@@ -30,9 +35,11 @@ class Server {
         this.app.get('/devices/'+id, (req: Request, res: Response) => {
             res.json(twin);
         });
-        this.app.get('/devices/'+id+'/light/switch', (req: Request, res: Response) => {
-            twin.proxyswitchLight = true
-            res.send("light switched")
+        this.app.post('/devices/'+id+'/light/switch', (req: Request, res: Response) => {
+            const date:Body = req.body
+            console.log(date.value)
+            twin.proxyswitchLight = date.value
+            res.status(201).send()
         });
         this.app.get('/devices/'+id+'/light/status', (req: Request, res: Response) => {
             const lightStatus = twin.getLightStatus()

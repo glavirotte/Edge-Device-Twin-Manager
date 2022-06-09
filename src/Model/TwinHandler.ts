@@ -39,7 +39,7 @@ class TwinHandler extends Object{
         for(var i = 0; i < properties.length; i++){
             if(prop === "proxy"+properties[i]){
                 const method = agent[properties[i] as keyof Agent] as Function
-                this.synchronizer.getTaskManager(twin)?.registerTask(new Task(agent, method, new Array(),  ""), this.synchronizer.handleResponse)
+                this.synchronizer.getTaskManager(twin)?.registerTask(new Task(agent, method, new Array(),  value), this.synchronizer.handleResponse)
             }
         }
 
