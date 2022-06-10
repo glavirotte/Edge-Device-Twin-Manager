@@ -13,6 +13,8 @@ import { Application } from './Application'
 import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
 import { IResponse } from './interfaces/IResponse'
+import FormData from "form-data"
+import { createReadStream, createWriteStream } from 'fs'
 
 class Agent {
 
@@ -287,6 +289,62 @@ class Agent {
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
         console.log("firmware status", response)
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+
+    public async upgradeFirmware():Promise<IResponse | undefined>{
+        const readStream = createReadStream('/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/M1065-L_9_80_3_11.bin')
+        const writeStream = createWriteStream('./temporaryFiles/firmware.txt')
+        const form = new FormData()
+        form.append('body', 'Content-Type: application/json\n{"apiVersion": "1.0","context": "abc","method": "upgrade"}')
+        form.append('binary',readStream)
+        form.pipe(writeStream)
+
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.firmware
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const options:urllib.RequestOptions = {
+            method: method,
+            data: createReadStream('./temporaryFiles/firmware.txt'),
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+            headers:form.getHeaders(),
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response:IResponse | undefined = await this.askDevice(request)
+        console.log("header:", form.getHeaders())
+        console.log("firmware status", response)
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+
+    public async factoryDefault():Promise<IResponse | undefined>{
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.firmware
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion": "1.0","method": "factoryDefault","factoryDefaultMode": "hard"}'
+        const options:urllib.RequestOptions = {
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response:IResponse | undefined = await this.askDevice(request)
+
         if(response !== undefined){
             return response
         }else{

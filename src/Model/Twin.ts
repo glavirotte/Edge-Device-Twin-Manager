@@ -55,7 +55,7 @@ class Twin implements ITwin{
             }
             if(response.data?.activeFirmwareVersion !== undefined){
                 this.firmwareInfo.activeFirmwarePart = response.data?.activeFirmwarePart
-                this.firmwareInfo.activeFirmwareVersion = response.data?.inactiveFirmwareVersion
+                this.firmwareInfo.activeFirmwareVersion = response.data?.activeFirmwareVersion
                 this.firmwareInfo.inactiveFirmwareVersion = response.data?.inactiveFirmwareVersion
                 this.firmwareInfo.lastUpgradeAt = response.data?.lastUpgradeAt
                 this.firmwareInfo.isCommitted = response.data?.isCommitted
