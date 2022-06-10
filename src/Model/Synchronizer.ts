@@ -51,7 +51,7 @@ class Synchronizer {
         routine.setDate(date)
         const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
-        const installApplication = new Task(agent, agent.installApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
+        // const installApplication = new Task(agent, agent.installApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
         // const removeApplication = new Task(agent, agent.removeApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
         // const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
         // const reboot = new Task(agent, agent.reboot, [], date)
@@ -60,7 +60,7 @@ class Synchronizer {
 
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
-        routine.addTask(installApplication)
+        // routine.addTask(installApplication)
         // routine.addTask(getFirmwareStatus)
         // routine.addTask(reboot)
         // routine.addTask(removeApplication)
