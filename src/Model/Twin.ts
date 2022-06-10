@@ -5,6 +5,8 @@ with the applications installed
 
 #########################################################*/
 
+import { off } from "process"
+import { IFirmwareInfo } from "./interfaces/IFirmwareInfo"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { ITwin, DeviceState } from "./interfaces/ITwin"
 import { TaskManager } from "./TaskManager"
@@ -18,6 +20,7 @@ class Twin implements ITwin{
     private lastseen:number     // last time the device was online
     private lastentry:number    // last time the device start connection with the system
     private state:DeviceState         // Current state
+    private firmwareInfo: IFirmwareInfo
     public  lightStatus:boolean
 
     // The followings fields are used to handle changes via the proxy
@@ -32,6 +35,8 @@ class Twin implements ITwin{
         this.lastentry = 0
         this.state = DeviceState.OFFLINE
         this.lightStatus = {} as boolean
+        this.firmwareInfo = {} as IFirmwareInfo
+
         this.proxyswitchLight = {} as string
     }
 
@@ -47,6 +52,13 @@ class Twin implements ITwin{
             }
             if(response?.data?.status !== undefined && response.method === 'getLightStatus'){
                 this.lightStatus = response.data.status
+            }
+            if(response.data?.activeFirmwareVersion !== undefined){
+                this.firmwareInfo.activeFirmwarePart = response.data?.activeFirmwarePart
+                this.firmwareInfo.activeFirmwareVersion = response.data?.inactiveFirmwareVersion
+                this.firmwareInfo.inactiveFirmwareVersion = response.data?.inactiveFirmwareVersion
+                this.firmwareInfo.lastUpgradeAt = response.data?.lastUpgradeAt
+                this.firmwareInfo.isCommitted = response.data?.isCommitted
             }
             this.storeTwinObject()
         } catch (error) {

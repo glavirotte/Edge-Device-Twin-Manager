@@ -15,6 +15,11 @@ export interface IResponse {
   export interface Data {
     status: boolean;
     propertyList: PropertyList;
+    activeFirmwareVersion: string,
+    activeFirmwarePart: string,
+    inactiveFirmwareVersion: string,
+    isCommitted: boolean,
+    lastUpgradeAt: string
   }
   export interface PropertyList {
     Architecture: string;

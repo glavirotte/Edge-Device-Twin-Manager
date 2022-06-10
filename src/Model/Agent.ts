@@ -48,8 +48,8 @@ class Agent {
             if(res.status != 200){
                 throw new Error('Error with request ! Status code: '+res.status.toString())
             }
-            console.log(res.status.toString())
-            console.log(res.data.toString())
+            console.log("Status code: ", res.status.toString())
+            console.log("Data: ", res.data.toString())
 
         }else if(contentType.startsWith('application/json')){
             response = JSON.parse(res.data.toString())
@@ -148,7 +148,8 @@ class Agent {
 
     // Install an application on the Device
     
-    public async installApplication(application:Application):Promise<IResponse | undefined>{  
+    public async installApplication(arg:Application[]):Promise<IResponse | undefined>{
+        const application = arg[0]
         const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.upload
@@ -175,7 +176,8 @@ class Agent {
 
     // Remove an application from the Device
 
-    public async removeApplication(application:Application):Promise<IResponse | undefined>{
+    public async removeApplication(arg:Application[]):Promise<IResponse | undefined>{
+        const application = arg[0]
         const protocol = 'https'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.control
@@ -261,6 +263,54 @@ class Agent {
         await this.askDevice(request)
         response = await this.getLightStatus()
         
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+
+    public async getFirmwareStatus():Promise<IResponse | undefined>{
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.firmware
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion": "1.0", "method": "status"}'
+        const options:urllib.RequestOptions = {
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response:IResponse | undefined = await this.askDevice(request)
+        console.log("firmware status", response)
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+
+    public async reboot():Promise<IResponse | undefined>{
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.firmware
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion": "1.0", "method": "reboot"}'
+        const options:urllib.RequestOptions = {
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response:IResponse | undefined = await this.askDevice(request)
+
         if(response !== undefined){
             return response
         }else{

@@ -4,6 +4,7 @@ interface IURIs {
     control:string
     basicdeviceinfo:string
     lightcontrol:string
+    firmware:string
 }
 
 export { IURIs }

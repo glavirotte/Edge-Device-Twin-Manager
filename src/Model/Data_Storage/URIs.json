@@ -3,5 +3,6 @@
     "upload":"axis-cgi/applications/upload.cgi",
     "control":"axis-cgi/applications/control.cgi",
     "basicdeviceinfo":"axis-cgi/basicdeviceinfo.cgi",
-    "lightcontrol":"axis-cgi/lightcontrol.cgi"
+    "lightcontrol":"axis-cgi/lightcontrol.cgi",
+    "firmware":"axis-cgi/firmwaremanagement.cgi"
 }

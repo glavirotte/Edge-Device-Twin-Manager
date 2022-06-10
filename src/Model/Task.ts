@@ -12,7 +12,7 @@ enum TaskState{
 }
 
 class Task{
-    private args:Array<string>
+    private args:Array<any>
     private method:Function
     private agent:Agent
     private executionTimestamp:Number
@@ -20,7 +20,7 @@ class Task{
     private date:string
     private state:TaskState
 
-    constructor(agent:Agent, method:Function, args:Array<string>, date:string){
+    constructor(agent:Agent, method:Function, args:Array<any>, date:string){
         this.date = date
         this.creationTimestamp = Date.now()/1000
         this.args = args
@@ -46,12 +46,12 @@ class Task{
             this.state = TaskState.SLEEPING
             await sleep(Number(timeToWait))
             this.state = TaskState.EXECUTING
-            const boundFunction = this.method.bind(this.agent)
+            const boundFunction = this.method.bind(this.agent, this.args)
             const res:IResponse | undefined = await boundFunction()
             res !== undefined ? this.state = TaskState.COMPLETED : this.state = TaskState.WAITING
             return res
         }else{  // If the task can be performed immediatly
-            const boundFunction = this.method.bind(this.agent)     // Bind method to the agent
+            const boundFunction = this.method.bind(this.agent, this.args)     // Bind method to the agent
             const res:IResponse | undefined = await boundFunction() // Call the method and get the response
             res !== undefined ? this.state = TaskState.COMPLETED : this.state = TaskState.WAITING
             return res
