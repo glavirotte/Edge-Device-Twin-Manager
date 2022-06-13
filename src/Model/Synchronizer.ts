@@ -13,6 +13,7 @@ import { TwinHandler } from "./TwinHandler"
 import { Task, TaskState } from "./Task"
 import { Routine } from "./Routine"
 import { TaskManager } from "./TaskManager"
+import { Firmware } from "./Firmware"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -52,16 +53,16 @@ class Synchronizer {
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
         // const installApplication = new Task(agent, agent.installApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
         // const removeApplication = new Task(agent, agent.removeApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
-        const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
+        // const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
         // const reboot = new Task(agent, agent.reboot, [], date)
-        // const upgradeFirmware = new Task(agent, agent.upgradeFirmware, [], date)
+        // const upgradeFirmware = new Task(agent, agent.upgradeFirmware, [new Firmware("M1065-L_9_80_3_11", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/M1065-L_9_80_3_11.bin")], date)
         // const factoryDefault = new Task(agent, agent.factoryDefault, [], date)
         // const rollBack = new Task(agent, agent.rollBack, [], date)
         
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
         // routine.addTask(installApplication)
-        routine.addTask(getFirmwareStatus)
+        // routine.addTask(getFirmwareStatus)
         // routine.addTask(reboot)
         // routine.addTask(removeApplication)
         // routine.addTask(upgradeFirmware)

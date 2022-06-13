@@ -1,11 +1,11 @@
 /*#######################################################  
 
-This class describes the Application object which is given
+This class describes the firmware object which is given
 to the agent by the synchronizer and will be uploaded. 
 
 #########################################################*/
 
-class Application{
+class Firmware{
     
     private name:string     // The name of the app
     private location:string // Where the source file is located (.eap)
@@ -25,4 +25,4 @@ class Application{
     }
 }
 
-export { Application }
+export { Firmware }

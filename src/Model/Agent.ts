@@ -14,6 +14,7 @@ import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
 import { IResponse } from './interfaces/IResponse'
 import util from "util"
+import { Firmware } from './Firmware'
 const exec = util.promisify(require('child_process').exec);
 
 
@@ -263,7 +264,6 @@ class Agent {
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
         response = await this.getLightStatus()
-        
         if(response !== undefined){
             return response
         }else{
@@ -294,19 +294,21 @@ class Agent {
         }
     }
 
-    public async upgradeFirmware():Promise<IResponse | undefined>{
+    public async upgradeFirmware(arg:Firmware[]):Promise<IResponse | undefined>{
+        const firmware = arg[0]
         const protocol = 'http'
         const DeviceIP = this.ipAddress
         const uri = this.URIs.firmware
-        const method: HttpMethod = 'POST'
+        const method: HttpMethod = "POST"
         const url = `${protocol}://${DeviceIP}/${uri}`
-        const location = "./resources/M1065-L_9_80_3_11.bin"
+        const location = firmware.getLocation()
         var stdout
         const body = JSON.stringify({"apiVersion":"1.0","context":"abc","method":"upgrade"})
         try {
-            var { stdout, stderr } = await exec(`curl --digest -u root:pass --location --request POST 'http://192.168.50.34/axis-cgi/firmwaremanagement.cgi' \
+            var { stdout, stderr } = await exec(`curl --digest -u ${this.username}:${this.password} --location --request ${method} ${url} \
             --form 'json=${body}' \
-            --form 'bin=@"./resources/M1065-L_9_80_3_11.bin"'`)
+            --form 'bin=@${location}'`)
+            console.log("stdout", stdout)
             const response = await this.getFirmwareStatus()
             return response
           } catch (e) {
@@ -354,7 +356,6 @@ class Agent {
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
-
         if(response !== undefined){
             return response
         }else{
