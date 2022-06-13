@@ -8,8 +8,6 @@ the React Application
 import { Synchronizer } from './Synchronizer'
 import { Twin } from './Twin'
 import { Server } from './server/Server'
-import FormData from 'form-data'
-import { createReadStream } from 'fs'
 const cameraIP = '192.168.50.34'
 const synchronizer = new Synchronizer()
 
