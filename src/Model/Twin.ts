@@ -5,11 +5,9 @@ with the applications installed
 
 #########################################################*/
 
-import { off } from "process"
 import { IFirmwareInfo } from "./interfaces/IFirmwareInfo"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { ITwin, DeviceState } from "./interfaces/ITwin"
-import { TaskManager } from "./TaskManager"
 import { writeJSON } from "./Utils"
 
 class Twin implements ITwin{
@@ -51,7 +49,7 @@ class Twin implements ITwin{
                 this.applications = response?.reply?.application
             }
             if(response?.data?.status !== undefined && response.method === 'getLightStatus'){
-                this.lightStatus = response.data.status
+                this.lightStatus = response.data.status as boolean
             }
             if(response.data?.activeFirmwareVersion !== undefined){
                 this.firmwareInfo.activeFirmwarePart = response.data?.activeFirmwarePart

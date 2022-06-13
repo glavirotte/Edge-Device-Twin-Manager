@@ -13,12 +13,12 @@ export interface IResponse {
     method: string;
   }
   export interface Data {
-    status: boolean;
-    propertyList: PropertyList;
-    activeFirmwareVersion: string,
-    activeFirmwarePart: string,
-    inactiveFirmwareVersion: string,
-    isCommitted: boolean,
+    status: boolean
+    propertyList: PropertyList
+    activeFirmwareVersion: string
+    activeFirmwarePart: string
+    inactiveFirmwareVersion: string
+    isCommitted: boolean
     lastUpgradeAt: string
   }
   export interface PropertyList {
