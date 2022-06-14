@@ -17,7 +17,7 @@ interface ITwin {
 
     getID():string
 
-    setIPAddress(ipAddress:string):void
+    setSerialNumber(serialNumber:string):void
 
     getLastSeen():number
 

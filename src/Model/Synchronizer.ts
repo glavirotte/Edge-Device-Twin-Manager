@@ -1,9 +1,7 @@
 /*#######################################################  
-
 This class describes the Device Manager resect, which is
 used to update the state of the Device twin and to interact
 with the physical device
-
 #########################################################*/
 
 import { Agent } from "./Agent"
@@ -14,6 +12,7 @@ import { Task, TaskState } from "./Task"
 import { Routine } from "./Routine"
 import { TaskManager } from "./TaskManager"
 import { Firmware } from "./Firmware"
+import { Application } from "./Application"
 
 const defautlUsername = 'root'
 const defaultPassword = 'pass'
@@ -33,11 +32,11 @@ class Synchronizer {
     }
 
     // Creates a twin, setup it and returns a twin proxy for the user to be able to interract with it
-    public async createTwin(ipAddress:string):Promise<Twin>{
-        const deviceTwin = new Twin(ipAddress)
-        const agent = new Agent(ipAddress)
+    public async createTwin(cameraID:string):Promise<Twin>{
+        const deviceTwin = new Twin(cameraID)
+        const agent = new Agent(cameraID)
+        await agent.getProxyUrl()
         this.agents.set(agent, deviceTwin)
-        agent.setLoginCredentials(defautlUsername, defaultPassword)    // Give default login and password to the device resect
 
         const taskManager = new TaskManager(deviceTwin)
         this.taskManagers.set(deviceTwin, taskManager)

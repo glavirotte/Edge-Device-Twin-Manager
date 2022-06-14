@@ -1,8 +1,6 @@
 /*#######################################################  
-
 This class describes and give methods to communicate 
 with a physical device on the local network
-
 #########################################################*/
 
 import  { Request } from './Request'
@@ -20,16 +18,18 @@ const exec = util.promisify(require('child_process').exec);
 
 class Agent {
 
-    ipAddress:string
+    cameraID:string
+    proxyUrl:string
     username:string
     password:string
     URIs:IURIs
 
-    public constructor(ipAddress:string){
-        this.ipAddress = ipAddress;
+    public constructor(cameraID:string){
+        this.cameraID = cameraID;
         this.username = {} as string
         this.password = {} as string
         this.URIs = loadJSON('./src/Model/Data_Storage/URIs.json')
+        this.proxyUrl = ""
     }
 
 /*-------------------------Device Methods-------------------------*/
@@ -69,22 +69,26 @@ class Agent {
         }
     }
 
+    // Function to get the proxy url to be able to interract with the physical device
+
+    public async getProxyUrl(){
+        var { stdout, stderr } = await exec(`bash ./secret/shell-api-client/morphean-test.sh ${this.cameraID}`)
+        this.proxyUrl = stdout
+        console.log(stdout)
+    }
+
     // Ping function to check connection with physical device
     // send HTTP Request to check connectivity
 
     public async ping(){
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.basicdeviceinfo
-        const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const uri = this.URIs.axis.ping
+        const method: HttpMethod = 'GET'
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
-        const body = '{"apiVersion":"1.0", "method":"getSupportedVersions"}'
+        args.set("ip", "127.0.0.1")
         const options:urllib.RequestOptions = {
             method: method,
-            data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
             timeout:1000,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
@@ -100,18 +104,16 @@ class Agent {
     }
 
     public async getDeviceInfo():Promise<IResponse | undefined>{
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.basicdeviceinfo
+        const uri = this.URIs.axis.basicdeviceinfo
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const body = '{"apiVersion":"1.0", "method":"getAllProperties"}'
         const options:urllib.RequestOptions = {
             method: method,
             data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
+        
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
@@ -126,16 +128,13 @@ class Agent {
     // Request to get the list of Applications currently installed on the device
 
     public async listApplications():Promise<IResponse | undefined>{
-        const protocol = 'https'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.list
+        const uri = this.URIs.axis.list
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
             timeout: 5000,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
@@ -152,16 +151,13 @@ class Agent {
     
     public async installApplication(arg:Application[]):Promise<IResponse | undefined>{
         const application = arg[0]
-        const protocol = 'https'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.upload
+        const uri = this.URIs.axis.upload
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
             timeout:30000,
             files: application.getLocation()
         }
@@ -180,18 +176,15 @@ class Agent {
 
     public async removeApplication(arg:Application[]):Promise<IResponse | undefined>{
         const application = arg[0]
-        const protocol = 'https'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.control
+        const uri = this.URIs.axis.control
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         args.set('package', application.getName())
         args.set('action', 'remove')
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
             timeout:30000,
             files: application.getLocation()
         }
@@ -207,18 +200,15 @@ class Agent {
     }
 
     public async getLightStatus():Promise<IResponse | undefined>{
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.lightcontrol
+        const uri = this.URIs.axis.lightcontrol
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const body = '{"apiVersion": "1.0","method": "getLightStatus","params": {"lightID": "led0"}}'
         const options:urllib.RequestOptions = {
             method: method,
             data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
@@ -249,17 +239,14 @@ class Agent {
             return undefined
         }
 
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.lightcontrol
+        const uri = this.URIs.axis.lightcontrol
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const options:urllib.RequestOptions = {
             method: method,
             data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
@@ -272,18 +259,15 @@ class Agent {
     }
 
     public async getFirmwareStatus():Promise<IResponse | undefined>{
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const body = '{"apiVersion": "1.0", "method": "status"}'
         const options:urllib.RequestOptions = {
             method: method,
             data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
@@ -296,11 +280,9 @@ class Agent {
 
     public async upgradeFirmware(arg:Firmware[]):Promise<IResponse | undefined>{
         const firmware = arg[0]
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = "POST"
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const location = firmware.getLocation()
         var stdout
         const body = JSON.stringify({"apiVersion":"1.0","context":"abc","method":"upgrade"})
@@ -317,18 +299,16 @@ class Agent {
     }
 
     public async rollBack():Promise<IResponse | undefined>{        
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const body = '{"apiVersion": "1.0","method": "rollback"}'
         const args:Map<string, string> = new Map()
         const options:urllib.RequestOptions = {
             method: method,
             data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
@@ -341,18 +321,15 @@ class Agent {
     }
 
     public async factoryDefault():Promise<IResponse | undefined>{
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const body = '{"apiVersion": "1.0","method": "factoryDefault","factoryDefaultMode": "hard"}'
         const options:urllib.RequestOptions = {
             method: method,
             data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
@@ -364,18 +341,15 @@ class Agent {
     }
 
     public async reboot():Promise<IResponse | undefined>{
-        const protocol = 'http'
-        const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
-        const url = `${protocol}://${DeviceIP}/${uri}`
+        const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         const body = '{"apiVersion": "1.0", "method": "reboot"}'
         const options:urllib.RequestOptions = {
             method: method,
             data:JSON.parse(JSON.stringify(body)),
             rejectUnauthorized: false,
-            digestAuth: this.username+':'+this.password,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const response:IResponse | undefined = await this.askDevice(request)
@@ -389,8 +363,8 @@ class Agent {
 
 /*-------------------------Getters & Setters-------------------------*/
 
-    public getIPAddress():string{
-        return this.ipAddress;
+    public getCameraID():string{
+        return this.cameraID;
     }
     public setLoginCredentials(username:string, password:string){
         this.username = username

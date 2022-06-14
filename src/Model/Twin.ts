@@ -1,8 +1,6 @@
 /*#######################################################  
-
 This class represent the current known state of the Device
 with the applications installed 
-
 #########################################################*/
 
 import { IFirmwareInfo } from "./interfaces/IFirmwareInfo"
@@ -12,7 +10,7 @@ import { writeJSON } from "./Utils"
 
 class Twin implements ITwin{
     private id:string
-    private ipAddress:string
+    private serialNumber:string
     private properties: PropertyList | undefined
     private applications: (ApplicationEntity)[] | null
     private lastseen:number     // last time the device was online
@@ -24,9 +22,9 @@ class Twin implements ITwin{
     // The followings fields are used to handle changes via the proxy
     public proxyswitchLight:string
 
-    public constructor(ipAddress:string){
-        this.id = {} as string
-        this.ipAddress = ipAddress
+    public constructor(id:string){
+        this.id = id
+        this.serialNumber = {} as string
         this.properties = {} as PropertyList | undefined
         this.applications = {} as (ApplicationEntity)[] | null
         this.lastseen = 0
@@ -43,7 +41,7 @@ class Twin implements ITwin{
         try {
             if(response?.data?.propertyList !== undefined){
                 this.properties = response?.data?.propertyList
-                this.id = this.properties.SerialNumber
+                this.serialNumber = this.properties.SerialNumber
             }
             if(response?.reply?.application?.[0].$ !== undefined){
                 this.applications = response?.reply?.application
@@ -65,7 +63,7 @@ class Twin implements ITwin{
     }
 
     public storeTwinObject(){
-        writeJSON(this, `./src/Model/Data_Storage/Twins/${this.id}-Twin.json`)
+        writeJSON(this, `./src/Model/Data_Storage/Twins/${this.serialNumber}-Twin.json`)
         console.log(this)
     }
 
@@ -77,8 +75,8 @@ class Twin implements ITwin{
     public getID():string{
         return this.id
     }
-    public setIPAddress(ipAddress:string):void{
-        this.ipAddress = ipAddress
+    public setSerialNumber(serialNumber:string):void{
+        this.serialNumber = serialNumber
     }
     public getLastSeen():number{
         return this.lastseen
