@@ -7,7 +7,6 @@ be called when the user interrcats with the twin proxy
 
 import { Agent } from "./Agent"
 import { Synchronizer } from "./Synchronizer"
-import { IResponse } from "./interfaces/IResponse"
 import { Task } from "./Task"
 import { Twin } from "./Twin"
 

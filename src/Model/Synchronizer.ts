@@ -32,7 +32,7 @@ class Synchronizer {
         this.taskManagers = new Map()
     }
 
-    // Create a twin, setup it and return a twin proxy for the user to be able to interract with it
+    // Creates a twin, setup it and returns a twin proxy for the user to be able to interract with it
     public async createTwin(ipAddress:string):Promise<Twin>{
         const deviceTwin = new Twin(ipAddress)
         const agent = new Agent(ipAddress)

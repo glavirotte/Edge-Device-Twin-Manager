@@ -5,6 +5,11 @@ enum DeviceState {
     ONLINE,
 }
 
+enum TwinState {
+    UPTODATE,
+    OUTDATED,
+}
+
 interface ITwin {
     updateState(response: IResponse):void
 
@@ -34,4 +39,4 @@ interface ITwin {
 
 }
 
-export { ITwin, DeviceState }
+export { ITwin, DeviceState, TwinState}

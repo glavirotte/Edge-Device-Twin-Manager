@@ -7,7 +7,7 @@ with the applications installed
 
 import { IFirmwareInfo } from "./interfaces/IFirmwareInfo"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
-import { ITwin, DeviceState } from "./interfaces/ITwin"
+import { ITwin, DeviceState, TwinState } from "./interfaces/ITwin"
 import { writeJSON } from "./Utils"
 
 class Twin implements ITwin{
