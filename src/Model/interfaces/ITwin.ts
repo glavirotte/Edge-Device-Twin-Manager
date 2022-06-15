@@ -1,14 +1,13 @@
 import { ApplicationEntity, IResponse } from "./IResponse"
 
 enum DeviceState {
-    OFFLINE,
+    UNREACHABLE,
     ONLINE,
 }
 
 enum TwinState {
     OUTDATED,
     UPTODATE,
-
 }
 
 interface ITwin {

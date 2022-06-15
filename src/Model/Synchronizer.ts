@@ -99,7 +99,7 @@ class Synchronizer {
         if(response !== undefined){
             twin.updateState(response, undefined)
         }else if(task !== undefined){
-            twin.setDeviceState(DeviceState.OFFLINE)
+            twin.setDeviceState(DeviceState.UNREACHABLE)
             task.setState(TaskState.WAITING)
         }
     }
@@ -117,8 +117,10 @@ class Synchronizer {
             twin.setLastSeen(timestamp)     // Update last seen with current timestamp
             twin.updateState(undefined, heartBeat)
 
-            if(timestamp - twin.getLastSeen() > timeout || twin.getDeviceState() === DeviceState.OFFLINE){  // If device was disconnected and is online again
+            if(timestamp - twin.getLastSeen() > timeout || twin.getDeviceState() === DeviceState.UNREACHABLE){  // If device was disconnected and is online again
                 twin.setLastEntry(timestamp)    // Update last entry with current timestamp
+                const agent = this.getAgent(twin) as Agent
+                await agent.getProxyUrl()   // The device is connected to the broker but unreachable => proxy url has changed
 
                 // Perform the tasks present in the task queue of the twin
                 const taskManager = this.taskManagers.get(twin) as TaskManager
@@ -163,7 +165,7 @@ class Synchronizer {
                     
                 }else{
                     console.log(twin.getID() + " is offline ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
-                    twin.setDeviceState(DeviceState.OFFLINE)    // Update state
+                    twin.setDeviceState(DeviceState.UNREACHABLE)    // Update state
                 }
             }, ms)
         }

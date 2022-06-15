@@ -33,7 +33,7 @@ class Twin{
         this.heartBeat = {} as IHeartBeat
         this.lastseen = 0
         this.lastentry = 0
-        this.deviceState = DeviceState.OFFLINE
+        this.deviceState = DeviceState.UNREACHABLE
         this.twinState = TwinState.OUTDATED
         this.lightStatus = {} as boolean
         this.firmwareInfo = {} as IFirmwareInfo

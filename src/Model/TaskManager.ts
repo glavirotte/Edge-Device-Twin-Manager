@@ -20,7 +20,7 @@ class TaskManager{
         this.taskList.push(task)
         const response = await task.execute()
         if(response === undefined){
-            this.twin.setDeviceState(DeviceState.OFFLINE)
+            this.twin.setDeviceState(DeviceState.UNREACHABLE)
             this.waitingQueue.addTask(task)
             console.log("Task added to waiting queue", task)
         }
@@ -45,7 +45,6 @@ class TaskManager{
     private async manageTasks(ms:number){
 
         setInterval(async () => {
-            console.log(this.taskList)
             for (const task of this.taskList){
                 switch (task.getState()) {
                     case TaskState.COMPLETED:

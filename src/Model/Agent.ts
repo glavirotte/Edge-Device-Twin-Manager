@@ -75,6 +75,7 @@ class Agent {
         try {
             var { stdout, stderr } = await exec(`bash ./secret/shell-api-client/morphean-test.sh ${this.cameraID}`)
             this.proxyUrl = stdout
+            console.log("Proxy url request !", this.proxyUrl)
         } catch (error) {
             console.log(error, "Morphean server unreachable")
         }
