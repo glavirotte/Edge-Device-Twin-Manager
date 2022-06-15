@@ -3,7 +3,7 @@ import { IResponse } from "./interfaces/IResponse"
 import { Routine } from "./Routine"
 import { Task, TaskState } from "./Task"
 import { TaskQueue } from "./TaskQueue"
-import { Twin } from "./Twin"
+import { DeviceState, Twin } from "./Twin"
 
 class TaskManager{
     private taskList:Array<Task>
@@ -20,6 +20,7 @@ class TaskManager{
         this.taskList.push(task)
         const response = await task.execute()
         if(response === undefined){
+            this.twin.setDeviceState(DeviceState.OFFLINE)
             this.waitingQueue.addTask(task)
             console.log("Task added to waiting queue", task)
         }
@@ -44,6 +45,7 @@ class TaskManager{
     private async manageTasks(ms:number){
 
         setInterval(async () => {
+            console.log(this.taskList)
             for (const task of this.taskList){
                 switch (task.getState()) {
                     case TaskState.COMPLETED:
@@ -64,7 +66,8 @@ class TaskManager{
         for (const task of tasks){
             if(task !== undefined){
                 const res = await task.execute()
-                this.waitingQueue.pop()
+                task.setState(TaskState.COMPLETED)  // Here we suppose that all the task are successfully performed, but we cannot be sure
+                this.waitingQueue.pop()             // Has to be fixed in a futur implementation
                 responses.push(res)
             }
         }

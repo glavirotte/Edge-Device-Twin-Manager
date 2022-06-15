@@ -72,8 +72,12 @@ class Agent {
     // Function to get the proxy url to be able to interract with the physical device
 
     public async getProxyUrl(){
-        var { stdout, stderr } = await exec(`bash ./secret/shell-api-client/morphean-test.sh ${this.cameraID}`)
-        this.proxyUrl = stdout
+        try {
+            var { stdout, stderr } = await exec(`bash ./secret/shell-api-client/morphean-test.sh ${this.cameraID}`)
+            this.proxyUrl = stdout
+        } catch (error) {
+            console.log(error, "Morphean server unreachable")
+        }
     }
 
     // Ping function to check connection with physical device

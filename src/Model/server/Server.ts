@@ -37,7 +37,7 @@ class Server {
         });
         this.app.post('/devices/'+id+'/light/switch', (req: Request, res: Response) => {
             const date:Body = req.body
-            console.log(date.value)
+            console.log("Asked for a light switch at", date.value)
             twin.proxyswitchLight = date.value
             res.status(201).send()
         });
@@ -46,7 +46,7 @@ class Server {
             res.send('<p>'+lightStatus+'<p>')
         });
         this.app.get('/devices/'+id+'/connected', (req: Request, res: Response) => {
-            const status = (twin.getState() === 0)?("Offline"):("Connected")
+            const status = (twin.getDeviceState() === 0)?("Offline"):("Connected")
             res.send('<p>'+status+'<p>')
         });
     }

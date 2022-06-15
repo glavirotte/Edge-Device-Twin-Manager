@@ -13,7 +13,8 @@ import { Routine } from "./Routine"
 import { TaskManager } from "./TaskManager"
 import { Firmware } from "./Firmware"
 import { Application } from "./Application"
-import { IBrokerMessage } from "./interfaces/IBrokerMessage"
+import { IHeartBeat } from "./interfaces/IBrokerMessage"
+import { timingSafeEqual } from "crypto"
 
 
 class Synchronizer {
@@ -22,29 +23,35 @@ class Synchronizer {
     private twins:Map<string, Twin>
     private proxies:Map<any, Twin>
     private taskManagers:Map<Twin, TaskManager>
+    private subToMQTTTopic:Function
 
     public constructor(){
         this.agents = new Map()
         this.twins = new Map()
         this.proxies = new Map()
         this.taskManagers = new Map()
+        this.subToMQTTTopic = {} as Function
     }
 
     // Creates a twin, setup it and returns a twin proxy for the user to be able to interract with it
     public async createTwin(cameraID:string):Promise<Twin>{
         const deviceTwin = new Twin(cameraID)
         const agent = new Agent(cameraID)
-        await agent.getProxyUrl()
-        this.agents.set(agent, deviceTwin)
-
         const taskManager = new TaskManager(deviceTwin)
         this.taskManagers.set(deviceTwin, taskManager)
         var date = ""
         date = "06/08/2022 15:17:00"    //@TODO Just for testing 
 
+        await agent.getProxyUrl()
+        this.agents.set(agent, deviceTwin)
+
         const getDeviceInfo = new Task(agent, agent.getDeviceInfo, new Array(), date)
         await taskManager.registerTask(getDeviceInfo, this.handleResponse)
-        this.twins.set(deviceTwin.getSerialNumber(), deviceTwin)
+        this.setTwin(deviceTwin)
+        this.subToMQTTTopic("AXIS/"+deviceTwin.getSerialNumber()+"/Monitoring/HeartBeat") // subscribe to the heartbeat topic of the twin
+
+
+        /* Routine to perform when a new twin is created */
 
 
         const routine = new Routine(date)
@@ -78,28 +85,39 @@ class Synchronizer {
         return twinProxy
     }
 
-
-    // If response is not undefined, we synchronize the twin, otherwise we add task to twin task queue and twin is set to offline
-    public handleResponse(twin:Twin, response:IResponse | undefined, task:Task | undefined){
-        if(response !== undefined){
-            twin.updateState(response)
-        }else if(task !== undefined){
-            twin.setState(DeviceState.OFFLINE)
-            task.setState(TaskState.WAITING)
+    public handleHeartBeat(twin:Twin, heartbeat:IHeartBeat){
+        if(heartbeat !== undefined){
+            twin.updateState(undefined, heartbeat)
         }else{
-            throw new Error("Task is undefined ! Cannot add it to task queue")
+            throw new Error("HeartBeat is undefined ! Cannot synchronize with device")
         }
     }
 
 
-    public async handleMQTTBrokerMessage(topic:string, brokerMessage:IBrokerMessage){
-        const twin = this.getTwin(brokerMessage.serial)
+    // If response is not undefined, we synchronize the twin, otherwise we add task to twin task queue and twin is set to offline
+    public handleResponse(twin:Twin, response:IResponse | undefined, task:Task | undefined){
+        if(response !== undefined){
+            twin.updateState(response, undefined)
+        }else if(task !== undefined){
+            twin.setDeviceState(DeviceState.OFFLINE)
+            task.setState(TaskState.WAITING)
+        }
+    }
+
+    // Handle the message from the broker to get update the twin and ensure connection with the device
+    public async handleMQTTBrokerMessage(topic:string, heartBeat:IHeartBeat){
+        const twin = this.getTwin(heartBeat.serial)
+
+        const heartBeatPeriod = 60000
+        const timeout = 2*heartBeatPeriod
 
         if(twin !== undefined){
             const timestamp = Date.now()        // get current timestamp
-            twin.setState(DeviceState.ONLINE)  // Update State
-            console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
-            if(timestamp - twin.getLastSeen() > 2*60000){  // If device was disconnected and is online again
+            console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "ms ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "ms ago")
+            twin.setLastSeen(timestamp)     // Update last seen with current timestamp
+            twin.updateState(undefined, heartBeat)
+
+            if(timestamp - twin.getLastSeen() > timeout || twin.getDeviceState() === DeviceState.OFFLINE){  // If device was disconnected and is online again
                 twin.setLastEntry(timestamp)    // Update last entry with current timestamp
 
                 // Perform the tasks present in the task queue of the twin
@@ -107,12 +125,12 @@ class Synchronizer {
                 const responses = await taskManager.executeTasksInWaitingQueue()
                 responses.forEach(response => {
                     if(response !== undefined){
-                        twin.updateState(response)
+                        twin.updateState(response, undefined)
                     }
                 });
 
             }
-            twin.setLastSeen(timestamp)     // Update last seen with current timestamp
+            twin.setDeviceState(DeviceState.ONLINE)  // Update State
         }
     }
 
@@ -125,7 +143,7 @@ class Synchronizer {
                 const res = await agent.ping()     // Send "ping" request and wait for the result status code
                 const timestamp = Date.now()        // get current timestamp
                 if(res === 200){
-                    twin.setState(DeviceState.ONLINE)  // Update State
+                    twin.setDeviceState(DeviceState.ONLINE)  // Update State
                     console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
                     if(timestamp - twin.getLastSeen() > 2*ms){  // If device was disconnected and is online again
                         twin.setLastEntry(timestamp)    // Update last entry with current timestamp
@@ -135,7 +153,7 @@ class Synchronizer {
                         const responses = await taskManager.executeTasksInWaitingQueue()
                         responses.forEach(response => {
                             if(response !== undefined){
-                                twin.updateState(response)
+                                twin.updateState(response, undefined)
                             }
                         });
 
@@ -145,13 +163,18 @@ class Synchronizer {
                     
                 }else{
                     console.log(twin.getID() + " is offline ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
-                    twin.setState(DeviceState.OFFLINE)    // Update state
+                    twin.setDeviceState(DeviceState.OFFLINE)    // Update state
                 }
             }, ms)
         }
     }
 
+
 /*------------------ Getters & Setters ------------------------ */
+
+    public setSubToMQTTTopic(subscribtionFunction:Function){
+        this.subToMQTTTopic = subscribtionFunction
+    }
 
     public getAgent(deviceTwin:Twin):Agent | undefined{
         for (let [agent, twin] of this.agents) {
@@ -164,6 +187,9 @@ class Synchronizer {
     public getTwin(serial:string):undefined | Twin{
         return this.twins.get(serial)
     }
+    public setTwin(twin:Twin){
+        this.twins.set(twin.getSerialNumber(), twin)
+    } 
     public getTaskManager(twin:Twin){
         return this.taskManagers.get(twin)
     }

@@ -1,4 +1,4 @@
-export interface IBrokerMessage {
+export interface IHeartBeat {
     timestamp: number;
     topic: string;
     serial: string;

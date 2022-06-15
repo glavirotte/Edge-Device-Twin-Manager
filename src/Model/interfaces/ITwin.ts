@@ -6,8 +6,9 @@ enum DeviceState {
 }
 
 enum TwinState {
-    UPTODATE,
     OUTDATED,
+    UPTODATE,
+
 }
 
 interface ITwin {
