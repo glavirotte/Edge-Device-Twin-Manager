@@ -74,7 +74,6 @@ class Agent {
     public async getProxyUrl(){
         var { stdout, stderr } = await exec(`bash ./secret/shell-api-client/morphean-test.sh ${this.cameraID}`)
         this.proxyUrl = stdout
-        console.log(stdout)
     }
 
     // Ping function to check connection with physical device

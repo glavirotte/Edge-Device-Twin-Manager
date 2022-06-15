@@ -13,9 +13,8 @@ import { Routine } from "./Routine"
 import { TaskManager } from "./TaskManager"
 import { Firmware } from "./Firmware"
 import { Application } from "./Application"
+import { IBrokerMessage } from "./interfaces/IBrokerMessage"
 
-const defautlUsername = 'root'
-const defaultPassword = 'pass'
 
 class Synchronizer {
     
@@ -44,7 +43,9 @@ class Synchronizer {
         date = "06/08/2022 15:17:00"    //@TODO Just for testing 
 
         const getDeviceInfo = new Task(agent, agent.getDeviceInfo, new Array(), date)
-        taskManager.registerTask(getDeviceInfo, this.handleResponse)
+        await taskManager.registerTask(getDeviceInfo, this.handleResponse)
+        this.twins.set(deviceTwin.getSerialNumber(), deviceTwin)
+
 
         const routine = new Routine(date)
         routine.setDate(date)
@@ -70,7 +71,7 @@ class Synchronizer {
 
         taskManager.registerRoutine(routine, this.handleResponse)
 
-        await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
+        // await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
         const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
         this.proxies.set(twinProxy, deviceTwin)
 
@@ -79,7 +80,7 @@ class Synchronizer {
 
 
     // If response is not undefined, we synchronize the twin, otherwise we add task to twin task queue and twin is set to offline
-    public handleResponse(twin:Twin, response:IResponse| undefined, task:Task | undefined){
+    public handleResponse(twin:Twin, response:IResponse | undefined, task:Task | undefined){
         if(response !== undefined){
             twin.updateState(response)
         }else if(task !== undefined){
@@ -90,6 +91,30 @@ class Synchronizer {
         }
     }
 
+
+    public async handleMQTTBrokerMessage(topic:string, brokerMessage:IBrokerMessage){
+        const twin = this.getTwin(brokerMessage.serial)
+
+        if(twin !== undefined){
+            const timestamp = Date.now()        // get current timestamp
+            twin.setState(DeviceState.ONLINE)  // Update State
+            console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "s ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "s ago")
+            if(timestamp - twin.getLastSeen() > 2*60000){  // If device was disconnected and is online again
+                twin.setLastEntry(timestamp)    // Update last entry with current timestamp
+
+                // Perform the tasks present in the task queue of the twin
+                const taskManager = this.taskManagers.get(twin) as TaskManager
+                const responses = await taskManager.executeTasksInWaitingQueue()
+                responses.forEach(response => {
+                    if(response !== undefined){
+                        twin.updateState(response)
+                    }
+                });
+
+            }
+            twin.setLastSeen(timestamp)     // Update last seen with current timestamp
+        }
+    }
 
     // Send a http request every {{ ms }} second to check connectivity with device
     private async checkDeviceConnectivity(twin:Twin, ms:number){
@@ -136,8 +161,8 @@ class Synchronizer {
         }
         throw(Error('No registered device for that twin !'))
     }
-    public getTwin(id:string):void | Twin{
-        return this.twins.get(id)
+    public getTwin(serial:string):undefined | Twin{
+        return this.twins.get(serial)
     }
     public getTaskManager(twin:Twin){
         return this.taskManagers.get(twin)

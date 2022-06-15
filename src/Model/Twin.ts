@@ -110,6 +110,9 @@ class Twin implements ITwin{
     public setLightStatus(status:boolean){
         this.lightStatus = status
     }
+    public getSerialNumber():string{
+        return this.serialNumber
+    }
 
 }
 
