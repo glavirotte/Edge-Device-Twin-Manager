@@ -403,6 +403,7 @@ class Agent {
 
     }
 
+    //@TODO Not tested
     public async activateMqttClient():Promise<IResponse | undefined>{
         const uri = this.URIs.axis.mqtt
         const method: HttpMethod = 'POST'
@@ -428,6 +429,7 @@ class Agent {
         }
     }
 
+    //@TODO Not tested
     public async deactivateMqttClient():Promise<IResponse | undefined>{
         const uri = this.URIs.axis.mqtt
         const method: HttpMethod = 'POST'
@@ -452,6 +454,118 @@ class Agent {
             return undefined
         }
     }
+
+    //@TODO Not tested
+    public async configureMqttClient(arg:string[]):Promise<IResponse | undefined>{
+        const deviceSerial = arg[0]
+        const mqttUsername = arg[1]
+        const mqttPassword = arg[2]
+
+        const uri = this.URIs.axis.mqtt
+        const method: HttpMethod = 'POST'
+        const url = `${this.proxyUrl}${uri}`
+        const args:Map<string, string> = new Map()
+        const body = {
+            "apiVersion": "1.0",
+            "method": "configureClient",
+            "params": {
+              "server": {
+                "protocol": "wss",
+                "host": "tellucare-mqtt-dev.tellucloud.com",
+                "port": 443,
+                "basepath": "/mqtt"
+              },
+              "username": mqttUsername,
+              "password": mqttPassword,
+              "clientId": "fleet",
+              "keepAliveInterval": 20,
+              "connectTimeout": 30,
+              "cleanSession": true,
+              "autoReconnect": true,
+              "lastWillTestament": {
+                "useDefault": false,
+                "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+                "message": "Connection Lost",
+                "retain": true,
+                "qos": 1
+              },
+              "connectMessage": {
+                "useDefault": false,
+                "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+                "message": "Connected",
+                "retain": true,
+                "qos": 1
+              },
+              "disconnectMessage": {
+                "useDefault": false,
+                "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+                "message": "Disconnected",
+                "retain": true,
+                "qos": 1
+              },
+              "ssl": {
+                "validateServerCert": true
+              }
+            }
+          }  
+        const options:urllib.RequestOptions = {
+            headers:{
+                "content-type": "application/json"
+            },
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        await this.askDevice(request)
+
+        const response:IResponse | undefined = await this.getMqttClientStatus()
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+    //@TODO Not tested
+    public async configureMqttEvent(arg:(string | Object[])[]):Promise<IResponse | undefined>{
+        const deviceSerial = arg[0]
+        const eventFilterList = arg[1]
+
+        const uri = this.URIs.axis.mqtt
+        const method: HttpMethod = 'POST'
+        const url = `${this.proxyUrl}${uri}`
+        const args:Map<string, string> = new Map()
+        const body = {
+            apiVersion: '1.0',
+            method: 'configureEventPublication',
+            params: {
+              topicPrefix: 'custom',
+              customTopicPrefix: `AXIS/${deviceSerial}`,
+              appendEventTopic: true,
+              includeTopicNamespaces: false,
+              includeSerialNumberInPayload: true,
+              eventFilterList:eventFilterList,
+            },
+          };
+        const options:urllib.RequestOptions = {
+            headers:{
+                "content-type": "application/json"
+            },
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        await this.askDevice(request)
+
+        const response:IResponse | undefined = await this.getMqttClientStatus()
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+    
 
 /*-------------------------Getters & Setters-------------------------*/
 
