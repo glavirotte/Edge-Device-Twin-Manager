@@ -23,6 +23,9 @@ class TaskQueue {
     public getArray(){
         return this.queue
     }
+    public remove(index:number, deleteCount:number){
+        this.queue.splice(index, deleteCount)
+    }
 
 }
 

@@ -69,7 +69,7 @@ class Twin{
                 if(response.data?.status !== undefined && (response.method === "getClientStatus" || response.method === "activateClient" || response.method === "deactivateClient")){
                     this.mqttClientStatus = response.data?.status ? response.data as IMQTTClientStatus: {} as IMQTTClientStatus
                 }
-                // console.log(this, "\n")
+                console.log(this, "\n")
             }else if(heartBeat !== undefined){
                 this.heartBeat = heartBeat
             }

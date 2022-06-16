@@ -22,7 +22,7 @@ class TaskManager{
         if(response === undefined){
             this.twin.setDeviceState(DeviceState.UNREACHABLE)
             this.waitingQueue.addTask(task)
-            console.log("Task added to waiting queue", task)
+            console.log("Task added to waiting queue", task, this.waitingQueue)
         }
         handleResponse(this.twin, response, task)
     }
@@ -58,17 +58,23 @@ class TaskManager{
         }, ms)
     }
     
-    // Performs the tasks present in the task queue one by one
+    // Performs the tasks present in the task queue one by one, if completed, the task leave the queue
     public async executeTasksInWaitingQueue():Promise<Array<IResponse | undefined>>{    // Concurent modifications possible !!!
         const responses:(IResponse | undefined) [] = new Array()
         const tasks = this.waitingQueue.getArray().slice().reverse()
+        var index = this.waitingQueue.getArrayLength() -1
+
         for (const task of tasks){
             if(task !== undefined){
-                const res = await task.execute()
-                task.setState(TaskState.COMPLETED)  // Here we suppose that all the task are successfully performed, but we cannot be sure
-                this.waitingQueue.pop()             // Has to be fixed in a futur implementation
-                responses.push(res)
+                const res:IResponse | undefined = await task.execute()
+                if(task.getState() === TaskState.COMPLETED){
+                    this.waitingQueue.remove(index, 1)
+                    responses.push(res)
+                }else if(task === undefined){
+                    this.waitingQueue.remove(index, 1)
+                }
             }
+            index --
         }
         return responses
     }

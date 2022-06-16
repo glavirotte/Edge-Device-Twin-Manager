@@ -44,6 +44,8 @@ class Synchronizer {
 
         if(proxyUrlResult === true){
             await this.initialSynchronization(agent, deviceTwin)
+        }else{
+            console.log("Twin for device:", cameraID, "created but not setup. Device unreachable !")
         }
         
         const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
@@ -71,27 +73,28 @@ class Synchronizer {
         routine.setDate(date)
         const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
+        
         // const installApplication = new Task(agent, agent.installApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
         // const controlApplication = new Task(agent, agent.controlApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap"), "remove"], date)
-        // const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
+        const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
         // const reboot = new Task(agent, agent.reboot, [], date)
         // const upgradeFirmware = new Task(agent, agent.upgradeFirmware, [new Firmware("M1065-L_9_80_3_11", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/M1065-L_9_80_3_11.bin")], date)
         // const factoryDefault = new Task(agent, agent.factoryDefault, [], date)
         // const rollBack = new Task(agent, agent.rollBack, [], date)
-        // const getMqttStatus = new Task(agent, agent.getMqttClientStatus, new Array(), date)
+        const getMqttStatus = new Task(agent, agent.getMqttClientStatus, new Array(), date)
         // const configureMqttClient = new Task(agent, agent.configureMqttClient, [deviceTwin.getSerialNumber(), "", ""], date)
         // const configureMqttEvent = new Task(agent, agent.configureMqttEvent, [deviceTwin.getSerialNumber(), [{"topicFilter": "Monitoring/HeartBeat","qos": 1,"retain": "all"}]], date)
         
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
         // routine.addTask(installApplication)
-        // routine.addTask(getFirmwareStatus)
+        routine.addTask(getFirmwareStatus)
         // routine.addTask(reboot)
         // routine.addTask(controlApplication)
         // routine.addTask(upgradeFirmware)
         // routine.addTask(factoryDefault)
         // routine.addTask(rollBack)
-        // routine.addTask(getmqttStatus)
+        routine.addTask(getMqttStatus)
         // routine.addTask(configureMqttClient)
 
         taskManager.registerRoutine(routine, this.handleResponse)
