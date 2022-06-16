@@ -13,8 +13,11 @@ class MQTTClient{
         this.brokerUrl = brokerUrl
         this.client = mqtt.connect(brokerUrl, options)
 
+        const subscribtionFunction = this.sub.bind(this)    // function given to the synchronizer to be able to subscribe to topics
+        this.synchronizer.setSubToMQTTTopic(subscribtionFunction)
+
         this.client.on('connect', () => {   // Start a connection with the broker
-            console.log("MQTT client successfully connected to: ", brokerUrl)
+            console.log("MQTT client connected to: ", brokerUrl)
         })
         this.client.on("error", (error) => {    // Handle errors
             console.log("Error: ", error)
@@ -25,13 +28,11 @@ class MQTTClient{
             const brokerMessage:IHeartBeat = JSON.parse(message.toString())     // Parse the message as a heartbeat message
             this.synchronizer.handleMQTTBrokerMessage(topic, brokerMessage)     // Give the message to the syncrhonizer to update the twins
         })
-
-        const subscribtionFunction = this.sub.bind(this)    // function given to the synchronizer to be able to subscribe to topics
-        this.synchronizer.setSubToMQTTTopic(subscribtionFunction)
     }
 
     public sub(topic:string){
         this.client.subscribe(topic)    // Topic subscription
+        console.log("Subscription to new topic:", topic)
     }
 
 }

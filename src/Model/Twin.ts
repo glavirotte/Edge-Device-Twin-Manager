@@ -116,6 +116,9 @@ class Twin{
     public getLightStatus():boolean{
         return this.lightStatus
     }
+    public getLastHeartBeat():IHeartBeat{
+        return this.heartBeat
+    }
     public switchLight():void{
         if(this.lightStatus){
             this.lightStatus = false

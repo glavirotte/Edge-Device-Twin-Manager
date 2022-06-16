@@ -37,22 +37,36 @@ class Synchronizer {
     public async createTwin(cameraID:string):Promise<Twin>{
         const deviceTwin = new Twin(cameraID)
         const agent = new Agent(cameraID)
+        this.agents.set(agent, deviceTwin)
+
+        // Getting the proxy url
+
+        const proxyUrlResult:boolean| undefined = await agent.getProxyUrl()
+
+        if(proxyUrlResult === true){
+            await this.initialSynchronization(agent, deviceTwin)
+        }
+        
+        const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
+        this.proxies.set(twinProxy, deviceTwin)
+
+        return twinProxy
+    }
+
+
+    public async initialSynchronization(agent:Agent, deviceTwin:Twin){
         const taskManager = new TaskManager(deviceTwin)
         this.taskManagers.set(deviceTwin, taskManager)
-        var date = ""
-        date = "06/08/2022 15:17:00"    //@TODO Just for testing 
 
-        await agent.getProxyUrl()
-        this.agents.set(agent, deviceTwin)
+        var date = ""
+        date = "06/08/2022 15:17:00"    //@TODO Just for testing
 
         const getDeviceInfo = new Task(agent, agent.getDeviceInfo, new Array(), date)
         await taskManager.registerTask(getDeviceInfo, this.handleResponse)
         this.setTwin(deviceTwin)
         this.subToMQTTTopic("AXIS/"+deviceTwin.getSerialNumber()+"/Monitoring/HeartBeat") // subscribe to the heartbeat topic of the twin
 
-
         /* Routine to perform when a new twin is created */
-
 
         const routine = new Routine(date)
         routine.setDate(date)
@@ -77,12 +91,6 @@ class Synchronizer {
         // routine.addTask(rollBack)
 
         taskManager.registerRoutine(routine, this.handleResponse)
-
-        // await this.checkDeviceConnectivity(deviceTwin, 5000)  // Check every 5s the connection with the device
-        const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
-        this.proxies.set(twinProxy, deviceTwin)
-
-        return twinProxy
     }
 
     public handleHeartBeat(twin:Twin, heartbeat:IHeartBeat){
@@ -111,7 +119,7 @@ class Synchronizer {
         const heartBeatPeriod = 60000
         const timeout = 2*heartBeatPeriod
 
-        if(twin !== undefined){
+        if(twin !== undefined && heartBeat.timestamp !== twin.getLastHeartBeat().timestamp){
             const timestamp = Date.now()        // get current timestamp
             console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "ms ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "ms ago")
             twin.setLastSeen(timestamp)     // Update last seen with current timestamp
