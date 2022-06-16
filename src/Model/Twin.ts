@@ -8,6 +8,7 @@ import { IFirmwareInfo } from "./interfaces/IFirmwareInfo"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { ITwin, DeviceState, TwinState } from "./interfaces/ITwin"
 import { writeJSON } from "./Utils"
+import {IMQTTClientStatus} from "./interfaces/IMQTTClientStatus"
 
 class Twin{
     private id:string
@@ -19,8 +20,9 @@ class Twin{
     private deviceState:DeviceState         // Current known state of the device
     private twinState:TwinState
     private firmwareInfo: IFirmwareInfo
+    private mqttClientStatus:IMQTTClientStatus
     public  lightStatus:boolean
-    public heartBeat: IHeartBeat
+    private heartBeat: IHeartBeat
 
     // The followings fields are used to handle changes via the proxy
     public proxyswitchLight:string
@@ -37,6 +39,7 @@ class Twin{
         this.twinState = TwinState.OUTDATED
         this.lightStatus = {} as boolean
         this.firmwareInfo = {} as IFirmwareInfo
+        this.mqttClientStatus = {} as IMQTTClientStatus
 
 
         this.proxyswitchLight = {} as string
@@ -63,7 +66,10 @@ class Twin{
                     this.firmwareInfo.lastUpgradeAt = response.data?.lastUpgradeAt
                     this.firmwareInfo.isCommitted = response.data?.isCommitted
                 }
-                console.log(this, "\n")
+                if(response.data?.status !== undefined && (response.method === "getClientStatus" || response.method === "activateClient" || response.method === "deactivateClient")){
+                    this.mqttClientStatus = response.data?.status ? response.data as IMQTTClientStatus: {} as IMQTTClientStatus
+                }
+                // console.log(this, "\n")
             }else if(heartBeat !== undefined){
                 this.heartBeat = heartBeat
             }

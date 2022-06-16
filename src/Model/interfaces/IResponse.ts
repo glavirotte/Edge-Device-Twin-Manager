@@ -11,9 +11,10 @@ export interface IResponse {
     data?: Data;
     reply?: Reply;
     method: string;
+    context?:string
   }
   export interface Data {
-    status: boolean
+    status: any
     propertyList: PropertyList
     activeFirmwareVersion: string
     activeFirmwarePart: string

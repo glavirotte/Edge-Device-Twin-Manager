@@ -36,7 +36,7 @@ class Agent {
 
     // Get json object from a Request sent to the Device
     
-    async askDevice(req: Request):Promise<IResponse | undefined>{
+    async askDevice(req: Request):Promise<IResponse | string |undefined>{
         try {
         // Send request to the Device
         const res = await HttpClient.request(req.getURL(), req.getOptions())
@@ -53,8 +53,14 @@ class Agent {
             }
             console.log("Status code: ", res.status.toString())
             console.log("Data: ", res.data.toString())
+            return res.data.toString()
         }else if(contentType.startsWith('application/json')){
             response = JSON.parse(res.data.toString())
+        }else{
+            // For debuging
+            // console.log(res.status)
+            // console.log(res.headers)
+            // console.log(res.data.toString())
         }
 
         return response
@@ -122,7 +128,7 @@ class Agent {
         
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response:IResponse | undefined = await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
 
         if(response !== undefined){
             return response
@@ -144,7 +150,7 @@ class Agent {
             timeout: 5000,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response:IResponse | undefined = await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
 
         if(response !== undefined){
             return response
@@ -180,14 +186,20 @@ class Agent {
 
     // Remove an application from the Device
 
-    public async removeApplication(arg:Application[]):Promise<IResponse | undefined>{
-        const application = arg[0]
+
+    public async controlApplication(arg:(Application | string)[]):Promise<IResponse | undefined>{
+        
+        const application = arg[0] as Application
+        const action = arg[1] as string
+
+        console.log("Request to", action, "app:", application.getName())
+
         const uri = this.URIs.axis.control
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
         args.set('package', application.getName())
-        args.set('action', 'remove')
+        args.set('action', action)
         const options:urllib.RequestOptions = {
             method: method,
             rejectUnauthorized: false,
@@ -195,7 +207,7 @@ class Agent {
             files: application.getLocation()
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        await this.askDevice(request)
+        const result = await this.askDevice(request)
         
         const response:IResponse | undefined = await this.listApplications()
         if(response !== undefined){
@@ -217,7 +229,7 @@ class Agent {
             rejectUnauthorized: false,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response:IResponse | undefined = await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
 
         if(response !== undefined){
             return response
@@ -276,7 +288,7 @@ class Agent {
             rejectUnauthorized: false,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response:IResponse | undefined = await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
         if(response !== undefined){
             return response
         }else{
@@ -317,7 +329,7 @@ class Agent {
             rejectUnauthorized: false,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response:IResponse | undefined = await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
         if(response !== undefined){
             return response
         }else{
@@ -338,7 +350,7 @@ class Agent {
             rejectUnauthorized: false,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response:IResponse | undefined = await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
         if(response !== undefined){
             return response
         }else{
@@ -358,8 +370,82 @@ class Agent {
             rejectUnauthorized: false,
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const response:IResponse | undefined = await this.askDevice(request)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
 
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+
+    public async getMqttClientStatus():Promise<IResponse | undefined>{
+        const uri = this.URIs.axis.mqtt
+        const method: HttpMethod = 'POST'
+        const url = `${this.proxyUrl}${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion": "1.0","context": "some context","method": "getClientStatus"}'
+        const options:urllib.RequestOptions = {
+            headers:{
+                "content-type": "application/json"
+            },
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+
+    }
+
+    public async activateMqttClient():Promise<IResponse | undefined>{
+        const uri = this.URIs.axis.mqtt
+        const method: HttpMethod = 'POST'
+        const url = `${this.proxyUrl}${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion": "1.0","context": "some context","method": "activateClient","params": {}}'
+        const options:urllib.RequestOptions = {
+            headers:{
+                "content-type": "application/json"
+            },
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        await this.askDevice(request)
+
+        const response:IResponse | undefined = await this.getMqttClientStatus()
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
+
+    public async deactivateMqttClient():Promise<IResponse | undefined>{
+        const uri = this.URIs.axis.mqtt
+        const method: HttpMethod = 'POST'
+        const url = `${this.proxyUrl}${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion": "1.0","context": "some context","method": "deactivateClient","params": {}}'
+        const options:urllib.RequestOptions = {
+            headers:{
+                "content-type": "application/json"
+            },
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        await this.askDevice(request)
+
+        const response:IResponse | undefined = await this.getMqttClientStatus()
         if(response !== undefined){
             return response
         }else{

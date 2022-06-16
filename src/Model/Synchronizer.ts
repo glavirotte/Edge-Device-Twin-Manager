@@ -14,7 +14,6 @@ import { TaskManager } from "./TaskManager"
 import { Firmware } from "./Firmware"
 import { Application } from "./Application"
 import { IHeartBeat } from "./interfaces/IBrokerMessage"
-import { timingSafeEqual } from "crypto"
 
 
 class Synchronizer {
@@ -73,22 +72,24 @@ class Synchronizer {
         const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
         // const installApplication = new Task(agent, agent.installApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
-        // const removeApplication = new Task(agent, agent.removeApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
+        const controlApplication = new Task(agent, agent.controlApplication, [new Application("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap"), "remove"], date)
         // const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
         // const reboot = new Task(agent, agent.reboot, [], date)
         // const upgradeFirmware = new Task(agent, agent.upgradeFirmware, [new Firmware("M1065-L_9_80_3_11", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/M1065-L_9_80_3_11.bin")], date)
         // const factoryDefault = new Task(agent, agent.factoryDefault, [], date)
         // const rollBack = new Task(agent, agent.rollBack, [], date)
+        // const getmqttStatus = new Task(agent, agent.getMqttClientStatus, new Array(), date)
         
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
         // routine.addTask(installApplication)
         // routine.addTask(getFirmwareStatus)
         // routine.addTask(reboot)
-        // routine.addTask(removeApplication)
+        routine.addTask(controlApplication)
         // routine.addTask(upgradeFirmware)
         // routine.addTask(factoryDefault)
         // routine.addTask(rollBack)
+        // routine.addTask(getmqttStatus)
 
         taskManager.registerRoutine(routine, this.handleResponse)
     }
