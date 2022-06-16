@@ -119,7 +119,12 @@ class Synchronizer {
         const heartBeatPeriod = 60000
         const timeout = 2*heartBeatPeriod
 
+        if(twin !== undefined){
+            this.ensureDeviceConnectivity(twin, heartBeat, heartBeatPeriod)
+        }
+        
         if(twin !== undefined && heartBeat.timestamp !== twin.getLastHeartBeat().timestamp){
+
             const timestamp = Date.now()        // get current timestamp
             console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "ms ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "ms ago")
             twin.setLastSeen(timestamp)     // Update last seen with current timestamp
@@ -142,6 +147,22 @@ class Synchronizer {
             }
             twin.setDeviceState(DeviceState.ONLINE)  // Update State
         }
+    }
+
+    // To ensure connectivity we check after 1.5*heartBeatPeriod if we received an other heartbeat, if not, the device is unreachable 
+    public ensureDeviceConnectivity(twin:Twin, heartBeat:IHeartBeat, heartBeatPeriod:number){
+        const connection = (twin:Twin, heartBeat:IHeartBeat) => {
+            if(heartBeat.timestamp === twin.getLastHeartBeat().timestamp){
+                twin.setDeviceState(DeviceState.UNREACHABLE)
+                console.log("Device", twin.getID(), " is offline !, Lastseen at timestamp:", twin.getLastSeen(), ", LastEntry at timestamp: ", twin.getLastEntry(), "ms ago")
+            }
+        }
+
+        const timeToWait = 1.5*heartBeatPeriod
+
+        setTimeout(() => { 
+            connection(twin, heartBeat)  
+          }, timeToWait)
     }
 
     // Send a http request every {{ ms }} second to check connectivity with device
