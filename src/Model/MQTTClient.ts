@@ -19,6 +19,10 @@ class MQTTClient{
         this.client.on('connect', () => {   // Start a connection with the broker
             console.log("MQTT client connected to: ", brokerUrl)
         })
+        this.client.on("disconnect", () => {   // Restart a connection with the broker
+            console.log("MQTT client disconnected, try to reconnect: ")
+            this.client.reconnect()
+        })
         this.client.on("error", (error) => {    // Handle errors
             console.log("Error: ", error)
             this.client.end()
