@@ -403,7 +403,6 @@ class Agent {
 
     }
 
-    //@TODO Not tested
     public async activateMqttClient():Promise<IResponse | undefined>{
         const uri = this.URIs.axis.mqtt
         const method: HttpMethod = 'POST'
@@ -429,7 +428,6 @@ class Agent {
         }
     }
 
-    //@TODO Not tested
     public async deactivateMqttClient():Promise<IResponse | undefined>{
         const uri = this.URIs.axis.mqtt
         const method: HttpMethod = 'POST'
@@ -455,7 +453,6 @@ class Agent {
         }
     }
 
-    //@TODO Not tested
     public async configureMqttClient(arg:string[]):Promise<IResponse | undefined>{
         const deviceSerial = arg[0]
         const mqttUsername = arg[1]
@@ -526,7 +523,7 @@ class Agent {
             return undefined
         }
     }
-    //@TODO Not tested
+    
     public async configureMqttEvent(arg:(string | Object[])[]):Promise<IResponse | undefined>{
         const deviceSerial = arg[0]
         const eventFilterList = arg[1]
