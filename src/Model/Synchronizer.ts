@@ -84,7 +84,8 @@ class Synchronizer {
         const getMqttStatus = new Task(agent, agent.getMqttClientStatus, new Array(), date)
         // const configureMqttClient = new Task(agent, agent.configureMqttClient, [deviceTwin.getSerialNumber(), "", ""], date)
         // const configureMqttEvent = new Task(agent, agent.configureMqttEvent, [deviceTwin.getSerialNumber(), [{"topicFilter": "Monitoring/HeartBeat","qos": 1,"retain": "all"}]], date)
-        
+        const getMqttEventConfiguration = new Task(agent, agent.getMqttEventConfiguration, [], date)
+
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
         // routine.addTask(installApplication)
@@ -96,6 +97,7 @@ class Synchronizer {
         // routine.addTask(rollBack)
         routine.addTask(getMqttStatus)
         // routine.addTask(configureMqttClient)
+        routine.addTask(getMqttEventConfiguration)
 
         taskManager.registerRoutine(routine, this.handleResponse)
     }

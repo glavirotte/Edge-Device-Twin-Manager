@@ -9,6 +9,7 @@ import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IRespo
 import { ITwin, DeviceState, TwinState } from "./interfaces/ITwin"
 import { writeJSON } from "./Utils"
 import {IMQTTClientStatus} from "./interfaces/IMQTTClientStatus"
+import {IMQTTEventConfig} from "./interfaces/IMQTTEventConfig"
 
 class Twin{
     private id:string
@@ -21,6 +22,7 @@ class Twin{
     private twinState:TwinState
     private firmwareInfo: IFirmwareInfo
     private mqttClientStatus:IMQTTClientStatus
+    private mqttEventConfig:IMQTTEventConfig
     public  lightStatus:boolean
     private heartBeat: IHeartBeat
 
@@ -40,6 +42,7 @@ class Twin{
         this.lightStatus = {} as boolean
         this.firmwareInfo = {} as IFirmwareInfo
         this.mqttClientStatus = {} as IMQTTClientStatus
+        this.mqttEventConfig = {} as IMQTTEventConfig
 
 
         this.proxyswitchLight = {} as string
@@ -68,6 +71,9 @@ class Twin{
                 }
                 if(response.data?.status !== undefined && (response.method === "getClientStatus" || response.method === "activateClient" || response.method === "deactivateClient")){
                     this.mqttClientStatus = response.data?.status ? response.data as IMQTTClientStatus: {} as IMQTTClientStatus
+                }
+                if(response.method === "getEventPublicationConfig"){
+                    this.mqttEventConfig = response.data as IMQTTEventConfig
                 }
                 console.log(this, "\n")
             }else if(heartBeat !== undefined){

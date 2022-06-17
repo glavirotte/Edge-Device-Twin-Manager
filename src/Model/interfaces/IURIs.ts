@@ -12,6 +12,13 @@ export interface IURIs {
     basicdeviceinfo: string;
     lightcontrol: string;
     firmware: string;
-    mqtt: string;
+    mqtt: Mqtt;
     ping: string;
   }
+  
+  export interface Mqtt {
+    client: string;
+    event: string;
+  }
+
+  

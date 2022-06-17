@@ -9,7 +9,10 @@
         "basicdeviceinfo":"axis-cgi/basicdeviceinfo.cgi",
         "lightcontrol":"axis-cgi/lightcontrol.cgi",
         "firmware":"axis-cgi/firmwaremanagement.cgi",
-        "mqtt":"axis-cgi/mqtt/client.cgi",
+        "mqtt":{
+            "client":"axis-cgi/mqtt/client.cgi",
+            "event":"axis-cgi/mqtt/event.cgi"
+        },
         "ping":"axis-cgi/pingtest.cgi"
     }
 }

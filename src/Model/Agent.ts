@@ -380,7 +380,7 @@ class Agent {
     }
 
     public async getMqttClientStatus():Promise<IResponse | undefined>{
-        const uri = this.URIs.axis.mqtt
+        const uri = this.URIs.axis.mqtt.client
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
@@ -404,7 +404,7 @@ class Agent {
     }
 
     public async activateMqttClient():Promise<IResponse | undefined>{
-        const uri = this.URIs.axis.mqtt
+        const uri = this.URIs.axis.mqtt.client
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
@@ -429,7 +429,7 @@ class Agent {
     }
 
     public async deactivateMqttClient():Promise<IResponse | undefined>{
-        const uri = this.URIs.axis.mqtt
+        const uri = this.URIs.axis.mqtt.client
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
@@ -458,7 +458,7 @@ class Agent {
         const mqttUsername = arg[1]
         const mqttPassword = arg[2]
 
-        const uri = this.URIs.axis.mqtt
+        const uri = this.URIs.axis.mqtt.client
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
@@ -523,12 +523,40 @@ class Agent {
             return undefined
         }
     }
+
+    public async getMqttEventConfiguration():Promise<IResponse | undefined>{
+
+        const uri = this.URIs.axis.mqtt.event
+        const method: HttpMethod = 'POST'
+        const url = `${this.proxyUrl}${uri}`
+        const args:Map<string, string> = new Map()
+        const body = {
+            apiVersion: '1.0',
+            method: 'getEventPublicationConfig',
+          };
+        const options:urllib.RequestOptions = {
+            headers:{
+                "content-type": "application/json"
+            },
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
+
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+    }
     
     public async configureMqttEvent(arg:(string | Object[])[]):Promise<IResponse | undefined>{
         const deviceSerial = arg[0]
         const eventFilterList = arg[1]
 
-        const uri = this.URIs.axis.mqtt
+        const uri = this.URIs.axis.mqtt.event
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
@@ -555,7 +583,7 @@ class Agent {
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
 
-        const response:IResponse | undefined = await this.getMqttClientStatus()
+        const response:IResponse | undefined = await this.getMqttEventConfiguration()
         if(response !== undefined){
             return response
         }else{
