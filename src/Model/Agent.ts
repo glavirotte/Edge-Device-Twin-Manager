@@ -56,7 +56,7 @@ class Agent {
         }else if(contentType.startsWith('application/json')){
             response = JSON.parse(res.data.toString())
         }
-
+        console.log(res.data.toString())
         return response
 
         } catch (error) {
@@ -75,7 +75,7 @@ class Agent {
     public async ping(){
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.basicdeviceinfo
+        const uri = this.URIs.axis.basicdeviceinfo
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -102,7 +102,7 @@ class Agent {
     public async getDeviceInfo():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.basicdeviceinfo
+        const uri = this.URIs.axis.basicdeviceinfo
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -128,7 +128,7 @@ class Agent {
     public async listApplications():Promise<IResponse | undefined>{
         const protocol = 'https'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.list
+        const uri = this.URIs.axis.list
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -154,7 +154,7 @@ class Agent {
         const application = arg[0]
         const protocol = 'https'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.upload
+        const uri = this.URIs.axis.upload
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -182,7 +182,7 @@ class Agent {
         const application = arg[0]
         const protocol = 'https'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.control
+        const uri = this.URIs.axis.control
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -209,7 +209,7 @@ class Agent {
     public async getLightStatus():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.lightcontrol
+        const uri = this.URIs.axis.lightcontrol
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -251,7 +251,7 @@ class Agent {
 
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.lightcontrol
+        const uri = this.URIs.axis.lightcontrol
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -274,7 +274,7 @@ class Agent {
     public async getFirmwareStatus():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -298,7 +298,7 @@ class Agent {
         const firmware = arg[0]
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = "POST"
         const url = `${protocol}://${DeviceIP}/${uri}`
         const location = firmware.getLocation()
@@ -319,7 +319,7 @@ class Agent {
     public async rollBack():Promise<IResponse | undefined>{        
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const body = '{"apiVersion": "1.0","method": "rollback"}'
@@ -343,7 +343,7 @@ class Agent {
     public async factoryDefault():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -366,7 +366,7 @@ class Agent {
     public async reboot():Promise<IResponse | undefined>{
         const protocol = 'http'
         const DeviceIP = this.ipAddress
-        const uri = this.URIs.firmware
+        const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
         const url = `${protocol}://${DeviceIP}/${uri}`
         const args:Map<string, string> = new Map()
@@ -386,6 +386,207 @@ class Agent {
             return undefined
         }
     }
+
+    public async getMqttClientStatus():Promise<IResponse | undefined>{
+        const protocol = 'http'
+        const DeviceIP = this.ipAddress
+        const uri = this.URIs.axis.mqtt
+        const method: HttpMethod = 'POST'
+        const url = `${protocol}://${DeviceIP}/${uri}`
+        const args:Map<string, string> = new Map()
+        const body = '{"apiVersion": "1.0","context": "some context","method": "getClientStatus"}'
+        const options:urllib.RequestOptions = {
+            headers:{
+                "content-type": "application/json"
+            },
+            method: method,
+            data:JSON.parse(JSON.stringify(body)),
+            rejectUnauthorized: false,
+            digestAuth: this.username+':'+this.password,
+        }
+        const request = new Request(url, method, this.username, this.password, args, options)
+        const response:IResponse | undefined = await this.askDevice(request) as (IResponse | undefined)
+
+        if(response !== undefined){
+            return response
+        }else{
+            return undefined
+        }
+
+    }
+
+        public async activateMqttClient():Promise<IResponse | undefined>{
+            const protocol = 'http'
+            const DeviceIP = this.ipAddress
+            const uri = this.URIs.axis.mqtt
+            const method: HttpMethod = 'POST'
+            const url = `${protocol}://${DeviceIP}/${uri}`
+            const args:Map<string, string> = new Map()
+            const body = '{"apiVersion": "1.0","context": "some context","method": "activateClient","params": {}}'
+            const options:urllib.RequestOptions = {
+                headers:{
+                    "content-type": "application/json"
+                },
+                method: method,
+                data:JSON.parse(JSON.stringify(body)),
+                rejectUnauthorized: false,
+                digestAuth: this.username+':'+this.password,
+            }
+            const request = new Request(url, method, this.username, this.password, args, options)
+            await this.askDevice(request)
+    
+            const response:IResponse | undefined = await this.getMqttClientStatus()
+            if(response !== undefined){
+                return response
+            }else{
+                return undefined
+            }
+        }
+    
+        public async deactivateMqttClient():Promise<IResponse | undefined>{
+            const protocol = 'http'
+            const DeviceIP = this.ipAddress
+            const uri = this.URIs.axis.mqtt
+            const method: HttpMethod = 'POST'
+            const url = `${protocol}://${DeviceIP}/${uri}`
+            const args:Map<string, string> = new Map()
+            const body = '{"apiVersion": "1.0","context": "some context","method": "deactivateClient","params": {}}'
+            const options:urllib.RequestOptions = {
+                headers:{
+                    "content-type": "application/json"
+                },
+                method: method,
+                data:JSON.parse(JSON.stringify(body)),
+                rejectUnauthorized: false,
+                digestAuth: this.username+':'+this.password,
+            }
+            const request = new Request(url, method, this.username, this.password, args, options)
+            await this.askDevice(request)
+    
+            const response:IResponse | undefined = await this.getMqttClientStatus()
+            if(response !== undefined){
+                return response
+            }else{
+                return undefined
+            }
+        }
+    
+        //@TODO Not tested
+        public async configureMqttClient(arg:string[]):Promise<IResponse | undefined>{
+            const deviceSerial = arg[0]
+            const mqttUsername = arg[1]
+            const mqttPassword = arg[2]
+    
+            const protocol = 'http'
+            const DeviceIP = this.ipAddress
+            const uri = this.URIs.axis.mqtt
+            const method: HttpMethod = 'POST'
+            const url = `${protocol}://${DeviceIP}/${uri}`
+            const args:Map<string, string> = new Map()
+            const body = {
+                "apiVersion": "1.0",
+                "method": "configureClient",
+                "params": {
+                  "server": {
+                    "protocol": "wss",
+                    "host": "tellucare-mqtt-dev.tellucloud.com",
+                    "port": 443,
+                    "basepath": "/mqtt"
+                  },
+                  "username": mqttUsername,
+                  "password": mqttPassword,
+                  "clientId": "fleet",
+                  "keepAliveInterval": 20,
+                  "connectTimeout": 30,
+                  "cleanSession": true,
+                  "autoReconnect": true,
+                  "lastWillTestament": {
+                    "useDefault": false,
+                    "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+                    "message": "Connection Lost",
+                    "retain": true,
+                    "qos": 1
+                  },
+                  "connectMessage": {
+                    "useDefault": false,
+                    "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+                    "message": "Connected",
+                    "retain": true,
+                    "qos": 1
+                  },
+                  "disconnectMessage": {
+                    "useDefault": false,
+                    "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+                    "message": "Disconnected",
+                    "retain": true,
+                    "qos": 1
+                  },
+                  "ssl": {
+                    "validateServerCert": true
+                  }
+                }
+              }  
+            const options:urllib.RequestOptions = {
+                headers:{
+                    "content-type": "application/json"
+                },
+                method: method,
+                data:JSON.parse(JSON.stringify(body)),
+                rejectUnauthorized: false,
+                digestAuth: this.username+':'+this.password,
+            }
+            const request = new Request(url, method, this.username, this.password, args, options)
+            await this.askDevice(request)
+    
+            const response:IResponse | undefined = await this.getMqttClientStatus()
+            if(response !== undefined){
+                return response
+            }else{
+                return undefined
+            }
+        }
+        //@TODO Not tested
+        public async configureMqttEvent(arg:(string | Object[])[]):Promise<IResponse | undefined>{
+            const deviceSerial = arg[0]
+            const eventFilterList = arg[1]
+    
+            const protocol = 'http'
+            const DeviceIP = this.ipAddress
+            const uri = this.URIs.axis.mqtt
+            const method: HttpMethod = 'POST'
+            const url = `${protocol}://${DeviceIP}/${uri}`
+            const args:Map<string, string> = new Map()
+            const body = {
+                apiVersion: '1.0',
+                method: 'configureEventPublication',
+                params: {
+                  topicPrefix: 'custom',
+                  customTopicPrefix: `AXIS/${deviceSerial}`,
+                  appendEventTopic: true,
+                  includeTopicNamespaces: false,
+                  includeSerialNumberInPayload: true,
+                  eventFilterList:eventFilterList,
+                },
+              };
+            const options:urllib.RequestOptions = {
+                headers:{
+                    "content-type": "application/json"
+                },
+                method: method,
+                data:JSON.parse(JSON.stringify(body)),
+                rejectUnauthorized: false,
+                digestAuth: this.username+':'+this.password,
+            }
+            const request = new Request(url, method, this.username, this.password, args, options)
+            await this.askDevice(request)
+    
+            const response:IResponse | undefined = await this.getMqttClientStatus()
+            if(response !== undefined){
+                return response
+            }else{
+                return undefined
+            }
+        }
 
 /*-------------------------Getters & Setters-------------------------*/
 

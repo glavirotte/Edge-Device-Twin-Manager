@@ -1,9 +1,12 @@
 {
-    "list":"axis-cgi/applications/list.cgi",
-    "upload":"axis-cgi/applications/upload.cgi",
-    "control":"axis-cgi/applications/control.cgi",
-    "basicdeviceinfo":"axis-cgi/basicdeviceinfo.cgi",
-    "lightcontrol":"axis-cgi/lightcontrol.cgi",
-    "firmware":"axis-cgi/firmwaremanagement.cgi",
-    "mqtt":"axis-cgi/mqtt/client.cgi"
+    "axis":{
+        "list":"axis-cgi/applications/list.cgi",
+        "upload":"axis-cgi/applications/upload.cgi",
+        "control":"axis-cgi/applications/control.cgi",
+        "basicdeviceinfo":"axis-cgi/basicdeviceinfo.cgi",
+        "lightcontrol":"axis-cgi/lightcontrol.cgi",
+        "firmware":"axis-cgi/firmwaremanagement.cgi",
+        "mqtt":"axis-cgi/mqtt/client.cgi",
+        "ping":"axis-cgi/pingtest.cgi"
+    }
 }
