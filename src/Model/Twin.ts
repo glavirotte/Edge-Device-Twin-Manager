@@ -3,13 +3,15 @@ This class represent the current known state of the Device
 with the applications installed 
 #########################################################*/
 
-import { IHeartBeat } from "./interfaces/IBrokerMessage"
+import { IHeartBeat } from "./interfaces/IHeartBeat"
 import { IFirmwareInfo } from "./interfaces/IFirmwareInfo"
 import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
 import { ITwin, DeviceState, TwinState } from "./interfaces/ITwin"
 import { writeJSON } from "./Utils"
 import {IMQTTClientStatus} from "./interfaces/IMQTTClientStatus"
-import {IMQTTEventConfig} from "./interfaces/IMQTTEventConfig"
+import {EventFilterListEntity, EventPublicationConfig, IMQTTEventConfig} from "./interfaces/IMQTTEventConfig"
+import ini from "ini"
+import { ICommon } from "./interfaces/ICommon"
 
 class Twin{
     private id:string
@@ -78,6 +80,19 @@ class Twin{
                 console.log(this, "\n")
             }else if(heartBeat !== undefined){
                 this.heartBeat = heartBeat
+                const topics = ini.parse(heartBeat.message.data.Topics)
+                const common = topics["common"]
+                this.mqttEventConfig.eventPublicationConfig = {} as EventPublicationConfig
+                this.mqttEventConfig.eventPublicationConfig.common = {} as ICommon
+                this.mqttEventConfig.eventPublicationConfig.common = common as ICommon
+
+                const eventFilterList:(EventFilterListEntity)[] = new Array()
+                for (const key of Object.keys(topics)){
+                    if(key !== "common"){
+                        eventFilterList.push(topics[key])
+                    }
+                }
+                this.mqttEventConfig.eventPublicationConfig.eventFilterList = eventFilterList
             }
 
             this.storeTwinObject()

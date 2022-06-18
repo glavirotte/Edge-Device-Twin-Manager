@@ -1,6 +1,6 @@
 export interface IHeartBeat {
     timestamp: number;
-    topic: string;
+    topics: string;
     serial: string;
     message: Message;
 }
@@ -18,5 +18,6 @@ export interface Data {
     "Monitoring.Swap": number;
     "Monitoring.Uptime": number;
     "Properties.Firmware.Version": string;
+    "Topics":string;
 }
   

@@ -1,14 +1,11 @@
+import { ICommon } from "./ICommon";
 import { Data } from "./IResponse";
 
 export interface IMQTTEventConfig extends Data{
     eventPublicationConfig: EventPublicationConfig;
   }
   export interface EventPublicationConfig {
-    topicPrefix: string;
-    customTopicPrefix: string;
-    appendEventTopic: boolean;
-    includeTopicNamespaces: boolean;
-    includeSerialNumberInPayload: boolean;
+    common:ICommon
     eventFilterList?: (EventFilterListEntity)[] | null;
   }
   export interface EventFilterListEntity {

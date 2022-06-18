@@ -29,4 +29,3 @@ const mqttClient = new MQTTClient(synchronizer, "wss://tellucare-mqtt-dev.telluc
 
 synchronizer.createTwin(cameraID)
     .then((twinProxy:Twin) => {server.addTwinProxy(twinProxy)})
-

@@ -13,7 +13,7 @@ import { Routine } from "./Routine"
 import { TaskManager } from "./TaskManager"
 import { Firmware } from "./Firmware"
 import { Application } from "./Application"
-import { IHeartBeat } from "./interfaces/IBrokerMessage"
+import { IHeartBeat } from "./interfaces/IHeartBeat"
 
 
 class Synchronizer {
@@ -84,7 +84,7 @@ class Synchronizer {
         const getMqttStatus = new Task(agent, agent.getMqttClientStatus, new Array(), date)
         // const configureMqttClient = new Task(agent, agent.configureMqttClient, [deviceTwin.getSerialNumber(), "", ""], date)
         // const configureMqttEvent = new Task(agent, agent.configureMqttEvent, [deviceTwin.getSerialNumber(), [{"topicFilter": "Monitoring/HeartBeat","qos": 1,"retain": "all"}]], date)
-        const getMqttEventConfiguration = new Task(agent, agent.getMqttEventConfiguration, [], date)
+        // const getMqttEventConfiguration = new Task(agent, agent.getMqttEventConfiguration, [], date)
 
         routine.addTask(getLightStatus)
         routine.addTask(listApplications)
@@ -97,7 +97,7 @@ class Synchronizer {
         // routine.addTask(rollBack)
         routine.addTask(getMqttStatus)
         // routine.addTask(configureMqttClient)
-        routine.addTask(getMqttEventConfiguration)
+        // routine.addTask(getMqttEventConfiguration)
 
         taskManager.registerRoutine(routine, this.handleResponse)
     }

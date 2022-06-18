@@ -1,5 +1,5 @@
 import mqtt from 'mqtt'
-import { IHeartBeat } from './interfaces/IBrokerMessage'
+import { IHeartBeat } from './interfaces/IHeartBeat'
 import { Synchronizer } from './Synchronizer'
 
 class MQTTClient{
