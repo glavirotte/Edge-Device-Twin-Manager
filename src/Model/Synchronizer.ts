@@ -97,6 +97,7 @@ class Synchronizer {
         // routine.addTask(rollBack)
         routine.addTask(getMqttStatus)
         // routine.addTask(configureMqttClient)
+        // routine.addTask(configureMqttEvent)
         // routine.addTask(getMqttEventConfiguration)
 
         taskManager.registerRoutine(routine, this.handleResponse)
@@ -152,7 +153,6 @@ class Synchronizer {
                         twin.updateState(response, undefined)
                     }
                 });
-
             }
             twin.setDeviceState(DeviceState.ONLINE)  // Update State
         }

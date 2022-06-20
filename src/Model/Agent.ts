@@ -13,10 +13,11 @@ import { IURIs } from './interfaces/IURIs'
 import { IResponse } from './interfaces/IResponse'
 import util from "util"
 import { Firmware } from './Firmware'
+import { IAgent } from './interfaces/IAgent'
 const exec = util.promisify(require('child_process').exec);
 
 
-class Agent {
+class Agent implements IAgent{
 
     cameraID:string
     proxyUrl:string
@@ -36,7 +37,7 @@ class Agent {
 
     // Get json object from a Request sent to the Device
     
-    async askDevice(req: Request):Promise<IResponse | string |undefined>{
+    private async askDevice(req: Request):Promise<IResponse | string |undefined>{
         try {
         // Send request to the Device
         const res = await HttpClient.request(req.getURL(), req.getOptions())

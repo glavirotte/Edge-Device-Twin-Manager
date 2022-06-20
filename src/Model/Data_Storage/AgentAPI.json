@@ -1,0 +1,23 @@
+{
+    "getProxyUrl":"getProxyUrl",
+    "ping":"ping",
+    "getDeviceInfo":"getDeviceInfo",
+    "listApplications":"listApplications",
+    "installApplication":"installApplication",
+    "controlApplication":"controlApplication",
+    "getLightStatus":"getLightStatus",
+    "switchLight":"switchLight",
+    "getFirmwareStatus":"getFirmwareStatus",
+    "upgradeFirmware":"upgradeFirmware",
+    "rollBack":"rollBack",
+    "factoryDefault":"factoryDefault",
+    "reboot":"reboot",
+    "getMqttClientStatus":"getMqttClientStatus",
+    "activateMqttClient":"activateMqttClient",
+    "deactivateMqttClient":"deactivateMqttClient",
+    "configureMqttClient":"configureMqttClient",
+    "getMqttEventConfiguration":"getMqttEventConfiguration",
+    "configureMqttEvent":"configureMqttEvent",
+    "getCameraID":"getCameraID",
+    "setLoginCredentials":"setLoginCredentials"
+}

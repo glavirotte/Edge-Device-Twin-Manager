@@ -82,8 +82,11 @@ class Twin{
                 this.heartBeat = heartBeat
                 const topics = ini.parse(heartBeat.message.data.Topics)
                 const common = topics["common"]
-                this.mqttEventConfig.eventPublicationConfig = {} as EventPublicationConfig
-                this.mqttEventConfig.eventPublicationConfig.common = {} as ICommon
+
+                if(this.mqttEventConfig.eventPublicationConfig == undefined){
+                    this.mqttEventConfig.eventPublicationConfig = {} as EventPublicationConfig
+                    this.mqttEventConfig.eventPublicationConfig.common = {} as ICommon
+                }
                 this.mqttEventConfig.eventPublicationConfig.common = common as ICommon
 
                 const eventFilterList:(EventFilterListEntity)[] = new Array()

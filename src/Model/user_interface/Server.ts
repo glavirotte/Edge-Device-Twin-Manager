@@ -31,7 +31,7 @@ class Server {
 
     public addTwinProxy(twin:Twin){
         var id = twin.getID()
-        id = "B8A44F3A42AB"
+        id = "B8A44F3A4540"
         this.app.get('/devices/'+id, (req: Request, res: Response) => {
             res.json(twin);
         });

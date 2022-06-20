@@ -5,9 +5,13 @@ the React Application
 
 import { Synchronizer } from './Synchronizer'
 import { Twin } from './Twin'
-import { Server } from './server/Server'
+import { Server } from './user_interface/Server'
 import {MQTTClient} from "./MQTTClient"
 import { exit } from 'process'
+
+const tellucareMqttBroker = "wss://tellucare-mqtt-dev.tellucloud.com/mqtt"
+const cameraID = '8992'
+
 
 const synchronizer = new Synchronizer()
 if(process.argv.length < 4){
@@ -17,10 +21,10 @@ if(process.argv.length < 4){
 const mqttClientUsername = process.argv[2]
 const mqttClientPassword = process.argv[3]
 
-const cameraID = '8992'
+
 const server = new Server(8000)
 
-const mqttClient = new MQTTClient(synchronizer, "wss://tellucare-mqtt-dev.tellucloud.com/mqtt", {
+const mqttClient = new MQTTClient(synchronizer, tellucareMqttBroker, {
     port:443,
     clientId:"mqtt-explorer-33c46ed3",
     username:mqttClientUsername,
