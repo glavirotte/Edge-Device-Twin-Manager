@@ -83,22 +83,27 @@ class Twin{
                 }
             }else if(heartBeat !== undefined){
                 this.heartBeat = heartBeat
-                const topics = ini.parse(heartBeat.message.data.Topics)
-                const common = topics["common"]
-
-                if(this.mqttEventConfig.eventPublicationConfig == undefined){
-                    this.mqttEventConfig.eventPublicationConfig = {} as EventPublicationConfig
-                    this.mqttEventConfig.eventPublicationConfig.common = {} as ICommon
-                }
-                this.mqttEventConfig.eventPublicationConfig.common = common as ICommon
-
-                const eventFilterList:(EventFilterListEntity)[] = new Array()
-                for (const key of Object.keys(topics)){
-                    if(key !== "common"){
-                        eventFilterList.push(topics[key])
+                if(!heartBeat.message.data.Topics.startsWith("none")){
+                    const topics = ini.parse(heartBeat.message.data.Topics)
+                    const common = topics["common"]
+    
+                    if(this.mqttEventConfig.eventPublicationConfig == undefined){
+                        this.mqttEventConfig.eventPublicationConfig = {} as EventPublicationConfig
+                        this.mqttEventConfig.eventPublicationConfig.common = {} as ICommon
                     }
+                    this.mqttEventConfig.eventPublicationConfig.common = common as ICommon
+    
+                    const eventFilterList:(EventFilterListEntity)[] = new Array()
+                    for (const key of Object.keys(topics)){
+                        if(key !== "common"){
+                            eventFilterList.push(topics[key])
+                        }
+                    }
+                    this.mqttEventConfig.eventPublicationConfig.eventFilterList = eventFilterList
+                }else{
+                    console.log("Error while parsing heartbeat topics, check the logs of the camera ! Topics:", heartBeat.message.data.Topics)
                 }
-                this.mqttEventConfig.eventPublicationConfig.eventFilterList = eventFilterList
+                
             }
 
             this.storeTwinObject()
@@ -108,7 +113,7 @@ class Twin{
     }
 
     public storeTwinObject(){
-        console.log(this, "\n")
+        // console.log(this, "\n")
         writeJSON(this, `./src/Model/Data_Storage/Twins/${this.serialNumber}-Twin.json`)
     }
 
