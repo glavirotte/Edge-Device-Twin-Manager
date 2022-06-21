@@ -77,7 +77,6 @@ class Twin{
                 if(response.method === "getEventPublicationConfig"){
                     this.mqttEventConfig = response.data as IMQTTEventConfig
                 }
-                console.log(this, "\n")
             }else if(heartBeat !== undefined){
                 this.heartBeat = heartBeat
                 const topics = ini.parse(heartBeat.message.data.Topics)
@@ -105,6 +104,7 @@ class Twin{
     }
 
     public storeTwinObject(){
+        console.log(this, "\n")
         writeJSON(this, `./src/Model/Data_Storage/Twins/${this.serialNumber}-Twin.json`)
     }
 

@@ -227,6 +227,16 @@ class Synchronizer {
     public getTwin(serial:string):undefined | Twin{
         return this.twins.get(serial)
     }
+    public getTwinByID(ID:string):Twin | undefined{
+        var twinToReturn:Twin | undefined = undefined
+
+        this.twins.forEach((twin: Twin, serialNumber: string) => {
+            if(twin.getID() === ID){
+                twinToReturn = twin
+            }
+        });
+        return twinToReturn
+    }
     public setTwin(twin:Twin){
         this.twins.set(twin.getSerialNumber(), twin)
     } 
