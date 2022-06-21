@@ -7,7 +7,7 @@ import  { Request } from './Request'
 import  { HttpMethod } from 'urllib'
 import HttpClient from 'urllib'
 import { xml2json } from './Utils'
-import { Application } from './Application'
+import { ApplicationTwin } from './Application'
 import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
 import { IResponse } from './interfaces/IResponse'
@@ -162,7 +162,7 @@ class Agent implements IAgent{
 
     // Install an application on the Device
     
-    public async installApplication(arg:Application[]):Promise<IResponse | undefined>{
+    public async installApplication(arg:ApplicationTwin[]):Promise<IResponse | undefined>{
         const application = arg[0]
         const uri = this.URIs.axis.upload
         const method: HttpMethod = 'POST'
@@ -188,9 +188,9 @@ class Agent implements IAgent{
     // Remove an application from the Device
 
 
-    public async controlApplication(arg:(Application | string)[]):Promise<IResponse | undefined>{
+    public async controlApplication(arg:(ApplicationTwin | string)[]):Promise<IResponse | undefined>{
         
-        const application = arg[0] as Application
+        const application = arg[0] as ApplicationTwin
         const action = arg[1] as string
 
         console.log("Request to", action, "app:", application.getName())

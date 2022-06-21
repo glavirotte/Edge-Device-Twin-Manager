@@ -5,7 +5,7 @@ with the applications installed
 
 import { IHeartBeat } from "./interfaces/IHeartBeat"
 import { IFirmwareInfo } from "./interfaces/IFirmwareInfo"
-import { PropertyList, IResponse, ApplicationEntity, } from "./interfaces/IResponse"
+import { PropertyList, IResponse, ApplicationEntity, ApplicationProperties, } from "./interfaces/IResponse"
 import { ITwin, DeviceState, TwinState } from "./interfaces/ITwin"
 import { writeJSON } from "./Utils"
 import {IMQTTClientStatus} from "./interfaces/IMQTTClientStatus"
@@ -17,7 +17,7 @@ class Twin{
     private id:string
     private serialNumber:string
     private properties: PropertyList | undefined
-    private applications: (ApplicationEntity)[] | null
+    private applications: (ApplicationProperties)[] | null
     private lastseen:number     // last time the device was online
     private lastentry:number    // last time the device start connection with the system
     private deviceState:DeviceState         // Current known state of the device
@@ -35,7 +35,7 @@ class Twin{
         this.id = id
         this.serialNumber = {} as string
         this.properties = {} as PropertyList | undefined
-        this.applications = {} as (ApplicationEntity)[] | null
+        this.applications = new Array<ApplicationProperties>()
         this.heartBeat = {} as IHeartBeat
         this.lastseen = 0
         this.lastentry = 0
@@ -59,7 +59,11 @@ class Twin{
                     this.serialNumber = this.properties.SerialNumber
                 }
                 if(response?.reply?.application?.[0].$ !== undefined){
-                    this.applications = response?.reply?.application
+                    response?.reply?.application.forEach(app => {
+                        if(this.applications !== null){
+                            this.applications.push(app.$)
+                        }
+                    });
                 }
                 if(response?.data?.status !== undefined && response.method === 'getLightStatus'){
                     this.lightStatus = response.data.status as boolean
@@ -110,7 +114,7 @@ class Twin{
 
 /*------------------ Getters & Setters ------------------------ */
 
-    public getApplications():(ApplicationEntity)[] | null{
+    public getApplications():(ApplicationProperties)[] | null{
         return this.applications
     }
     public getID():string{

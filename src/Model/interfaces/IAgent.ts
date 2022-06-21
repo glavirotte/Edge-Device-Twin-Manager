@@ -1,4 +1,4 @@
-import { Application } from "../Application"
+import { ApplicationTwin } from "../Application"
 import { Firmware } from "../Firmware"
 import { Request } from "../Request"
 import { IResponse } from "./IResponse"
@@ -13,9 +13,9 @@ interface IAgent{
 
     listApplications():Promise<IResponse | undefined>
 
-    installApplication(arg:Application[]):Promise<IResponse | undefined>
+    installApplication(arg:ApplicationTwin[]):Promise<IResponse | undefined>
 
-    controlApplication(arg:(Application | string)[]):Promise<IResponse | undefined>
+    controlApplication(arg:(ApplicationTwin | string)[]):Promise<IResponse | undefined>
 
     getLightStatus():Promise<IResponse | undefined>
 

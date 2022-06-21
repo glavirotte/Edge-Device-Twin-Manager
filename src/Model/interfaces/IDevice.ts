@@ -1,4 +1,4 @@
-import { Application } from "../Application"
+import { ApplicationTwin } from "../Application"
 import { IResponse } from "./IResponse"
 import { IURIs } from "./IURIs"
 import { Request } from "../Request"
@@ -13,9 +13,9 @@ export interface IDevice {
 
     listApplications():Promise<IResponse | undefined>
 
-    installApplication(application:Application):Promise<IResponse | undefined>
+    installApplication(application:ApplicationTwin):Promise<IResponse | undefined>
 
-    removeApplication(application:Application):Promise<IResponse | undefined>
+    removeApplication(application:ApplicationTwin):Promise<IResponse | undefined>
 
     getLightStatus():Promise<IResponse | undefined>
 
