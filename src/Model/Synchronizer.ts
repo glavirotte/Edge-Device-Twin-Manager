@@ -13,6 +13,7 @@ import { TaskManager } from "./task/TaskManager"
 import { Firmware } from "./Firmware"
 import { ApplicationTwin } from "./Application"
 import { IHeartBeat } from "./interfaces/IHeartBeat"
+import { TaskFactory } from "./task/TaskFactory"
 
 
 class Synchronizer {
@@ -69,7 +70,6 @@ class Synchronizer {
         routine.setDate(date)
         const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
-        
         // const installApplication = new Task(agent, agent.installApplication, [new ApplicationTwin("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
         // const controlApplication = new Task(agent, agent.controlApplication, [new ApplicationTwin("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap"), "remove"], date)
         const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
@@ -177,7 +177,7 @@ class Synchronizer {
         const twin = getTwinReference() as Twin
         const agent = this.getAgent(twin) as Agent
         const taskManager:TaskManager = this.getTaskManager(twin) as TaskManager
-        const task = new Task(agent, agent.switchLight, [], "") // Just for testing
+        const task = TaskFactory.generateTask(agent, twin, property, value)
         taskManager.registerTask(task, this.handleResponse)
     }
 

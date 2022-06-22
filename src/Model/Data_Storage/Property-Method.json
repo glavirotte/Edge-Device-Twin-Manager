@@ -1,0 +1,17 @@
+{
+    "desired": {
+        "id": "8992",
+        "serialNumber": {},
+        "deviceProperties": {},
+        "applications": [],
+        "heartBeat": {},
+        "lastseen": 0,
+        "lastentry": 0,
+        "deviceState": 0,
+        "twinState": 0,
+        "lightStatus": "switchLight",
+        "firmwareInfo": {},
+        "mqttClientStatus": {},
+        "mqttEventConfig": {}
+    }
+}
