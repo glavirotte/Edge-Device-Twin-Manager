@@ -3,7 +3,7 @@ import { IResponse } from "./interfaces/IResponse"
 import { Routine } from "./Routine"
 import { Task, TaskState } from "./Task"
 import { TaskQueue } from "./TaskQueue"
-import { DeviceState, Twin } from "./Twin"
+import { DeviceState, Twin } from "./twin/Twin"
 
 class TaskManager{
     private taskList:Array<Task>

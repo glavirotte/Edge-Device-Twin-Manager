@@ -6,8 +6,7 @@ with the physical device
 
 import { Agent } from "./Agent"
 import { IResponse } from "./interfaces/IResponse"
-import { DeviceState, Twin } from "./Twin"
-import { TwinHandler } from "./TwinHandler"
+import { DeviceState, Twin } from "./twin/Twin"
 import { Task, TaskState } from "./Task"
 import { Routine } from "./Routine"
 import { TaskManager } from "./TaskManager"
@@ -34,7 +33,7 @@ class Synchronizer {
 
     // Creates a twin, setup it and returns a twin proxy for the user to be able to interract with it
     public async createTwin(cameraID:string):Promise<Twin>{
-        const deviceTwin = new Twin(cameraID)
+        const deviceTwin = new Twin(cameraID, this.handleTwinModification.bind(this))
         const agent = new Agent(cameraID)
         this.agents.set(agent, deviceTwin)
 
@@ -47,11 +46,8 @@ class Synchronizer {
         }else{
             console.log("Twin for device:", cameraID, "created but not setup. Device unreachable !")
         }
-        
-        const twinProxy = new Proxy(deviceTwin, new TwinHandler(this))   // Create a proxy to trigger event from the user interraction and apply them to the twin and device
-        this.proxies.set(twinProxy, deviceTwin)
 
-        return twinProxy
+        return deviceTwin
     }
 
 
@@ -172,6 +168,17 @@ class Synchronizer {
         setTimeout(() => { 
             connection(twin, heartBeat)  
           }, timeToWait)
+    }
+
+    /*This function is called when the twin is modified by a user ("desired" attributes).
+    It creates a task and perform it to synchronize the twin ("reported attributes").
+    */
+    private handleTwinModification(getTwinReference:Function, property:string, value:any){
+        const twin = getTwinReference() as Twin
+        const agent = this.getAgent(twin) as Agent
+        const taskManager:TaskManager = this.getTaskManager(twin) as TaskManager
+        const task = new Task(agent, agent.switchLight, [], "") // Just for testing
+        taskManager.registerTask(task, this.handleResponse)
     }
 
     // Send a http request every {{ ms }} second to check connectivity with device

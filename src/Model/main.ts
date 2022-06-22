@@ -4,7 +4,7 @@ the React Application
 #########################################################*/
 
 import { Synchronizer } from './Synchronizer'
-import { Twin } from './Twin'
+import { Twin } from './twin/Twin'
 import { Server } from './user_interface/Server'
 import {MQTTClient} from "./MQTTClient"
 import { exit } from 'process'
@@ -32,4 +32,4 @@ const mqttClient = new MQTTClient(synchronizer, tellucareMqttBroker, {
 })
 
 synchronizer.createTwin(cameraID)
-    .then((twinProxy:Twin) => {server.addTwinProxy(twinProxy)})
+    .then((twin:Twin) => {server.addTwin(twin)})
