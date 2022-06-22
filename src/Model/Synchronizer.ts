@@ -7,9 +7,9 @@ with the physical device
 import { Agent } from "./Agent"
 import { IResponse } from "./interfaces/IResponse"
 import { DeviceState, Twin } from "./twin/Twin"
-import { Task, TaskState } from "./Task"
-import { Routine } from "./Routine"
-import { TaskManager } from "./TaskManager"
+import { Task, TaskState } from "./task/Task"
+import { Routine } from "./task/Routine"
+import { TaskManager } from "./task/TaskManager"
 import { Firmware } from "./Firmware"
 import { ApplicationTwin } from "./Application"
 import { IHeartBeat } from "./interfaces/IHeartBeat"
@@ -181,7 +181,7 @@ class Synchronizer {
         taskManager.registerTask(task, this.handleResponse)
     }
 
-    // Send a http request every {{ ms }} second to check connectivity with device
+    // Send a http request every {{ ms }} second to check connectivity with device, not use in this impl
     private async checkDeviceConnectivity(twin:Twin, ms:number){
         const agent = this.getAgent(twin)
 

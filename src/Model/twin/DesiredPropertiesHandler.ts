@@ -1,5 +1,3 @@
-import { TwinProperties } from "./TwinProperties";
-
 class DesiredPropertiesHandler{
 
     private synchronizerCallback:Function

@@ -1,6 +1,6 @@
-import { Agent } from "./Agent"
-import { IResponse } from "./interfaces/IResponse"
-import { toTimestamp } from "./Utils"
+import { Agent } from "../Agent"
+import { IResponse } from "../interfaces/IResponse"
+import { toTimestamp } from "../Utils"
 
 enum TaskState{
     READY,
