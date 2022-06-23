@@ -1,5 +1,5 @@
 {
-  "name": "api_fetcher",
+  "name": "Edge_Device_Twin_Manager",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

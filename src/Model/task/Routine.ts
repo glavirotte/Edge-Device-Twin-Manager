@@ -1,6 +1,6 @@
-import { IResponse } from "./interfaces/IResponse";
+import { IResponse } from "../interfaces/IResponse";
 import { Task } from "./Task";
-import { toTimestamp } from "./Utils";
+import { toTimestamp } from "../Utils";
 
 
 class Routine {

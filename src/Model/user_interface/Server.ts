@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from "dotenv"
-import { Twin } from '../Twin';
+import { Twin } from '../twin/Twin';
 const cors = require("cors")
 
 interface Body {
@@ -8,7 +8,7 @@ interface Body {
 }
 
 class Server {
-
+    
     private app:Express
     private port:Number
 
@@ -29,16 +29,17 @@ class Server {
 
 /*##################  Methods  #####################*/
 
-    public addTwinProxy(twin:Twin){
+    public addTwin(twin:Twin){
         var id = twin.getID()
-        id = "B8A44F3A4540"
+        id = "B8A44F3A42AB"
         this.app.get('/devices/'+id, (req: Request, res: Response) => {
             res.json(twin);
         });
         this.app.post('/devices/'+id+'/light/switch', (req: Request, res: Response) => {
             const date:Body = req.body
-            console.log("Asked for a light switch at", date.value)
-            twin.proxyswitchLight = date.value
+            console.log("Asked for performing a light switch at", date.value)
+            const currentValue = twin.reported.lightStatus
+            twin.desired.lightStatus = !currentValue
             res.status(201).send()
         });
         this.app.get('/devices/'+id+'/light/status', (req: Request, res: Response) => {
