@@ -17,6 +17,7 @@ export interface IResponse {
     status: any
     propertyList: PropertyList
     activeFirmwareVersion: string
+    firmwareVersion:string
     activeFirmwarePart: string
     inactiveFirmwareVersion: string
     isCommitted: boolean

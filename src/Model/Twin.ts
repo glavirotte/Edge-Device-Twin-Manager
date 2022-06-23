@@ -81,6 +81,10 @@ class Twin{
                 if(response.method === "getEventPublicationConfig"){
                     this.mqttEventConfig = response.data as IMQTTEventConfig
                 }
+                if(response.method === "upgrade" && response.data?.firmwareVersion !== undefined){
+                    this.firmwareInfo.activeFirmwareVersion = response.data?.firmwareVersion
+                }
+                
             }else if(heartBeat !== undefined){
                 this.heartBeat = heartBeat
                 if(!heartBeat.message.data.Topics.startsWith("none")){

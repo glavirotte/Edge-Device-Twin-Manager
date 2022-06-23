@@ -73,16 +73,16 @@ class Synchronizer {
         routine.setDate(date)
         const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
-        
         // const installApplication = new Task(agent, agent.installApplication, [new ApplicationTwin("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
-        // const controlApplication = new Task(agent, agent.controlApplication, [new ApplicationTwin("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap"), "remove"], date)
+        // const controlApplication = new Task(agent, agent.controlApplication, [new ApplicationTwin("heartbeatv2", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/heartbeatv2/heartbeatv2_1_0_0_armv7hf.eap"), "start"], date)
         const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
         // const reboot = new Task(agent, agent.reboot, [], date)
-        // const upgradeFirmware = new Task(agent, agent.upgradeFirmware, [new Firmware("M1065-L_9_80_3_11", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/M1065-L_9_80_3_11.bin")], date)
+        // const upgradeFirmware = new Task(agent, agent.upgradeFirmware, [new Firmware("M1065-L_9_80_3_12", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/M1065-L_9_80_3_12.bin")], date)
         // const factoryDefault = new Task(agent, agent.factoryDefault, [], date)
         // const rollBack = new Task(agent, agent.rollBack, [], date)
         const getMqttStatus = new Task(agent, agent.getMqttClientStatus, new Array(), date)
-        // const configureMqttClient = new Task(agent, agent.configureMqttClient, [deviceTwin.getSerialNumber(), "", ""], date)
+        // const configureMqttClient = new Task(agent, agent.configureMqttClient, [deviceTwin.getSerialNumber(), "monitoring", "fleet1234"], date)
+        // const activateClient = new Task(agent, agent.activateMqttClient, [], date)
         // const configureMqttEvent = new Task(agent, agent.configureMqttEvent, [deviceTwin.getSerialNumber(), [{"topicFilter": "Monitoring/HeartBeat","qos": 1,"retain": "all"}]], date)
         // const getMqttEventConfiguration = new Task(agent, agent.getMqttEventConfiguration, [], date)
 
@@ -97,6 +97,7 @@ class Synchronizer {
         // routine.addTask(rollBack)
         routine.addTask(getMqttStatus)
         // routine.addTask(configureMqttClient)
+        // routine.addTask(activateClient)
         // routine.addTask(configureMqttEvent)
         // routine.addTask(getMqttEventConfiguration)
 

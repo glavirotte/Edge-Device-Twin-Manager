@@ -208,8 +208,8 @@ class Agent implements IAgent{
             files: application.getLocation()
         }
         const request = new Request(url, method, this.username, this.password, args, options)
-        const result = await this.askDevice(request)
-        
+        const result:string = await this.askDevice(request) as string
+
         const response:IResponse | undefined = await this.listApplications()
         if(response !== undefined){
             return response
@@ -301,20 +301,25 @@ class Agent implements IAgent{
         const firmware = arg[0]
         const uri = this.URIs.axis.firmware
         const method: HttpMethod = "POST"
-        const url = `${this.proxyUrl}${uri}`
+        const url = this.proxyUrl.slice(0, -1).concat("/"+uri)
         const location = firmware.getLocation()
         var stdout
         const body = JSON.stringify({"apiVersion":"1.0","context":"abc","method":"upgrade"})
         try {
-            var { stdout, stderr } = await exec(`curl --digest -u ${this.username}:${this.password} --location --request ${method} ${url} \
+            var { stdout, stderr } = await exec(`curl --location --request ${method} '${url}' \
             --form 'json=${body}' \
             --form 'bin=@${location}'`)
             console.log("stdout", stdout)
-            const response = await this.getFirmwareStatus()
-            return response
+            const response = JSON.parse(stdout) as IResponse | undefined
+            if(response !== undefined){
+                return response
+            }else{
+                return undefined
+            }
           } catch (e) {
             console.error(e); // should contain code (exit code) and signal (that caused the termination).
           }
+
     }
 
     public async rollBack():Promise<IResponse | undefined>{        
