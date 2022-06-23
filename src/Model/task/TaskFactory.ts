@@ -17,7 +17,6 @@ import { Task } from "./Task";
 
 class TaskFactory{
 
-
     static generateTask(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Task{
         const task = this.switchLight(agent, "")
         return task
