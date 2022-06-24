@@ -2,6 +2,7 @@ import { Agent } from "../Agent";
 import { ApplicationTwin } from "../application/ApplicationTwin";
 import { Firmware } from "../Firmware";
 import { Twin } from "../twin/Twin";
+import { Routine } from "./Routine";
 import { Task } from "./Task";
 
 // const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(agent))
@@ -31,26 +32,26 @@ import { Task } from "./Task";
 // }
 
 
-class TaskFactory{
+class RoutineFactory{
 
-    static generateTask(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Task{
+    static generateRoutine(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Routine{
         console.log("Property modified: ", modifiedTwinProperty)
-        var task:Task = {} as Task
+        var routine:Routine = new Routine("")
 
         switch (modifiedTwinProperty) {
             case 'lightStatus':
-                task = this.switchLight(agent, "")
+                const task = this.switchLight(agent, "")
+                routine.addTask(task)
                 break;
 
-            // case 'applications':
-            //     task = this.switchLight(agent, "")
-            //     break;
+            case 'applications':
+                break;
 
             default:
                 break;
         }
 
-        return task
+        return routine
     }
 
     static getLightStatus (agent:Agent, date:string){return new Task(agent, agent.getLightStatus, new Array(), date)}        
@@ -68,4 +69,4 @@ class TaskFactory{
     static getMqttEventConfiguration(agent:Agent, date:string){return new Task(agent, agent.getMqttEventConfiguration, [], date)}
     static switchLight(agent:Agent, date:string){return new Task(agent, agent.switchLight, [], date)}
 }
-export { TaskFactory }
+export { RoutineFactory }

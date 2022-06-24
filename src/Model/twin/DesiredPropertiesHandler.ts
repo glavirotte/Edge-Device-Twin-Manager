@@ -1,7 +1,3 @@
-import { TwinProperties } from "./twin/TwinProperties"
-import { ApplicationTwinProperties } from "./application/ApplicationTwinProperties"
-import { Type } from "typescript"
-
 interface IConfigurableProperties{
     list:(string)[]
 }

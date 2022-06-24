@@ -12,7 +12,7 @@ import {EventFilterListEntity, EventPublicationConfig, IMQTTEventConfig} from ".
 import ini from "ini"
 import { ICommon } from "../interfaces/ICommon"
 import { TwinProperties } from "./TwinProperties"
-import { TwinPropertiesHandler } from "../DesiredPropertiesHandler"
+import { TwinPropertiesHandler } from "./DesiredPropertiesHandler"
 import { ApplicationTwin } from "../application/ApplicationTwin"
 
 class Twin{

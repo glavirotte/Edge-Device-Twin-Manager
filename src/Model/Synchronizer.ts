@@ -13,7 +13,7 @@ import { TaskManager } from "./task/TaskManager"
 import { Firmware } from "./Firmware"
 import { ApplicationTwin } from "./application/ApplicationTwin"
 import { IHeartBeat } from "./interfaces/IHeartBeat"
-import { TaskFactory } from "./task/TaskFactory"
+import { RoutineFactory } from "./task/RoutineFactory"
 
 const HEART_BEAT_PERIOD = 60000
 
@@ -179,8 +179,8 @@ class Synchronizer {
         const twin = getTwinReference() as Twin
         const agent = this.getAgent(twin) as Agent
         const taskManager:TaskManager = this.getTaskManager(twin) as TaskManager
-        const task = TaskFactory.generateTask(agent, twin, property, value)
-        taskManager.registerTask(task, this.handleResponse)
+        const routine = RoutineFactory.generateRoutine(agent, twin, property, value)
+        taskManager.registerRoutine(routine, this.handleResponse)
     }
 
     // Send a http request every {{ ms }} second to check connectivity with device, not use in this impl
