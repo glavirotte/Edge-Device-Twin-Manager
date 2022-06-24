@@ -71,7 +71,7 @@ class Synchronizer {
         routine.setDate(date)
         const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
-        // const installApplication = new Task(agent, agent.installApplication, [new ApplicationTwin("heartbeatv2", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/heartbeatv2/heartbeatv2_1_0_0_armv7hf.eap")], date)
+        const installApplication = new Task(agent, agent.installApplication, [new ApplicationTwin({"Name": "heartbeatv2","NiceName": "","Vendor": "", "Version": "1.0-0", "License": "","Status": "","LicenseName": ""}, "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/heartbeatv2/heartbeatv2_1_0_0_armv7hf.eap")], date)
         // const controlApplication = new Task(agent, agent.controlApplication, [new ApplicationTwin("heartbeatv2", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/heartbeatv2/heartbeatv2_1_0_0_armv7hf.eap"), "start"], date)
         const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
         // const reboot = new Task(agent, agent.reboot, [], date)

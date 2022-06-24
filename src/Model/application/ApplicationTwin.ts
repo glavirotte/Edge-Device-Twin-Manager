@@ -5,6 +5,7 @@ to the agent by the synchronizer and will be uploaded.
 
 #########################################################*/
 
+import { IApplication } from "../interfaces/IResponse"
 import {ApplicationTwinProperties} from "./ApplicationTwinProperties"
 
 
@@ -14,9 +15,9 @@ class ApplicationTwin{
     reported: ApplicationTwinProperties
     desired:ApplicationTwinProperties
 
-    public constructor (Name:string, resourceLocation:string){
+    public constructor (properties:IApplication, resourceLocation:string){
         this.reported = new ApplicationTwinProperties()
-        this.reported.Name = Name
+        this.reported = properties
         this.desired = new ApplicationTwinProperties()
         this.desired.ResourceLocation = resourceLocation
     }

@@ -44,7 +44,7 @@ class Twin{
                             if(isStored.status === true){
                                 isStored.appStored.reported = app.$
                             }else{
-                                const appTwin:ApplicationTwin = new ApplicationTwin(app.$.Name, "")
+                                const appTwin:ApplicationTwin = new ApplicationTwin(app.$, "")
                                 appTwin.sync(app.$)
                                 this.reported.applications.push(appTwin)
                             }
