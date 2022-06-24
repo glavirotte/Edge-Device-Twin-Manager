@@ -1,7 +1,11 @@
+import { TwinProperties } from "./twin/TwinProperties"
+import { ApplicationTwinProperties } from "./application/ApplicationTwinProperties"
+import { Type } from "typescript"
+
 interface IConfigurableProperties{
     list:(string)[]
 }
-const configurableProperties = {
+const twinConfigurableProperties = {
     list:[
         "applications",
         "lightStatus",
@@ -11,16 +15,16 @@ const configurableProperties = {
     ]
 }
 
-class DesiredPropertiesHandler{
+class TwinPropertiesHandler{
 
     private synchronizerCallback:Function
     private getTwinReference:Function
-    private configurableProperties:IConfigurableProperties
+    private twinConfigurableProperties:IConfigurableProperties
 
     constructor(synchronizerCallback:Function, getTwinReference:Function){
         this.synchronizerCallback = synchronizerCallback
         this.getTwinReference = getTwinReference
-        this.configurableProperties = configurableProperties
+        this.twinConfigurableProperties = twinConfigurableProperties
     }
 
     get(target:any, property:string) {
@@ -33,15 +37,15 @@ class DesiredPropertiesHandler{
 
     set(target:any, property:string, value:any) {
         // console.log("Setting property:", property,"of target:", target, "to:", value)
-        
-        this.configurableProperties.list.forEach(prop => {
+        this.twinConfigurableProperties.list.forEach(prop => {
             if(property === prop){
                 target[property] = value;
                 this.synchronizerCallback(this.getTwinReference, property, value)
             }
         });
+
         return true
     }
 }
 
-export { DesiredPropertiesHandler }
+export { TwinPropertiesHandler }

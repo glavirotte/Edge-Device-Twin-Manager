@@ -1,16 +1,17 @@
-import { ApplicationProperties, PropertyList } from "../interfaces/IResponse"
+import { PropertyList } from "../interfaces/IResponse"
 import { DeviceState, TwinState } from "../interfaces/ITwin"
 import {IFirmwareInfo} from "../interfaces/IFirmwareInfo"
 import { IMQTTClientStatus } from "../interfaces/IMQTTClientStatus"
 import { IMQTTEventConfig } from "../interfaces/IMQTTEventConfig"
 import { IHeartBeat } from "../interfaces/IHeartBeat"
+import { ApplicationTwin } from "../application/ApplicationTwin"
 
 class TwinProperties{
 
     id:string
     serialNumber:string
     deviceProperties: PropertyList | undefined
-    applications: (ApplicationProperties)[] | null
+    applications: (ApplicationTwin)[] | null
     lastseen:number     // last time the device was online
     lastentry:number    // last time the device start connection with the system
     deviceState:DeviceState         // Current known state of the device
@@ -25,7 +26,7 @@ class TwinProperties{
         this.id = id
         this.serialNumber = {} as string
         this.deviceProperties = {} as PropertyList | undefined
-        this.applications = new Array<ApplicationProperties>()
+        this.applications = new Array<ApplicationTwin>()
         this.heartBeat = {} as IHeartBeat
         this.lastseen = 0
         this.lastentry = 0

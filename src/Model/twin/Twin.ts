@@ -4,7 +4,7 @@ with the applications installed
 #########################################################*/
 
 import { IHeartBeat } from "../interfaces/IHeartBeat"
-import { IResponse, ApplicationProperties, } from "../interfaces/IResponse"
+import { IResponse, IApplication, } from "../interfaces/IResponse"
 import { DeviceState, TwinState } from "../interfaces/ITwin"
 import { writeJSON } from "../Utils"
 import {IMQTTClientStatus} from "../interfaces/IMQTTClientStatus"
@@ -12,52 +12,65 @@ import {EventFilterListEntity, EventPublicationConfig, IMQTTEventConfig} from ".
 import ini from "ini"
 import { ICommon } from "../interfaces/ICommon"
 import { TwinProperties } from "./TwinProperties"
-import { DesiredPropertiesHandler } from "./DesiredPropertiesHandler"
+import { TwinPropertiesHandler } from "../DesiredPropertiesHandler"
+import { ApplicationTwin } from "../application/ApplicationTwin"
 
 class Twin{
     
     public reported:TwinProperties
     public desired:TwinProperties
+    private synchronizerCallback:Function
 
     // The followings fields are used to handle changes via the proxy
 
     public constructor(id:string, synchronizerCallback:Function){
         this.reported = new TwinProperties(id)
-        this.desired = new Proxy(new TwinProperties(id), new DesiredPropertiesHandler(synchronizerCallback, this.getTwin.bind(this))) as TwinProperties
+        this.desired = new Proxy(new TwinProperties(id), new TwinPropertiesHandler(synchronizerCallback, this.getTwin.bind(this))) as TwinProperties
+        this.synchronizerCallback = synchronizerCallback
     }
 
     // Update the state of the Twin by storing values from last request
     updateState(response: IResponse | undefined , heartBeat:IHeartBeat | undefined){
         try {
-            if(response !== undefined){
+            if(response !== undefined){     // Synchronization with device properties
                 if(response?.data?.propertyList !== undefined){
                     this.reported.deviceProperties = response?.data?.propertyList
                     this.reported.serialNumber = this.reported.deviceProperties.SerialNumber
                 }
-                if(response?.reply?.application?.[0].$ !== undefined){
+                if(response?.reply?.application?.[0].$ !== undefined){  // Synchronization with device applications
                     response?.reply?.application.forEach(app => {
                         if(this.reported.applications !== null){
-                            this.reported.applications.push(app.$)
+                            const isStored = this.isAlreayStored(app.$)
+                            if(isStored.status === true){
+                                isStored.appStored.reported = app.$
+                            }else{
+                                const appTwin:ApplicationTwin = new ApplicationTwin(app.$.Name, "")
+                                appTwin.sync(app.$)
+                                this.reported.applications.push(appTwin)
+                            }
                         }
                     });
                 }
-                if(response?.data?.status !== undefined && response.method === 'getLightStatus'){
+                if(response?.data?.status !== undefined && response.method === 'getLightStatus'){ // Synchronization with device light status
                     this.reported.lightStatus = response.data.status as boolean
                 }
-                if(response.data?.activeFirmwareVersion !== undefined){
+                if(response.data?.activeFirmwareVersion !== undefined){ // Synchronization with device firmware
                     this.reported.firmwareInfo.activeFirmwarePart = response.data?.activeFirmwarePart
                     this.reported.firmwareInfo.activeFirmwareVersion = response.data?.activeFirmwareVersion
                     this.reported.firmwareInfo.inactiveFirmwareVersion = response.data?.inactiveFirmwareVersion
                     this.reported.firmwareInfo.lastUpgradeAt = response.data?.lastUpgradeAt
                     this.reported.firmwareInfo.isCommitted = response.data?.isCommitted
                 }
+                // Synchronization with mqtt client
                 if(response.data?.status !== undefined && (response.method === "getClientStatus" || response.method === "activateClient" || response.method === "deactivateClient")){
                     this.reported.mqttClientStatus = response.data?.status ? response.data as IMQTTClientStatus: {} as IMQTTClientStatus
                 }
+                // Synchronization with mqtt event configuration
                 if(response.method === "getEventPublicationConfig"){
                     this.reported.mqttEventConfig = response.data as IMQTTEventConfig
                 }
-            }else if(heartBeat !== undefined){
+            console.log(this.reported, "\n")
+            }else if(heartBeat !== undefined){  // Synchronization via heartbeat
                 this.reported.heartBeat = heartBeat
                 if(!heartBeat.message.data.Topics.startsWith("none")){
                     const topics = ini.parse(heartBeat.message.data.Topics)
@@ -81,7 +94,6 @@ class Twin{
                 }
                 
             }
-            console.log(this.reported, "\n")
             this.storeTwinObject()
         } catch (error) {
             console.log(error)
@@ -92,9 +104,22 @@ class Twin{
         writeJSON(this, `./src/Model/Data_Storage/Twins/${this.reported.serialNumber}-Twin.json`)
     }
 
+    private isAlreayStored(app:IApplication){
+        var status = false
+        var appStored:ApplicationTwin = {} as ApplicationTwin
+        if(this.reported.applications !== null){
+            this.reported.applications.forEach(application => {
+                if(app.Name === application.reported.Name){
+                    status = true
+                }
+            });
+        }
+        return {'status':status, 'appStored':appStored}
+    }
+
 /*------------------ Getters & Setters ------------------------ */
 
-    public getApplications():(ApplicationProperties)[] | null{
+    public getApplications():(ApplicationTwin)[] | null{
         return this.reported.applications
     }
     public getID():string{

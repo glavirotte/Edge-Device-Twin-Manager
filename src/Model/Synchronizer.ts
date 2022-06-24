@@ -11,10 +11,11 @@ import { Task, TaskState } from "./task/Task"
 import { Routine } from "./task/Routine"
 import { TaskManager } from "./task/TaskManager"
 import { Firmware } from "./Firmware"
-import { ApplicationTwin } from "./Application"
+import { ApplicationTwin } from "./application/ApplicationTwin"
 import { IHeartBeat } from "./interfaces/IHeartBeat"
 import { TaskFactory } from "./task/TaskFactory"
 
+const HEART_BEAT_PERIOD = 60000
 
 class Synchronizer {
     
@@ -70,7 +71,7 @@ class Synchronizer {
         routine.setDate(date)
         const getLightStatus = new Task(agent, agent.getLightStatus, new Array(), date)        
         const listApplications = new Task(agent, agent.listApplications, new Array(), date)
-        // const installApplication = new Task(agent, agent.installApplication, [new ApplicationTwin("loiteringguard", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/Loitering_Guard/AXIS_Loitering_Guard_2_3_2.eap")], date)
+        // const installApplication = new Task(agent, agent.installApplication, [new ApplicationTwin("heartbeatv2", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/heartbeatv2/heartbeatv2_1_0_0_armv7hf.eap")], date)
         // const controlApplication = new Task(agent, agent.controlApplication, [new ApplicationTwin("heartbeatv2", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/heartbeatv2/heartbeatv2_1_0_0_armv7hf.eap"), "start"], date)
         const getFirmwareStatus =  new Task(agent, agent.getFirmwareStatus, [], date)
         // const reboot = new Task(agent, agent.reboot, [], date)
@@ -124,11 +125,10 @@ class Synchronizer {
     public async handleMQTTBrokerMessage(topic:string, heartBeat:IHeartBeat){
         const twin = this.getTwin(heartBeat.serial)
 
-        const heartBeatPeriod = 60000
-        const timeout = 2*heartBeatPeriod
+        const timeout = 2*HEART_BEAT_PERIOD
 
         if(twin !== undefined){
-            this.ensureDeviceConnectivity(twin, heartBeat, heartBeatPeriod)
+            this.ensureDeviceConnectivity(twin, heartBeat, HEART_BEAT_PERIOD)
         }
         
         if(twin !== undefined && heartBeat.timestamp !== twin.getLastHeartBeat().timestamp){

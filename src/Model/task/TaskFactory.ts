@@ -1,5 +1,5 @@
 import { Agent } from "../Agent";
-import { ApplicationTwin } from "../Application";
+import { ApplicationTwin } from "../application/ApplicationTwin";
 import { Firmware } from "../Firmware";
 import { Twin } from "../twin/Twin";
 import { Task } from "./Task";
@@ -13,12 +13,43 @@ import { Task } from "./Task";
 //         this.synchronizer.getTaskManager(twin)?.registerTask(new Task(agent, method, new Array(),  value), this.synchronizer.handleResponse)
 //     }
 // }
+// const customSwitch = [
+//     {condition: 'case1', fn(){ console.log("Hello") }},
+//     {condition: 'salut', fn() { console.log("Hi") }},
+// ]
+
+// // edit a condition:
+// customSwitch[0].condition = 'changed';
+
+// // use the switch
+// const myValue = 'salut'
+// for (const { condition, fn } of customSwitch) {
+//     if (myValue === condition) {
+//         fn();
+//         break;
+//     }
+// }
 
 
 class TaskFactory{
 
     static generateTask(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Task{
-        const task = this.switchLight(agent, "")
+        console.log("Property modified: ", modifiedTwinProperty)
+        var task:Task = {} as Task
+
+        switch (modifiedTwinProperty) {
+            case 'lightStatus':
+                task = this.switchLight(agent, "")
+                break;
+
+            // case 'applications':
+            //     task = this.switchLight(agent, "")
+            //     break;
+
+            default:
+                break;
+        }
+
         return task
     }
 

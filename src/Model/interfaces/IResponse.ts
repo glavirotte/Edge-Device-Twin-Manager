@@ -47,18 +47,19 @@ export interface IResponse {
     result: string;
   }
   export interface ApplicationEntity {
-    $: ApplicationProperties;
+    $: IApplication;
   }
-  export interface ApplicationProperties {
+  export interface IApplication {
     Name: string;
     NiceName: string;
     Vendor: string;
     Version: string;
-    ApplicationID: string;
+    ApplicationID?: string;
     License: string;
     Status: string;
-    ConfigurationPage: string;
-    VendorHomePage: string;
+    ConfigurationPage?: string;
+    VendorHomePage?: string;
     LicenseName: string;
+    ResourceLocation?:string
   }
   

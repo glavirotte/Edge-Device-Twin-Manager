@@ -1,4 +1,4 @@
-import { ApplicationTwin } from "../Application"
+import { ApplicationTwin } from "../application/ApplicationTwin"
 import { Firmware } from "../Firmware"
 import { Request } from "../Request"
 import { IResponse } from "./IResponse"
