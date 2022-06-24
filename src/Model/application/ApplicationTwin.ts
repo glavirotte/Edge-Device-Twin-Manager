@@ -19,7 +19,9 @@ class ApplicationTwin{
         this.reported = new ApplicationTwinProperties()
         this.reported = properties
         this.desired = new ApplicationTwinProperties()
-        this.desired.ResourceLocation = resourceLocation
+        if(resourceLocation !== ""){
+            this.desired.ResourceLocation = resourceLocation
+        }
     }
 
     public sync(reported:ApplicationTwinProperties){
