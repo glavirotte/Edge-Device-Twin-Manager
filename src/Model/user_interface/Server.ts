@@ -1,10 +1,18 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from "dotenv"
 import { Twin } from '../twin/Twin';
+import { TwinProperties } from '../twin/TwinProperties';
+import { diff, addedDiff, deletedDiff, updatedDiff, detailedDiff } from 'deep-object-diff';
 const cors = require("cors")
 
 interface Body {
     value:string
+}
+
+interface IDiff{
+    added:TwinProperties
+    deleted:TwinProperties
+    updated:TwinProperties
 }
 
 class Server {
@@ -33,23 +41,21 @@ class Server {
         var id = twin.getID()
         id = "B8A44F3A4540"
         this.app.get('/devices/'+id, (req: Request, res: Response) => {
-            res.json(twin);
+            const dataToSend = twin.reported
+            res.json(dataToSend);
         });
-        this.app.post('/devices/'+id+'/light/switch', (req: Request, res: Response) => {
-            const date:Body = req.body
-            console.log("Asked for performing a light switch at", date.value)
-            const currentValue = twin.reported.lightStatus
-            twin.desired.lightStatus = !currentValue
-            res.status(201).send()
+
+        this.app.post('/devices/'+id+'/desired', (req: Request, res: Response) => {
+            const body:Body = req.body
+            const reported = twin.reported
+            const whisedDesired = body.value as unknown as TwinProperties
+            const diffObject = detailedDiff(reported, whisedDesired) as IDiff
+
+            Object.assign(twin.desired, diffObject.updated)
+
+            res.status(200).send()
         });
-        this.app.get('/devices/'+id+'/light/status', (req: Request, res: Response) => {
-            const lightStatus = twin.getLightStatus()
-            res.send('<p>'+lightStatus+'<p>')
-        });
-        this.app.get('/devices/'+id+'/connected', (req: Request, res: Response) => {
-            const status = (twin.getDeviceState() === 0)?("Offline"):("Connected")
-            res.send('<p>'+status+'<p>')
-        });
+
     }
 
 

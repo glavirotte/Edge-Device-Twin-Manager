@@ -3,8 +3,7 @@
     "compilerOptions": {
         "outDir": "dist/Model",
         "resolveJsonModule":true,
-    },
-    "compilerOptions": {
+        "noImplicitAny": true,
         "skipLibCheck": true,
     },
     
