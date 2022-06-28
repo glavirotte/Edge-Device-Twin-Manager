@@ -5,14 +5,13 @@ import { Routine } from "./Routine";
 import { Task } from "./Task";
 
 // const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(agent))
-// const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(agent))
 
 class RoutineFactory {
     
     //Create routine to perform from a change in twin properties
 
     static generateRoutine(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Routine{  
-        console.log("Property modified: ", modifiedTwinProperty)
+        console.log("Property modified: ", modifiedTwinProperty, "on twin:", twin.getID())
         var routine:Routine = new Routine("")
 
         switch (modifiedTwinProperty) {
@@ -23,7 +22,6 @@ class RoutineFactory {
 
             case 'applications':
                 routine = RoutineFactory.manageApps(agent, twin, newValue as (ApplicationTwin)[], routine)
-
                 break;
 
             default:

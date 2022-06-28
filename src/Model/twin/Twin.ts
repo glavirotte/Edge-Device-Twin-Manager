@@ -14,7 +14,6 @@ import { ICommon } from "../interfaces/ICommon"
 import { TwinProperties } from "./TwinProperties"
 import { TwinPropertiesHandler } from "./DesiredPropertiesHandler"
 import { ApplicationTwin } from "../application/ApplicationTwin"
-import { ppid } from "process"
 
 class Twin{
     
@@ -66,7 +65,7 @@ class Twin{
                 if(response.method === "getEventPublicationConfig"){
                     this.reported.mqttEventConfig = response.data as IMQTTEventConfig
                 }
-            console.log(this.reported, "\n")
+            // console.log(this.reported, "\n")
             }else if(heartBeat !== undefined){  // Synchronization via heartbeat
                 this.reported.heartBeat = heartBeat
                 if(!heartBeat.message.data.Topics.startsWith("none")){
