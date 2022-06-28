@@ -7,9 +7,11 @@ import { Task } from "./Task";
 // const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(agent))
 // const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(agent))
 
-class RoutineFactory{
+class RoutineFactory {
+    
+    //Create routine to perform from a change in twin properties
 
-    static generateRoutine(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Routine{
+    static generateRoutine(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Routine{  
         console.log("Property modified: ", modifiedTwinProperty)
         var routine:Routine = new Routine("")
 

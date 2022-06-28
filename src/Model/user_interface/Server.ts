@@ -6,7 +6,8 @@ import { diff, addedDiff, deletedDiff, updatedDiff, detailedDiff } from 'deep-ob
 const cors = require("cors")
 
 interface Body {
-    value:string
+    twin:string
+    date:string
 }
 
 interface IDiff{
@@ -19,9 +20,11 @@ class Server {
     
     private app:Express
     private port:Number
+    private twins:Twin[]
 
     constructor(port:Number){
         this.port = port
+        this.twins = new Array<Twin>()
         dotenv.config();
         this.app = express();
         this.app.use(express.json());
@@ -33,13 +36,17 @@ class Server {
         this.app.get("/",(req:Request, res:Response) => {
             res.send("<h1>You are on the root of the server !</h1>")
         })
+        
+        this.app.get("/devices",(req:Request, res:Response) => {
+            res.json(this.twins)
+        })
     }
 
 /*##################  Methods  #####################*/
 
     public addTwin(twin:Twin){
-        var id = twin.getID()
-        id = "B8A44F3A4540"
+        var id = twin.getSerialNumber()
+        this.twins.push(twin)
         this.app.get('/devices/'+id, (req: Request, res: Response) => {
             const dataToSend = twin.reported
             res.json(dataToSend);
@@ -48,14 +55,14 @@ class Server {
         this.app.post('/devices/'+id+'/desired', (req: Request, res: Response) => {
             const body:Body = req.body
             const reported = twin.reported
-            const whisedDesired = body.value as unknown as TwinProperties
-            const diffObject = detailedDiff(reported, whisedDesired) as IDiff
-
+            const desiredTwin = body.twin as unknown as TwinProperties
+            const desiredDate = body.date as unknown as string
+            const diffObject = detailedDiff(reported, desiredTwin) as IDiff
+            
             Object.assign(twin.desired, diffObject.updated)
 
             res.status(200).send()
         });
-
     }
 
 
