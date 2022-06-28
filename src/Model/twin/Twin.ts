@@ -14,6 +14,7 @@ import { ICommon } from "../interfaces/ICommon"
 import { TwinProperties } from "./TwinProperties"
 import { TwinPropertiesHandler } from "./DesiredPropertiesHandler"
 import { ApplicationTwin } from "../application/ApplicationTwin"
+import { ppid } from "process"
 
 class Twin{
     
@@ -38,18 +39,14 @@ class Twin{
                     this.reported.serialNumber = this.reported.deviceProperties.SerialNumber
                 }
                 if(response?.reply?.application?.[0].$ !== undefined){  // Synchronization with device applications
+                    const newApps =  new Array<ApplicationTwin>()
                     response?.reply?.application.forEach(app => {
-                        if(this.reported.applications !== null){
-                            const isStored = this.isAlreayStored(app.$)
-                            if(isStored.status === true){
-                                isStored.appStored.reported = app.$
-                            }else{
-                                const appTwin:ApplicationTwin = new ApplicationTwin(app.$, "")
-                                appTwin.sync(app.$)
-                                this.reported.applications.push(appTwin)
-                            }
-                        }
+                            const appTwin:ApplicationTwin = new ApplicationTwin(app.$, "")
+                            appTwin.sync(app.$)
+                            newApps.push(appTwin)
                     });
+                    this.reported.applications = newApps
+
                 }
                 if(response?.data?.status !== undefined && response.method === 'getLightStatus'){ // Synchronization with device light status
                     this.reported.lightStatus = response.data.status as boolean
@@ -102,19 +99,6 @@ class Twin{
 
     public storeTwinObject(){
         writeJSON(this, `./src/Model/Data_Storage/Twins/${this.reported.serialNumber}-Twin.json`)
-    }
-
-    private isAlreayStored(app:IApplication){
-        var status = false
-        var appStored:ApplicationTwin = {} as ApplicationTwin
-        if(this.reported.applications !== null){
-            this.reported.applications.forEach(application => {
-                if(app.Name === application.reported.Name){
-                    status = true
-                }
-            });
-        }
-        return {'status':status, 'appStored':appStored}
     }
 
 /*------------------ Getters & Setters ------------------------ */

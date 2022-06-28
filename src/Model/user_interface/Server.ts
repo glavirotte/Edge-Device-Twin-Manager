@@ -58,9 +58,9 @@ class Server {
             const desiredTwin = body.twin as unknown as TwinProperties
             const desiredDate = body.date as unknown as string
             const diffObject = detailedDiff(reported, desiredTwin) as IDiff
-            
-            Object.assign(twin.desired, diffObject.updated)
 
+            Object.assign(twin.desired, diffObject.updated)
+            
             res.status(200).send()
         });
     }

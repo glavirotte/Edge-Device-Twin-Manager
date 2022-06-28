@@ -22,7 +22,7 @@ class RoutineFactory {
                 break;
 
             case 'applications':
-                RoutineFactory.manageApps(agent, twin, newValue as (ApplicationTwin)[], routine)
+                routine = RoutineFactory.manageApps(agent, twin, newValue as (ApplicationTwin)[], routine)
 
                 break;
 
@@ -33,17 +33,30 @@ class RoutineFactory {
         return routine
     }
     
-    static manageApps(agent:Agent, twin:Twin, modifiedApplications:(ApplicationTwin)[], routine:Routine){   // Not tested
-        if(modifiedApplications !== undefined && twin.reported.applications !== null){
-            for (const desiredApp of modifiedApplications) {
-                for (const appStored of twin.reported.applications) {
-                    if(desiredApp != appStored){
-                        routine.addTask(this.controlApplication(agent, appStored, "remove", ""))
-                        routine.addTask(this.installApplication(agent, desiredApp, ""))
-                    }
+    static manageApps(agent:Agent, twin:Twin, modifiedApplications:(ApplicationTwin)[], routine:Routine):Routine{   // Not tested
+        const properties = Object.getOwnPropertyNames(modifiedApplications)
+
+        for(const property of properties){
+            const desiredStatus = modifiedApplications![parseInt(property)].reported.Status
+            const effectiveStatus = twin.reported.applications![parseInt(property)].reported.Status
+
+            var action = ""
+            const appName = twin.reported.applications![parseInt(property)].reported.Name
+            if( desiredStatus !== effectiveStatus ){
+                if(desiredStatus === "Running"){
+                    action = "start"
+                }else if(desiredStatus === "Stopped"){
+                    action = "stop"
+                }
+                if(action !== ""){
+                    routine.addTask(this.controlApplication(agent, twin.reported.applications![parseInt(property)], action, ""))
+
+                }else{
+                    throw new Error("Incorrect Status was entered ! " + desiredStatus)
                 }
             }
         }
+        return routine
     }
 
     static getLightStatus (agent:Agent, date:string){return new Task(agent, agent.getLightStatus, new Array(), date)}

@@ -29,10 +29,8 @@ class TaskManager{
 
     public async registerRoutine(routine:Routine, handleResponse:(twin: Twin, response: IResponse | undefined, task: Task) => void):Promise<void>{
         const tasks = routine.destruct()
-        var responses:IResponse | undefined [] = new Array()
-        const promises = new Array()
         tasks.forEach(task => {
-            promises.push(this.registerTask(task, handleResponse))
+            this.registerTask(task, handleResponse)
         });
     }
 

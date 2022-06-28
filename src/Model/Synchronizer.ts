@@ -132,7 +132,6 @@ class Synchronizer {
         }
         
         if(twin !== undefined && heartBeat.timestamp !== twin.getLastHeartBeat().timestamp){
-
             const timestamp = Date.now()        // get current timestamp
             console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "ms ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "ms ago")
             twin.setLastSeen(timestamp)     // Update last seen with current timestamp
