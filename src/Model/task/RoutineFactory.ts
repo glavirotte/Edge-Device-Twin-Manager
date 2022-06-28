@@ -11,7 +11,7 @@ class RoutineFactory {
     //Create routine to perform from a change in twin properties
 
     static generateRoutine(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Routine{  
-        console.log("Property modified: ", modifiedTwinProperty, "on twin:", twin.getID())
+        console.log("Modification of property", modifiedTwinProperty, "on twin:", twin.getID())
         var routine:Routine = new Routine("")
 
         switch (modifiedTwinProperty) {
