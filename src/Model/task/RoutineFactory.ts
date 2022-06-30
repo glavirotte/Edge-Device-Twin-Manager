@@ -21,7 +21,6 @@ class RoutineFactory {
                     routine.addTask(task)
                     console.log(routine)
                 }
-                
                 break;
 
             case 'applications':

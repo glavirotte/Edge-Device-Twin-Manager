@@ -8,6 +8,7 @@ to the agent by the synchronizer and will be uploaded.
 import { IApplication } from "../interfaces/IResponse"
 import {ApplicationTwinProperties} from "./ApplicationTwinProperties"
 
+const resourceFolder = "./resurces/"
 
 class ApplicationTwin{
     
@@ -31,6 +32,7 @@ class ApplicationTwin{
     public getName(){
         return this.reported.Name
     }
+
 
 }
 
