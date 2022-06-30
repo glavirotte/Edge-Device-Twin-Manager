@@ -11,7 +11,7 @@ class ApplicationTwinProperties implements IApplication{
     ConfigurationPage?: string
     VendorHomePage?: string
     LicenseName: string
-    ResourceLocation?:string
+    FileName?:string
 
     constructor(){
         this.Name = ""
@@ -24,7 +24,7 @@ class ApplicationTwinProperties implements IApplication{
         this.ConfigurationPage = ""
         this.VendorHomePage = ""
         this.LicenseName = ""
-        this.ResourceLocation = ""
+        this.FileName = ""
     }
 }
 

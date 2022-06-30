@@ -9,6 +9,9 @@ import { Server } from './user_interface/Server'
 import {MQTTClient} from "./MQTTClient"
 import { exit } from 'process'
 
+import fs from "fs"
+import fetch from "node-fetch"
+
 const tellucareMqttBroker = "wss://tellucare-mqtt-dev.tellucloud.com/mqtt"
 const cameraID = '8992'
 
@@ -33,3 +36,5 @@ const mqttClient = new MQTTClient(synchronizer, tellucareMqttBroker, {
 
 synchronizer.createTwin(cameraID)
     .then((twin:Twin) => {server.addTwin(twin)})
+
+

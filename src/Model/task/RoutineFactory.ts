@@ -39,7 +39,7 @@ class RoutineFactory {
         for (const modifiedApp of modifiedApplications){
             if(twin.contains(modifiedApp)){
                 const registeredApp = twin.getAppTwin(modifiedApp.reported.Name) as ApplicationTwin
-                const desiredStatus = modifiedApp.reported.Status
+                const desiredStatus = modifiedApp.desired.Status
                 const effectiveStatus = registeredApp.reported.Status
     
                 let action = ""
@@ -58,8 +58,8 @@ class RoutineFactory {
                     }
                 }
             }else{
-                console.log(modifiedApp)
-                routine.addTask(this.installApplication(agent, modifiedApp, ""))
+                console.log('new App:', modifiedApp)
+                routine.addTask(this.installApplication(agent, new ApplicationTwin(modifiedApp.desired), ""))
             }
         }
 
@@ -68,7 +68,7 @@ class RoutineFactory {
             for(const storedApp of twin.reported.applications){
                 let hastoBeRemoved:boolean = true
                 for(const modifiedApp of modifiedApplications){
-                    if(modifiedApp.reported.Name === storedApp.reported.Name){
+                    if(modifiedApp.desired.Name === storedApp.reported.Name){
                         hastoBeRemoved = false
                     }
                 }

@@ -174,7 +174,7 @@ class Agent implements IAgent{
             method: method,
             rejectUnauthorized: false,
             timeout:30000,
-            files: application.desired.ResourceLocation
+            files: await application.getFile()
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
@@ -207,7 +207,6 @@ class Agent implements IAgent{
             method: method,
             rejectUnauthorized: false,
             timeout:30000,
-            files: application.desired.ResourceLocation
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const result:string = await this.askDevice(request) as string

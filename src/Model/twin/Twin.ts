@@ -104,7 +104,7 @@ class Twin{
         let bool:boolean = false
         if(this.reported.applications !== null){
             for (const app of this.reported.applications) {
-                if(app.reported.Name === appTwin.reported.Name){
+                if(app.reported.Name === appTwin.desired.Name){
                     return bool = true
                 }
             }
