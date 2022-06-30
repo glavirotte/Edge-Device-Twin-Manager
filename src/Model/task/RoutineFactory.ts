@@ -8,16 +8,20 @@ import { Task } from "./Task";
 
 class RoutineFactory {
     
-    //Create routine to perform from a change in twin properties
+    //Create a routine to perform, from a change in twin properties
 
     static generateRoutine(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Routine{  
-        console.log("Modification of property", modifiedTwinProperty, "on twin:", twin.getID())
-        var routine:Routine = new Routine("")
+        // console.log("Modification of property", modifiedTwinProperty, "on twin:", twin.getID())
 
+        var routine:Routine = new Routine("")
         switch (modifiedTwinProperty) {
             case 'lightStatus':
-                const task = this.switchLight(agent, "")
-                routine.addTask(task)
+                if(twin.reported.lightStatus !== newValue){
+                    const task = this.switchLight(agent, "")
+                    routine.addTask(task)
+                    console.log(routine)
+                }
+                
                 break;
 
             case 'applications':
@@ -32,25 +36,45 @@ class RoutineFactory {
     }
     
     static manageApps(agent:Agent, twin:Twin, modifiedApplications:(ApplicationTwin)[], routine:Routine):Routine{   // Not tested
-        const properties = Object.getOwnPropertyNames(modifiedApplications)
 
-        for(const property of properties){
-            const desiredStatus = modifiedApplications![parseInt(property)].reported.Status
-            const effectiveStatus = twin.reported.applications![parseInt(property)].reported.Status
-
-            var action = ""
-            const appName = twin.reported.applications![parseInt(property)].reported.Name
-            if( desiredStatus !== effectiveStatus ){
-                if(desiredStatus === "Running"){
-                    action = "start"
-                }else if(desiredStatus === "Stopped"){
-                    action = "stop"
+        for (const modifiedApp of modifiedApplications){
+            if(twin.contains(modifiedApp)){
+                const registeredApp = twin.getAppTwin(modifiedApp.reported.Name) as ApplicationTwin
+                const desiredStatus = modifiedApp.reported.Status
+                const effectiveStatus = registeredApp.reported.Status
+    
+                let action = ""
+                
+                if( desiredStatus !== effectiveStatus ){
+                    if(desiredStatus === "Running"){
+                        action = "start"
+                    }else if(desiredStatus === "Stopped"){
+                        action = "stop"
+                    }
+                    if(action !== ""){
+                        routine.addTask(this.controlApplication(agent, registeredApp, action, ""))
+    
+                    }else{
+                        throw new Error("Incorrect Status was entered ! " + desiredStatus)
+                    }
                 }
-                if(action !== ""){
-                    routine.addTask(this.controlApplication(agent, twin.reported.applications![parseInt(property)], action, ""))
+            }else{
+                console.log(modifiedApp)
+                routine.addTask(this.installApplication(agent, modifiedApp, ""))
+            }
+        }
 
-                }else{
-                    throw new Error("Incorrect Status was entered ! " + desiredStatus)
+        // Check if some apps have been removed
+        if(twin.reported.applications !== null){
+            for(const storedApp of twin.reported.applications){
+                let hastoBeRemoved:boolean = true
+                for(const modifiedApp of modifiedApplications){
+                    if(modifiedApp.reported.Name === storedApp.reported.Name){
+                        hastoBeRemoved = false
+                    }
+                }
+                if(hastoBeRemoved){
+                    routine.addTask(this.controlApplication(agent, storedApp, "remove", ""))
                 }
             }
         }

@@ -15,13 +15,10 @@ class ApplicationTwin{
     reported: ApplicationTwinProperties
     desired:ApplicationTwinProperties
 
-    public constructor (properties:IApplication, resourceLocation:string){
+    public constructor (properties:IApplication){
         this.reported = new ApplicationTwinProperties()
         this.reported = properties
         this.desired = new ApplicationTwinProperties()
-        if(resourceLocation !== ""){
-            this.desired.ResourceLocation = resourceLocation
-        }
     }
 
     public sync(reported:ApplicationTwinProperties){
@@ -33,9 +30,6 @@ class ApplicationTwin{
 
     public getName(){
         return this.reported.Name
-    }
-    public getLocation(){
-        return this.reported.ResourceLocation
     }
 
 }

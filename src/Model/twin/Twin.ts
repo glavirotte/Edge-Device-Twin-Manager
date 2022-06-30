@@ -40,7 +40,7 @@ class Twin{
                 if(response?.reply?.application?.[0].$ !== undefined){  // Synchronization with device applications
                     const newApps =  new Array<ApplicationTwin>()
                     response?.reply?.application.forEach(app => {
-                            const appTwin:ApplicationTwin = new ApplicationTwin(app.$, "")
+                            const appTwin:ApplicationTwin = new ApplicationTwin(app.$)
                             appTwin.sync(app.$)
                             newApps.push(appTwin)
                     });
@@ -65,7 +65,7 @@ class Twin{
                 if(response.method === "getEventPublicationConfig"){
                     this.reported.mqttEventConfig = response.data as IMQTTEventConfig
                 }
-            // console.log(this.reported, "\n")
+            console.log(this.reported, "\n")
             }else if(heartBeat !== undefined){  // Synchronization via heartbeat
                 this.reported.heartBeat = heartBeat
                 if(!heartBeat.message.data.Topics.startsWith("none")){
@@ -100,10 +100,32 @@ class Twin{
         writeJSON(this, `./src/Model/Data_Storage/Twins/${this.reported.serialNumber}-Twin.json`)
     }
 
+    public contains(appTwin:ApplicationTwin){
+        let bool:boolean = false
+        if(this.reported.applications !== null){
+            for (const app of this.reported.applications) {
+                if(app.reported.Name === appTwin.reported.Name){
+                    return bool = true
+                }
+            }
+        }
+        return bool
+    }
+
 /*------------------ Getters & Setters ------------------------ */
 
     public getApplications():(ApplicationTwin)[] | null{
         return this.reported.applications
+    }
+    public getAppTwin(name:string):ApplicationTwin | null{
+        if(this.reported.applications !== null){
+            for (const app of this.reported.applications) {
+                if(app.reported.Name === name){
+                    return app
+                }
+            }
+        }
+        return null
     }
     public getID():string{
         return this.reported.id

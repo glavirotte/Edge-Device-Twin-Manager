@@ -164,6 +164,8 @@ class Agent implements IAgent{
     
     public async installApplication(arg:ApplicationTwin[]):Promise<IResponse | undefined>{
         const application = arg[0]
+        console.log("Request to install app:", application.getName())
+        
         const uri = this.URIs.axis.upload
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
@@ -172,7 +174,7 @@ class Agent implements IAgent{
             method: method,
             rejectUnauthorized: false,
             timeout:30000,
-            files: application.getLocation()
+            files: application.desired.ResourceLocation
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         await this.askDevice(request)
@@ -205,7 +207,7 @@ class Agent implements IAgent{
             method: method,
             rejectUnauthorized: false,
             timeout:30000,
-            files: application.getLocation()
+            files: application.desired.ResourceLocation
         }
         const request = new Request(url, method, this.username, this.password, args, options)
         const result:string = await this.askDevice(request) as string
