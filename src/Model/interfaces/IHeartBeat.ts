@@ -19,5 +19,14 @@ export interface Data {
     "Monitoring.Uptime": number;
     "Properties.Firmware.Version": string;
     "Topics":string;
+    "Applications":string;
+}
+
+export interface IHeartBeatAppMessage {
+    applications: IHeartBeatAppMessageArray
+    status: IHeartBeatAppMessageArray
+}
+export interface IHeartBeatAppMessageArray{
+    array:(string)[]
 }
   

@@ -3,7 +3,7 @@ This class represent the current known state of the Device
 with the applications installed 
 #########################################################*/
 
-import { IHeartBeat } from "../interfaces/IHeartBeat"
+import { IHeartBeat, IHeartBeatAppMessage } from "../interfaces/IHeartBeat"
 import { IResponse, IApplication, } from "../interfaces/IResponse"
 import { DeviceState, TwinState } from "../interfaces/ITwin"
 import { writeJSON } from "../Utils"
@@ -67,9 +67,24 @@ class Twin{
                 if(response.method === "getEventPublicationConfig"){
                     this.reported.mqttEventConfig = response.data as IMQTTEventConfig
                 }
-            console.log(this.reported, "\n")
+            // console.log(this.reported, "\n")
             }else if(heartBeat !== undefined){  // Synchronization via heartbeat
                 this.reported.heartBeat = heartBeat
+                if(heartBeat.message.data.Applications !== undefined){
+                    const appMessage:IHeartBeatAppMessage = ini.parse(heartBeat.message.data.Applications) as IHeartBeatAppMessage
+                    const applications = appMessage.applications.array
+                    const status = appMessage.status.array
+                    for (let index = 0; index < applications.length; index++) {
+                        status[index] = status[index].replace("ENABLED=", "").replace("no", "Stopped").replace("yes", "Running")
+                        this.reported.applications!.forEach(app => {
+                            if(app.reported.Name === applications[index]){
+                                if(status[index] !== app.reported.Status && applications[index] !== "heartbeatv2"){ // Has to be fixed
+                                    app.reported.Status = status[index]
+                                }
+                            }
+                        });
+                    }              
+                }
                 if(!heartBeat.message.data.Topics.startsWith("none")){
                     const topics = ini.parse(heartBeat.message.data.Topics)
                     const common = topics["common"]
