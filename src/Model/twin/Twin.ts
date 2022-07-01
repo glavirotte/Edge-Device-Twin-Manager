@@ -70,21 +70,29 @@ class Twin{
             // console.log(this.reported, "\n")
             }else if(heartBeat !== undefined){  // Synchronization via heartbeat
                 this.reported.heartBeat = heartBeat
+
+                // Synchronization of apps status
                 if(heartBeat.message.data.Applications !== undefined){
                     const appMessage:IHeartBeatAppMessage = ini.parse(heartBeat.message.data.Applications) as IHeartBeatAppMessage
                     const applications = appMessage.applications.array
                     const status = appMessage.status.array
+
+                    const reportedApplications = new Array<ApplicationTwin>()
+
                     for (let index = 0; index < applications.length; index++) {
                         status[index] = status[index].replace("ENABLED=", "").replace("no", "Stopped").replace("yes", "Running")
-                        this.reported.applications!.forEach(app => {
+                        for(const app of this.reported.applications!){
                             if(app.reported.Name === applications[index]){
                                 if(status[index] !== app.reported.Status && applications[index] !== "heartbeatv2"){ // Has to be fixed
                                     app.reported.Status = status[index]
                                 }
+                                reportedApplications.push(app)
                             }
-                        });
-                    }              
+                        }
+                    }
+                    this.reported.applications = reportedApplications     
                 }
+                // Synchronization of MQTT topics
                 if(!heartBeat.message.data.Topics.startsWith("none")){
                     const topics = ini.parse(heartBeat.message.data.Topics)
                     const common = topics["common"]
