@@ -14,6 +14,8 @@ import { ICommon } from "../interfaces/ICommon"
 import { TwinProperties } from "./TwinProperties"
 import { TwinPropertiesHandler } from "./DesiredPropertiesHandler"
 import { ApplicationTwin } from "../application/ApplicationTwin"
+import { FirmwareTwin } from "../firmware/FirmwareTwin"
+import { FirmwareTwinProperties } from "../firmware/FirmwareTwinProperties"
 
 class Twin{
     
@@ -51,11 +53,11 @@ class Twin{
                     this.reported.lightStatus = response.data.status as boolean
                 }
                 if(response.data?.activeFirmwareVersion !== undefined){ // Synchronization with device firmware
-                    this.reported.firmwareInfo.activeFirmwarePart = response.data?.activeFirmwarePart
-                    this.reported.firmwareInfo.activeFirmwareVersion = response.data?.activeFirmwareVersion
-                    this.reported.firmwareInfo.inactiveFirmwareVersion = response.data?.inactiveFirmwareVersion
-                    this.reported.firmwareInfo.lastUpgradeAt = response.data?.lastUpgradeAt
-                    this.reported.firmwareInfo.isCommitted = response.data?.isCommitted
+                    const firmwareProps = new FirmwareTwinProperties(
+                        response.data?.activeFirmwareVersion, response.data?.activeFirmwarePart,
+                        response.data?.inactiveFirmwareVersion, response.data?.isCommitted,
+                        response.data?.lastUpgradeAt, "")
+                    this.reported.firmware = new FirmwareTwin(firmwareProps)
                 }
                 // Synchronization with mqtt client
                 if(response.data?.status !== undefined && (response.method === "getClientStatus" || response.method === "activateClient" || response.method === "deactivateClient")){

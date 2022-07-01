@@ -7,7 +7,7 @@ const twinConfigurableProperties = {
         "lightStatus",
         "mqttClientStatus",
         "mqttEventConfig",
-        "firmwareInfo"
+        "firmware"
     ]
 }
 

@@ -8,7 +8,6 @@ to the agent by the synchronizer and will be uploaded.
 import { IApplication } from "../interfaces/IResponse"
 import {ApplicationTwinProperties} from "./ApplicationTwinProperties"
 import fs from "fs"
-const https = require('https');
 
 const resourceFolder = "./resources/"
 const repositoryURL = "https://"

@@ -5,6 +5,7 @@ import { IMQTTClientStatus } from "../interfaces/IMQTTClientStatus"
 import { IMQTTEventConfig } from "../interfaces/IMQTTEventConfig"
 import { IHeartBeat } from "../interfaces/IHeartBeat"
 import { ApplicationTwin } from "../application/ApplicationTwin"
+import { FirmwareTwin } from "../firmware/FirmwareTwin"
 
 class TwinProperties{
 
@@ -16,7 +17,7 @@ class TwinProperties{
     lastentry:number    // last time the device start connection with the system
     deviceState:DeviceState         // Current known state of the device
     twinState:TwinState
-    firmwareInfo: IFirmwareInfo
+    firmware: FirmwareTwin
     mqttClientStatus:IMQTTClientStatus
     mqttEventConfig:IMQTTEventConfig
     lightStatus:boolean
@@ -33,7 +34,7 @@ class TwinProperties{
         this.deviceState = DeviceState.UNREACHABLE
         this.twinState = TwinState.OUTDATED
         this.lightStatus = {} as boolean
-        this.firmwareInfo = {} as IFirmwareInfo
+        this.firmware = {} as FirmwareTwin
         this.mqttClientStatus = {} as IMQTTClientStatus
         this.mqttEventConfig = {} as IMQTTEventConfig
     }

@@ -1,6 +1,8 @@
 import { Agent } from "../Agent";
 import { ApplicationTwin } from "../application/ApplicationTwin";
-import { Firmware } from "../Firmware";import { Twin } from "../twin/Twin";
+import { FirmwareTwin } from "../firmware/FirmwareTwin";
+import { FirmwareTwinProperties } from "../firmware/FirmwareTwinProperties";
+import { Twin } from "../twin/Twin";
 import { Routine } from "./Routine";
 import { Task } from "./Task";
 
@@ -19,7 +21,6 @@ class RoutineFactory {
                 if(twin.reported.lightStatus !== newValue){
                     const task = this.switchLight(agent, "")
                     routine.addTask(task)
-                    console.log(routine)
                 }
                 break;
 
@@ -27,10 +28,13 @@ class RoutineFactory {
                 routine = RoutineFactory.manageApps(agent, twin, newValue as (ApplicationTwin)[], routine)
                 break;
 
+            case 'firmware':
+                routine = RoutineFactory.manageFirware(agent, twin, newValue as FirmwareTwin, routine)
+                break
+
             default:
                 break;
         }
-
         return routine
     }
     
@@ -80,6 +84,14 @@ class RoutineFactory {
         return routine
     }
 
+    static manageFirware(agent:Agent, twin:Twin, modifiedFirmware:FirmwareTwin, routine:Routine):Routine{
+        if(twin.reported.firmware.reported.activeFirmwareVersion !== modifiedFirmware.desired.activeFirmwareVersion){
+            const task = this.upgradeFirmware(agent, modifiedFirmware.desired, "")
+            routine.addTask(task)
+        }
+        return routine
+    }
+
     static getLightStatus (agent:Agent, date:string){return new Task(agent, agent.getLightStatus, new Array(), date)}
 
     static listApplications (agent:Agent, date:string){return new Task(agent, agent.listApplications, new Array(), date)}
@@ -91,9 +103,9 @@ class RoutineFactory {
     static getFirmwareStatus(agent:Agent, date:string){return new Task(agent, agent.getFirmwareStatus, [], date)}
 
     static reboot(agent:Agent, date:string){return new Task(agent, agent.reboot, [], date)}
-
-    static upgradeFirmware(agent:Agent, date:string){return new Task(agent, agent.upgradeFirmware, [new Firmware("M1065-L_9_80_3_11", "/home/alphagone/Documents/Polytech/2021-2022/Stage/AXIS_Camera/App_dev/M1065-L_9_80_3_11.bin")], date)}
-
+    
+    static upgradeFirmware(agent:Agent, firmwareTwinProperties:FirmwareTwinProperties,date:string){return new Task(agent, agent.upgradeFirmware, [new FirmwareTwin(firmwareTwinProperties)], date)}
+    
     static factoryDefault(agent:Agent, date:string){return new Task(agent, agent.factoryDefault, [], date)}
 
     static rollBack(agent:Agent, date:string){return new Task(agent, agent.rollBack, [], date)}

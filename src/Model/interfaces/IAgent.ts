@@ -1,5 +1,5 @@
 import { ApplicationTwin } from "../application/ApplicationTwin"
-import { Firmware } from "../Firmware"
+import { FirmwareTwin } from "../firmware/FirmwareTwin"
 import { Request } from "../Request"
 import { IResponse } from "./IResponse"
 
@@ -23,7 +23,7 @@ interface IAgent{
 
     getFirmwareStatus():Promise<IResponse | undefined>
 
-    upgradeFirmware(arg:Firmware[]):Promise<IResponse | undefined>
+    upgradeFirmware(arg:FirmwareTwin[]):Promise<IResponse | undefined>
 
     rollBack():Promise<IResponse | undefined>
 

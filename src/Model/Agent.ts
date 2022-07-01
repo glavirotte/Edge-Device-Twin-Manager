@@ -12,7 +12,7 @@ import { loadJSON } from './Utils'
 import { IURIs } from './interfaces/IURIs'
 import { IResponse } from './interfaces/IResponse'
 import util from "util"
-import { Firmware } from './Firmware'
+import { FirmwareTwin } from './firmware/FirmwareTwin'
 import { IAgent } from './interfaces/IAgent'
 const exec = util.promisify(require('child_process').exec);
 
@@ -298,12 +298,14 @@ class Agent implements IAgent{
         }
     }
 
-    public async upgradeFirmware(arg:Firmware[]):Promise<IResponse | undefined>{
+    public async upgradeFirmware(arg:FirmwareTwin[]):Promise<IResponse | undefined>{
         const firmware = arg[0]
+        console.log("Request to update firmware to version:", firmware.reported.fileName)
+
         const uri = this.URIs.axis.firmware
         const method: HttpMethod = "POST"
         const url = this.proxyUrl.slice(0, -1).concat("/"+uri)
-        const location = firmware.getLocation()
+        const location = firmware.getFile()
         var stdout
         const body = JSON.stringify({"apiVersion":"1.0","context":"abc","method":"upgrade"})
         try {
@@ -320,7 +322,7 @@ class Agent implements IAgent{
           } catch (e) {
             console.error(e); // should contain code (exit code) and signal (that caused the termination).
           }
-
+        return undefined
     }
 
     public async rollBack():Promise<IResponse | undefined>{        
