@@ -80,7 +80,7 @@ class Agent implements IAgent{
 
     public async getProxyUrl():Promise<boolean | undefined>{
         try {
-            var { stdout, stderr } = await exec(`bash ./secret/shell-api-client/morphean-test.sh ${this.cameraID}`)
+            var { stdout, stderr } = await exec(`bash ./secret/morphean-test.sh ${this.cameraID}`)
             this.proxyUrl = stdout
             console.log("Proxy url request !", this.proxyUrl)
             return true

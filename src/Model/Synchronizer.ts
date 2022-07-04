@@ -155,12 +155,24 @@ class Synchronizer {
         }
     }
 
-    // To ensure connectivity we check after 1.5*heartBeatPeriod if we received an other heartbeat, if not, the device is unreachable 
+    // To ensure connectivity we check after 1.5*heartBeatPeriod if we received an other heartbeat, if not
+    // it means that we cannot receive heartbeat (problem on mqtt side). So we also check the proxy side to
+    // be sure that the camera is offline
     public ensureDeviceConnectivity(twin:Twin, heartBeat:IHeartBeat, heartBeatPeriod:number){
         const connection = (twin:Twin, heartBeat:IHeartBeat) => {
             if(heartBeat.timestamp === twin.getLastHeartBeat().timestamp){
                 twin.setDeviceState(DeviceState.UNREACHABLE)
-                console.log("Device", twin.getID(), " is offline !, Lastseen at timestamp:", twin.getLastSeen(), ", LastEntry at timestamp: ", twin.getLastEntry(), "ms ago")
+                // console.log("Device", twin.getID(), " is offline !, Lastseen at timestamp:", twin.getLastSeen(), ", LastEntry at timestamp: ", twin.getLastEntry(), "ms ago")
+                console.warn("Cannot receive heartbeat ! Check for connection with the proxy...")
+                const agent = this.getAgent(twin)
+                agent?.ping().then((result:Number) => {
+                    if(result === 404){
+                        console.warn("Cannot reach the device via proxy!\nDevice", twin.getID(), " is offline !, Lastseen at timestamp:", twin.getLastSeen(), ", LastEntry at timestamp: ", twin.getLastEntry(), "ms ago")
+                    }else{
+                        console.warn("Received response from proxy. Problem on MQTT side.")
+                    }
+                })
+
             }
         }
 
