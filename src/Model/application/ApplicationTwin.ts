@@ -33,7 +33,7 @@ class ApplicationTwin{
 
     private async download(url:string, fileName:string|undefined){  
             const res = await fetch(url);
-            fs.writeFileSync(resourceFolder+fileName, res.body.toString());
+            fs.writeFileSync(resourceFolder+fileName, res.body!.toString());
             return true
     }
 /*------------------ Getters & Setters ------------------------ */

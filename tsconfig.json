@@ -5,6 +5,7 @@
         "resolveJsonModule":true,
         "noImplicitAny": true,
         "skipLibCheck": true,
+        "lib": ["DOM"],
     },
     
     "include": ["src"],
