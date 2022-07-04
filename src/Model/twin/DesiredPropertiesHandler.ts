@@ -1,3 +1,6 @@
+import { time } from "console"
+import {toTimestamp} from "../Utils"
+
 interface IConfigurableProperties{
     list:(string)[]
 }
@@ -7,7 +10,8 @@ const twinConfigurableProperties = {
         "lightStatus",
         "mqttClientStatus",
         "mqttEventConfig",
-        "firmware"
+        "firmware",
+        "effectivityDate"
     ]
 }
 
@@ -32,9 +36,18 @@ class TwinPropertiesHandler{
     }
 
     set(target:any, property:string, value:any) {
-        // console.log("Setting property:", property,"of target:", target, "to:", value)
+        let dateHasChanged = false
+        if(property === "effectivityDate"){
+            const timestamp = value === "" ? 1 : toTimestamp(value)
+            if(timestamp !== 0){    // Check if the date entered by the user follows the right format
+                target[property] = value
+                dateHasChanged = true
+            }else{
+               console.log("Try to change a date to an incorrect format ! Right format: 'MM/DD/YYYY hh:mm:ss'")
+            }
+        }
         this.twinConfigurableProperties.list.forEach(prop => {
-            if(property === prop){
+            if(property === prop && !dateHasChanged){
                 target[property] = value;
                 this.synchronizerCallback(this.getTwinReference, property, value)
             }

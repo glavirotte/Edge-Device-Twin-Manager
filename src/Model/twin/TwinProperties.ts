@@ -22,6 +22,7 @@ class TwinProperties{
     mqttEventConfig:IMQTTEventConfig
     lightStatus:boolean
     heartBeat: IHeartBeat
+    effectivityDate:string
 
     public constructor(id:string){
         this.id = id
@@ -37,6 +38,7 @@ class TwinProperties{
         this.firmware = {} as FirmwareTwin
         this.mqttClientStatus = {} as IMQTTClientStatus
         this.mqttEventConfig = {} as IMQTTEventConfig
+        this.effectivityDate = ""
     }
     
 }

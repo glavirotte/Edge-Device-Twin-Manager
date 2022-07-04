@@ -19,8 +19,8 @@ class Routine {
     }
 
     public addTask(task:Task){
-        this.tasks.push(task)
         task.setDate(this.date) // Every task are performed at the date of the routine
+        this.tasks.push(task)
     }
 
     public destruct(){
@@ -34,6 +34,12 @@ class Routine {
 /*------------------ Getters & Setters ------------------------ */
     public getResultTaskMap(){
         return this.resultTaskMap
+    }
+    public getDate(){
+        return this.date
+    }
+    public getTimestamp(){
+        return this.executionTimestamp
     }
     public setDate(date:string){
         this.date = date

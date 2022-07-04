@@ -15,7 +15,7 @@ class RoutineFactory {
     static generateRoutine(agent:Agent, twin:Twin, modifiedTwinProperty:string, newValue:any):Routine{  
         // console.log("Modification of property", modifiedTwinProperty, "on twin:", twin.getID())
 
-        var routine:Routine = new Routine("")
+        var routine:Routine = new Routine(twin.desired.effectivityDate)
         switch (modifiedTwinProperty) {
             case 'lightStatus':
                 if(twin.reported.lightStatus !== newValue){
@@ -30,14 +30,14 @@ class RoutineFactory {
 
             case 'firmware':
                 routine = RoutineFactory.manageFirware(agent, twin, newValue as FirmwareTwin, routine)
-                break
+                break;
 
             default:
                 break;
         }
         return routine
     }
-    
+
     static manageApps(agent:Agent, twin:Twin, modifiedApplications:(ApplicationTwin)[], routine:Routine):Routine{   // Not tested
 
         for (const modifiedApp of modifiedApplications){
@@ -45,9 +45,9 @@ class RoutineFactory {
                 const registeredApp = twin.getAppTwin(modifiedApp.reported.Name) as ApplicationTwin
                 const desiredStatus = modifiedApp.desired.Status
                 const effectiveStatus = registeredApp.reported.Status
-    
+
                 let action = ""
-                
+
                 if( desiredStatus !== effectiveStatus ){
                     if(desiredStatus === "Running"){
                         action = "start"
@@ -56,13 +56,11 @@ class RoutineFactory {
                     }
                     if(action !== ""){
                         routine.addTask(this.controlApplication(agent, registeredApp, action, ""))
-    
                     }else{
                         throw new Error("Incorrect Status was entered ! " + desiredStatus)
                     }
                 }
             }else{
-                console.log('new App:', modifiedApp)
                 routine.addTask(this.installApplication(agent, new ApplicationTwin(modifiedApp.desired), ""))
             }
         }

@@ -7,7 +7,6 @@ const cors = require("cors")
 
 interface Body {
     twin:string
-    date:string
 }
 
 interface IDiff{
@@ -55,8 +54,9 @@ class Server {
         this.app.post('/devices/'+id+'/desired', (req: Request, res: Response) => {
             const body:Body = req.body
             const desiredTwin = body.twin as unknown as TwinProperties
-            const desiredDate = body.date as unknown as string
-            
+
+            twin.desired.effectivityDate = desiredTwin.effectivityDate  // Set the effectivity date before the other props to use it
+
             Object.assign(twin.desired, desiredTwin)
             res.status(200).send()
         });

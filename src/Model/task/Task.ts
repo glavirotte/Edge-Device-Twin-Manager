@@ -42,7 +42,7 @@ class Task{
         this.state = TaskState.EXECUTING
         const timeToWait = this.computeTimeToWait()
         if(timeToWait > 0){     // If the task has to before executing
-            console.log("Waiting for ", timeToWait, "s ...")
+            console.log("Task will be performed in", timeToWait, "s")
             this.state = TaskState.SLEEPING
             await sleep(Number(timeToWait))
             this.state = TaskState.EXECUTING
@@ -71,6 +71,7 @@ class Task{
     }
     public setDate(date:string){
         this.date = date
+        this.executionTimestamp = toTimestamp(date)
     }
 
 /*------------------ Utils ------------------------ */
