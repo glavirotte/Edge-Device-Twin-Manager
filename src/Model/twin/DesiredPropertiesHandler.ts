@@ -38,7 +38,7 @@ class TwinPropertiesHandler{
     set(target:any, property:string, value:any) {
         let dateHasChanged = false
         if(property === "effectivityDate"){
-            const timestamp = value === "" ? 1 : toTimestamp(value)
+            const timestamp = value === '' ? 1 : toTimestamp(value)
             if(timestamp !== 0){    // Check if the date entered by the user follows the right format
                 target[property] = value
                 dateHasChanged = true

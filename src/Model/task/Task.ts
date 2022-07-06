@@ -36,7 +36,6 @@ class Task{
         }
         async function sleep(s:number) {
             await timeout(s);
-            console.log("Finished waiting !")
         }
 
         this.state = TaskState.EXECUTING

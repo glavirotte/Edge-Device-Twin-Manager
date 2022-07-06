@@ -7,19 +7,13 @@ const cors = require("cors")
 
 interface Body {
     twin:string
-}
-
-interface IDiff{
-    added:TwinProperties
-    deleted:TwinProperties
-    updated:TwinProperties
-}
+}dated:TwinProperties
 
 class Server {
     
     private app:Express
     private port:Number
-    private twins:Twin[]
+    private twins:Object[]
 
     constructor(port:Number){
         this.port = port
@@ -45,7 +39,11 @@ class Server {
 
     public addTwin(twin:Twin){
         var id = twin.getSerialNumber()
-        this.twins.push(twin)
+        this.twins.push({"id":twin.reported.id, "serial":twin.reported.serialNumber})
+        this.app.get('/devices', (req:Request, res:Response) => {
+            const devices = this.twins
+            res.json(devices)
+        })
         this.app.get('/devices/'+id, (req: Request, res: Response) => {
             const dataToSend = twin.reported
             res.json(dataToSend);
@@ -54,7 +52,6 @@ class Server {
         this.app.post('/devices/'+id+'/desired', (req: Request, res: Response) => {
             const body:Body = req.body
             const desiredTwin = body.twin as unknown as TwinProperties
-
             twin.desired.effectivityDate = desiredTwin.effectivityDate  // Set the effectivity date before the other props to use it
 
             Object.assign(twin.desired, desiredTwin)

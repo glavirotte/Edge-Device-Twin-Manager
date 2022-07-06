@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsc && node dist/Model/main.js",
-    "client": "cd src/WebApp/dashboard/ && npm start"
+    "client": "cd src/Client && npm run dev"
   },
   "keywords": [],
   "author": "",
