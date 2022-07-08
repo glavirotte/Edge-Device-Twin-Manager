@@ -4,10 +4,10 @@ the React Application
 #########################################################*/
 
 import { Synchronizer } from './Synchronizer'
-import { Twin } from './twin/Twin'
 import { Server } from './user_interface/Server'
 import {MQTTClient} from "./MQTTClient"
 import { exit } from 'process'
+import { MongoAgent } from './database/MongoAgent'
 
 const tellucareMqttBroker = "wss://tellucare-mqtt-dev.tellucloud.com/mqtt"
 

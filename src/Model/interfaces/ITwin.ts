@@ -1,3 +1,4 @@
+import { TwinProperties } from "../twin/TwinProperties"
 import { ApplicationEntity, IResponse } from "./IResponse"
 
 enum DeviceState {
@@ -11,6 +12,10 @@ enum TwinState {
 }
 
 interface ITwin {
+    reported:TwinProperties
+
+    desired:TwinProperties
+    
     updateState(response: IResponse):void
 
     getApplications():(ApplicationEntity)[] | null
@@ -36,7 +41,6 @@ interface ITwin {
     setLightStatus(newLightStatus:boolean):void
 
     switchLight():void
-
 }
 
 export { ITwin, DeviceState, TwinState}
