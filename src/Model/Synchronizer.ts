@@ -35,6 +35,9 @@ class Synchronizer {
 
     // Creates a twin, setup it and returns a twin proxy for the user to be able to interract with it
     public async createTwin(cameraID:string):Promise<Twin>{
+        if(this.isDeviceAlreadyStored(cameraID)){
+            throw new Error("Device "+cameraID+" already stored !")
+        }
         const deviceTwin = new Twin(cameraID, this.handleTwinModification.bind(this))
         const agent = new Agent(cameraID)
         this.agents.set(agent, deviceTwin)
@@ -42,7 +45,6 @@ class Synchronizer {
         // Getting the proxy url
 
         const proxyUrlResult:boolean| undefined = await agent.getProxyUrl()
-
         if(proxyUrlResult === true){
             await this.initialSynchronization(agent, deviceTwin)
         }else{
@@ -262,6 +264,14 @@ class Synchronizer {
     } 
     public getTaskManager(twin:Twin){
         return this.taskManagers.get(twin)
+    }
+    public isDeviceAlreadyStored(newTwinId:string):boolean{
+        for (const pair of this.twins) {
+            if(pair[1].reported.id === newTwinId){
+                return true
+            }
+        }
+        return false
     }
 }
 
