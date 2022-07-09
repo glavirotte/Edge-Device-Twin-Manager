@@ -32,7 +32,7 @@ class Twin{
     }
 
     // Update the state of the Twin by storing values from last request
-    updateState(response: IResponse | undefined , heartBeat:IHeartBeat | undefined){
+    public updateState(response: IResponse | undefined , heartBeat:IHeartBeat | undefined){
         try {
             if(response !== undefined){     // Synchronization with device properties
                 if(response?.data?.propertyList !== undefined){

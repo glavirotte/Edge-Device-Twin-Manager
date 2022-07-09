@@ -14,6 +14,7 @@ import { FirmwareTwin } from "./firmware/FirmwareTwin"
 import { ApplicationTwin } from "./application/ApplicationTwin"
 import { IHeartBeat } from "./interfaces/IHeartBeat"
 import { RoutineFactory } from "./task/RoutineFactory"
+import { MongoAgent } from "./database/MongoAgent"
 
 const HEART_BEAT_PERIOD = 60000
 
@@ -24,13 +25,15 @@ class Synchronizer {
     private proxies:Map<any, Twin>
     private taskManagers:Map<Twin, TaskManager>
     private subToMQTTTopic:Function
+    private mongoAgent:MongoAgent
 
-    public constructor(){
+    public constructor(mongoAgent:MongoAgent){
         this.agents = new Map()
         this.twins = new Map()
         this.proxies = new Map()
         this.taskManagers = new Map()
         this.subToMQTTTopic = {} as Function
+        this.mongoAgent = mongoAgent
     }
 
     // Creates a twin, setup it and returns a twin proxy for the user to be able to interract with it
@@ -47,10 +50,11 @@ class Synchronizer {
         const proxyUrlResult:boolean| undefined = await agent.getProxyUrl()
         if(proxyUrlResult === true){
             await this.initialSynchronization(agent, deviceTwin)
+            
         }else{
             console.log("Twin for device:", cameraID, "created but not setup. Device unreachable !")
         }
-
+        this.mongoAgent.insert(deviceTwin, "Twins") // Store twin in database
         return deviceTwin
     }
 
@@ -107,6 +111,7 @@ class Synchronizer {
     public handleHeartBeat(twin:Twin, heartbeat:IHeartBeat){
         if(heartbeat !== undefined){
             twin.updateState(undefined, heartbeat)
+            // this.mongoAgent.update(twin, "Twins")
         }else{
             throw new Error("HeartBeat is undefined ! Cannot synchronize with device")
         }

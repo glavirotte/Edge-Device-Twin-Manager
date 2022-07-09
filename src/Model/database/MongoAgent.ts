@@ -22,22 +22,21 @@ class MongoAgent{
         this.db.command({ ping: 1 }).then(() => console.log("Connected to database:",this.databaseName,"and collection:",this.databaseName, "!")); //ping Table
     }
 
-    public async find(obj:Object, collectionName:string):Promise<ITwin>{
+    public async find(obj:Object, collectionName:string):Promise<ITwin[]>{
         const collection:Collection<Twin> = this.db.collection(collectionName)
         const twins:ITwin[] = await collection.find(obj).toArray() as unknown as ITwin[]
         console.log("Result:", twins);
-        return twins[0]
+        return twins //TODO: control response !
     }
     public async insert(twin:Twin, collectionName:string){
         const collection:Collection<Twin> = this.db.collection(collectionName)
-        collection.insertOne(twin)
+        collection.insertOne(twin)  //TODO: control response !
     }
 
-    public async update(obj:Object, collectionName:string){
-        // const collection:Collection<Twin> = this.db.collection(collectionName)
-        // const twins:ITwin[] = await collection.find(obj).toArray() as unknown as ITwin[]
-        // console.log("Result:", twins);
-        // return twins[0]
+    public async update(twin:Twin, collectionName:string){
+        let query = {id: twin.reported.id}
+        const collection:Collection<Twin> = this.db.collection(collectionName)
+        collection.updateOne(query, { $set: twin })  //TODO: control response !
     }
 }
 

@@ -18,7 +18,10 @@ if(process.argv.length < 4){
 const mqttClientUsername = process.argv[2]
 const mqttClientPassword = process.argv[3]
 
-const synchronizer = new Synchronizer()
+const mongoAgent = new MongoAgent("Manager", "3dGeD3v1CE7w", "Twins")
+
+const synchronizer = new Synchronizer(mongoAgent)
+
 const server = new Server(8000, synchronizer)
 
 const mqttClient = new MQTTClient(synchronizer, tellucareMqttBroker, {
