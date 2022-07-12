@@ -15,7 +15,6 @@ import { ApplicationTwin } from "./application/ApplicationTwin"
 import { IHeartBeat } from "./interfaces/IHeartBeat"
 import { RoutineFactory } from "./task/RoutineFactory"
 import { MongoAgent } from "./database/MongoAgent"
-
 const HEART_BEAT_PERIOD = 60000
 
 class Synchronizer {
@@ -34,6 +33,17 @@ class Synchronizer {
         this.taskManagers = new Map()
         this.subToMQTTTopic = {} as Function
         this.mongoAgent = mongoAgent
+        this.initSynchronizer()
+    }
+
+    private async initSynchronizer() {  // Restoring twins from database
+        console.log("Restoring twins from database...")
+        const storedTwinsID:Array<Twin> = await this.mongoAgent.find({}, {projection:{_id:0, reported:{id:1}}}, "Twins")
+        this.mongoAgent.setStoredTwins(storedTwinsID)
+        for (const result of storedTwinsID) {
+            this.createTwin(result.reported.id)
+        }
+
     }
 
     // Creates a twin, setup it and returns a twin proxy for the user to be able to interract with it
@@ -54,7 +64,9 @@ class Synchronizer {
         }else{
             console.log("Twin for device:", cameraID, "created but not setup. Device unreachable !")
         }
-        this.mongoAgent.insert(deviceTwin, "Twins") // Store twin in database
+
+        // Insert the new twin in the database or update it if already stored
+        this.mongoAgent.insert(deviceTwin, "Twins") 
         return deviceTwin
     }
 
@@ -64,7 +76,7 @@ class Synchronizer {
         this.taskManagers.set(deviceTwin, taskManager)
 
         var date = ""
-        date = "06/08/2022 15:17:00"    //@TODO Just for testing
+        date = "07/11/2022 15:17:00"    //@TODO Just for testing
 
         const getDeviceInfo = new Task(agent, agent.getDeviceInfo, new Array(), date)
         await taskManager.registerTask(getDeviceInfo, this.handleResponse)
@@ -111,7 +123,6 @@ class Synchronizer {
     public handleHeartBeat(twin:Twin, heartbeat:IHeartBeat){
         if(heartbeat !== undefined){
             twin.updateState(undefined, heartbeat)
-            // this.mongoAgent.update(twin, "Twins")
         }else{
             throw new Error("HeartBeat is undefined ! Cannot synchronize with device")
         }
@@ -143,6 +154,7 @@ class Synchronizer {
             console.log(twin.getID() + " is connected ! Lastseen:", timestamp - twin.getLastSeen(), "ms ago", ", LastEntry: ", timestamp - twin.getLastEntry(), "ms ago")
             twin.setLastSeen(timestamp)     // Update last seen with current timestamp
             twin.updateState(undefined, heartBeat)
+            this.mongoAgent.update(twin, "Twins")
 
             if(timestamp - twin.getLastSeen() > timeout || twin.getDeviceState() === DeviceState.UNREACHABLE){  // If device was disconnected and is online again
                 twin.setLastEntry(timestamp)    // Update last entry with current timestamp
@@ -155,6 +167,7 @@ class Synchronizer {
                 responses.forEach(response => {
                     if(response !== undefined){
                         twin.updateState(response, undefined)
+                        this.mongoAgent.update(twin, "Twins")
                     }
                 });
             }

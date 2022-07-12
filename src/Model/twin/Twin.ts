@@ -18,7 +18,7 @@ import { FirmwareTwin } from "../firmware/FirmwareTwin"
 import { FirmwareTwinProperties } from "../firmware/FirmwareTwinProperties"
 
 class Twin{
-    
+    public _id?:string
     public reported:TwinProperties
     public desired:TwinProperties
     private synchronizerCallback:Function
