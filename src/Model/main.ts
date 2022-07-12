@@ -18,7 +18,7 @@ if(process.argv.length < 4){
 const mqttClientUsername = process.argv[2]
 const mqttClientPassword = process.argv[3]
 
-const mongoAgent = new MongoAgent("Manager", "3dGeD3v1CE7w", "Twins")
+const mongoAgent = new MongoAgent("", "", "Twins")
 
 const synchronizer = new Synchronizer(mongoAgent)
 
