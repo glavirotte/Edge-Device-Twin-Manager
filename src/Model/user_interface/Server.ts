@@ -17,9 +17,9 @@ class Server {
     private twins:Object[]
 
     constructor(port:Number, synchronizer:Synchronizer){
+        this.twins = new Array()
         this.port = port
         this.synchronizer = synchronizer
-        this.twins = new Array<Twin>()
         dotenv.config();
         this.app = express();
         this.app.use(express.json());
@@ -32,6 +32,9 @@ class Server {
             res.send("<h1>You are on the root of the server !</h1>")
         })
         this.app.get("/devices",(req:Request, res:Response) => {
+            this.synchronizer.getTwins().forEach((twin:Twin) => {
+                this.addTwin(twin)
+            })
             res.json(this.twins)
         })
         this.app.post("/register", async (req:Request, res:Response) =>{

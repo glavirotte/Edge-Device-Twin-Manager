@@ -256,6 +256,14 @@ class Synchronizer {
         this.subToMQTTTopic = subscribtionFunction
     }
 
+    public getTwins(){
+        const twins = new Array<Twin>()
+        this.twins.forEach((twin:Twin, serialNumber:string) => {
+            twins.push(twin)
+        })
+        return twins
+    }
+
     public getAgent(deviceTwin:Twin):Agent | undefined{
         for (let [agent, twin] of this.agents) {
             if(twin === deviceTwin){
