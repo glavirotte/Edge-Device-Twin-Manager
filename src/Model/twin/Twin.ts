@@ -115,7 +115,6 @@ class Twin{
                 }
                 
             }
-            this.storeTwinObject()
         } catch (error) {
             console.log(error)
         }
