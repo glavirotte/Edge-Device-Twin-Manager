@@ -2,6 +2,7 @@ import { Agent } from "../Agent";
 import { ApplicationTwin } from "../application/ApplicationTwin";
 import { FirmwareTwin } from "../firmware/FirmwareTwin";
 import { FirmwareTwinProperties } from "../firmware/FirmwareTwinProperties";
+import { IMQTTClientStatus } from "../interfaces/IMQTTClientStatus";
 import { Twin } from "../twin/Twin";
 import { Routine } from "./Routine";
 import { Task } from "./Task";
@@ -30,6 +31,13 @@ class RoutineFactory {
 
             case 'firmware':
                 routine = RoutineFactory.manageFirware(agent, twin, newValue as FirmwareTwin, routine)
+                break;
+            
+            case 'mqttClientStatus':
+                routine = RoutineFactory.manageMQTTClientStatus(agent, twin, newValue as IMQTTClientStatus, routine)
+                break;
+            
+            case 'mqttEventConfig':
                 break;
 
             default:
@@ -90,6 +98,22 @@ class RoutineFactory {
         return routine
     }
 
+    static manageMQTTClientStatus(agent:Agent, twin:Twin, modifiedMQTTClientStatus:IMQTTClientStatus, routine:Routine):Routine{
+        if(modifiedMQTTClientStatus.config.password.includes("*****")){
+            throw new Error("You need to enter the mqtt client password to update mqtt config or status!")
+        }
+        if(twin.reported.mqttClientStatus !== modifiedMQTTClientStatus){
+            if(twin.reported.mqttClientStatus.status !== modifiedMQTTClientStatus.status && modifiedMQTTClientStatus.status.state === "active"){
+                routine.addTask(this.activateMqttClient(agent, ""))
+            }else if(twin.reported.mqttClientStatus.status !== modifiedMQTTClientStatus.status &&modifiedMQTTClientStatus.status.state === "inactive"){
+                routine.addTask(this.deactivateMqttClient(agent, ""))
+            }
+            const task = this.configureMqttClient(agent, twin, modifiedMQTTClientStatus, "")
+            routine.addTask(task)
+        }
+        return routine
+    }
+
     static getLightStatus (agent:Agent, date:string){return new Task(agent, agent.getLightStatus, new Array(), date)}
 
     static listApplications (agent:Agent, date:string){return new Task(agent, agent.listApplications, new Array(), date)}
@@ -110,7 +134,7 @@ class RoutineFactory {
 
     static getMqttStatus(agent:Agent, date:string){return new Task(agent, agent.getMqttClientStatus, new Array(), date)}
 
-    static configureMqttClient(agent:Agent, twin:Twin, date:string){return new Task(agent, agent.configureMqttClient, [twin.getSerialNumber(), "", ""], date)}
+    static configureMqttClient(agent:Agent, twin:Twin, mqttClientStatus:IMQTTClientStatus, date:string){return new Task(agent, agent.configureMqttClient, [twin.getSerialNumber(), mqttClientStatus], date)}
 
     static configureMqttEvent(agent:Agent, twin:Twin, date:string){return new Task(agent, agent.configureMqttEvent, [twin.getSerialNumber(), [{"topicFilter": "Monitoring/HeartBeat","qos": 1,"retain": "all"}]], date)}
     
@@ -118,5 +142,9 @@ class RoutineFactory {
 
     static switchLight(agent:Agent, date:string){return new Task(agent, agent.switchLight, [], date)}
 
+    static activateMqttClient(agent:Agent, date:string){return new Task(agent, agent.activateMqttClient, [], date)}
+
+    static deactivateMqttClient(agent:Agent, date:string){return new Task(agent, agent.deactivateMqttClient, [], date)}
 }
+
 export { RoutineFactory }

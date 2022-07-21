@@ -2,7 +2,7 @@ import { Task } from "./Task"
 
 class TaskQueue {
 
-    private queue:Array<Task>
+    public queue:Array<Task>
 
     constructor(){
         this.queue = new Array()

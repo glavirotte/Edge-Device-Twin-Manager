@@ -14,6 +14,7 @@ import { IResponse } from './interfaces/IResponse'
 import util from "util"
 import { FirmwareTwin } from './firmware/FirmwareTwin'
 import { IAgent } from './interfaces/IAgent'
+import { IMQTTClientStatus } from './interfaces/IMQTTClientStatus'
 const exec = util.promisify(require('child_process').exec);
 
 
@@ -431,6 +432,7 @@ class Agent implements IAgent{
 
         const response:IResponse | undefined = await this.getMqttClientStatus()
         if(response !== undefined){
+            console.log("MQTT client activated!")
             return response
         }else{
             return undefined
@@ -456,64 +458,71 @@ class Agent implements IAgent{
 
         const response:IResponse | undefined = await this.getMqttClientStatus()
         if(response !== undefined){
+            console.log("MQTT client deactivated!")
             return response
         }else{
             return undefined
         }
     }
 
-    public async configureMqttClient(arg:string[]):Promise<IResponse | undefined>{
-        const deviceSerial = arg[0]
-        const mqttUsername = arg[1]
-        const mqttPassword = arg[2]
+    public async configureMqttClient(arg:Object[]):Promise<IResponse | undefined>{
+        if(arg.length != 2){throw new Error("configureMQTTCLient() requires 4 arguments!")}
+        const deviceSerial = arg[0] as string
+        const mqttConfig = arg[1] as IMQTTClientStatus
 
         const uri = this.URIs.axis.mqtt.client
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
         const args:Map<string, string> = new Map()
+        mqttConfig.config.lastWillTestament.topic = "AXIS/"+deviceSerial+"/ConnectionStatus"
+        // const body = {
+        //     "apiVersion": "1.0",
+        //     "method": "configureClient",
+        //     "params": {
+        //       "server": {
+        //         "protocol": "wss",
+        //         "host": "tellucare-mqtt-dev.tellucloud.com",
+        //         "port": 443,
+        //         "basepath": "/mqtt"
+        //       },
+        //       "username": mqttUsername,
+        //       "password": mqttPassword,
+        //       "clientId": "fleet",
+        //       "keepAliveInterval": 20,
+        //       "connectTimeout": 30,
+        //       "cleanSession": true,
+        //       "autoReconnect": true,
+        //       "lastWillTestament": {
+        //         "useDefault": false,
+        //         "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+        //         "message": "Connection Lost",
+        //         "retain": true,
+        //         "qos": 1
+        //       },
+        //       "connectMessage": {
+        //         "useDefault": false,
+        //         "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+        //         "message": "Connected",
+        //         "retain": true,
+        //         "qos": 1
+        //       },
+        //       "disconnectMessage": {
+        //         "useDefault": false,
+        //         "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
+        //         "message": "Disconnected",
+        //         "retain": true,
+        //         "qos": 1
+        //       },
+        //       "ssl": {
+        //         "validateServerCert": true
+        //       }
+        //     }
+        // }  
         const body = {
             "apiVersion": "1.0",
             "method": "configureClient",
-            "params": {
-              "server": {
-                "protocol": "wss",
-                "host": "tellucare-mqtt-dev.tellucloud.com",
-                "port": 443,
-                "basepath": "/mqtt"
-              },
-              "username": mqttUsername,
-              "password": mqttPassword,
-              "clientId": "fleet",
-              "keepAliveInterval": 20,
-              "connectTimeout": 30,
-              "cleanSession": true,
-              "autoReconnect": true,
-              "lastWillTestament": {
-                "useDefault": false,
-                "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
-                "message": "Connection Lost",
-                "retain": true,
-                "qos": 1
-              },
-              "connectMessage": {
-                "useDefault": false,
-                "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
-                "message": "Connected",
-                "retain": true,
-                "qos": 1
-              },
-              "disconnectMessage": {
-                "useDefault": false,
-                "topic": "AXIS/"+deviceSerial+"/ConnectionStatus",
-                "message": "Disconnected",
-                "retain": true,
-                "qos": 1
-              },
-              "ssl": {
-                "validateServerCert": true
-              }
-            }
-          }  
+            "params":mqttConfig.config
+        }
         const options:urllib.RequestOptions = {
             headers:{
                 "content-type": "application/json"

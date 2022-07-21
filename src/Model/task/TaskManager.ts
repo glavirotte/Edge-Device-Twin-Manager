@@ -1,4 +1,3 @@
-import { addListener } from "process"
 import { IResponse } from "../interfaces/IResponse"
 import { Routine } from "./Routine"
 import { Task, TaskState } from "./Task"
@@ -77,5 +76,12 @@ class TaskManager{
         return responses
     }
 
+    public getWaitingQueue():TaskQueue{
+        return this.waitingQueue
+    }
+    public getTaskList():Array<Task>{
+        return this.taskList
+    }
 }
+
 export { TaskManager }
