@@ -99,13 +99,13 @@ class RoutineFactory {
     }
 
     static manageMQTTClientStatus(agent:Agent, twin:Twin, modifiedMQTTClientStatus:IMQTTClientStatus, routine:Routine):Routine{
-        if(modifiedMQTTClientStatus.config.password.includes("*****")){
-            throw new Error("You need to enter the mqtt client password to update mqtt config or status!")
-        }
-        if(twin.reported.mqttClientStatus !== modifiedMQTTClientStatus){
-            if(twin.reported.mqttClientStatus.status !== modifiedMQTTClientStatus.status && modifiedMQTTClientStatus.status.state === "active"){
+        if(JSON.stringify(twin.reported.mqttClientStatus) !== JSON.stringify(modifiedMQTTClientStatus)){
+            if(modifiedMQTTClientStatus.config.password.includes("*****")){
+                throw new Error("You need to enter the mqtt client password to update mqtt config or status!")
+            }
+            if(twin.reported.mqttClientStatus.status.state !== modifiedMQTTClientStatus.status.state && modifiedMQTTClientStatus.status.state === "active"){
                 routine.addTask(this.activateMqttClient(agent, ""))
-            }else if(twin.reported.mqttClientStatus.status !== modifiedMQTTClientStatus.status &&modifiedMQTTClientStatus.status.state === "inactive"){
+            }else if(twin.reported.mqttClientStatus.status.state !== modifiedMQTTClientStatus.status.state && modifiedMQTTClientStatus.status.state === "inactive"){
                 routine.addTask(this.deactivateMqttClient(agent, ""))
             }
             const task = this.configureMqttClient(agent, twin, modifiedMQTTClientStatus, "")

@@ -96,7 +96,7 @@ class Synchronizer {
         // const rollBack = new Task(agent, agent.rollBack, [], date)
         const getMqttStatus = new Task(agent, agent.getMqttClientStatus, new Array(), date)
         // const configureMqttClient = new Task(agent, agent.configureMqttClient, [deviceTwin.getSerialNumber(), {}], date)
-        const activateClient = new Task(agent, agent.activateMqttClient, [], date)
+        // const activateClient = new Task(agent, agent.activateMqttClient, [], date)
         // const configureMqttEvent = new Task(agent, agent.configureMqttEvent, [deviceTwin.getSerialNumber(), [{"topicFilter": "Monitoring/HeartBeat","qos": 1,"retain": "all"}]], date)
         // const getMqttEventConfiguration = new Task(agent, agent.getMqttEventConfiguration, [], date)
 

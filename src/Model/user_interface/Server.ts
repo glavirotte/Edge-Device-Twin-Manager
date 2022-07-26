@@ -66,7 +66,7 @@ class Server {
             const dataToSend = twin.reported
             res.json(dataToSend);
         });
-        this.app.get('/devices/'+id+'/tasks', (req:Request, res:Response) => {
+        this.app.get('/devices/'+id+'/tasks', (req:Request, res:Response) => {  // To get the list of tasks of a certain device
             const taskManager = this.synchronizer.getTaskManager(twin)
             const obj = {
                 taskList:taskManager?.getTaskList(),

@@ -369,6 +369,7 @@ class Agent implements IAgent{
     }
 
     public async reboot():Promise<IResponse | undefined>{
+        console.log("Rebooting camera")
         const uri = this.URIs.axis.firmware
         const method: HttpMethod = 'POST'
         const url = `${this.proxyUrl}${uri}`
